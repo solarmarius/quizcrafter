@@ -203,6 +203,7 @@ async def create_question(
                 quiz_id=quiz_id,
                 question_type=question_request.question_type,
                 questions_data=[question_data_with_metadata],
+                module_id=None,  # Manual questions don't have a source module
             )
 
         if result["saved_count"] == 0:

@@ -130,6 +130,12 @@ class Question(SQLModel, table=True):
     quiz_id: uuid.UUID = Field(foreign_key="quiz.id", nullable=False, index=True)
     quiz: "Quiz" = Relationship(back_populates="questions")
 
+    # Source module tracking
+    module_id: str | None = Field(
+        default=None,
+        description="ID of the Canvas/manual module this question was generated from",
+    )
+
     # Question type discrimination
     question_type: QuestionType = Field(index=True, description="Type of question")
 
