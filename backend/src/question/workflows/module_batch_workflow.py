@@ -309,6 +309,7 @@ class ModuleBatchWorkflow:
                         question_data=validated_data.model_dump(),
                         difficulty=state.difficulty,
                         is_approved=False,
+                        module_id=state.module_id,
                     )
                     state.generated_questions.append(question)
 

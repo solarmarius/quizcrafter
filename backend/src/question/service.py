@@ -25,6 +25,7 @@ async def save_questions(
     quiz_id: UUID,
     question_type: QuestionType,
     questions_data: list[dict[str, Any]],
+    module_id: str | None = None,
 ) -> dict[str, Any]:
     """
     Save a batch of questions to the database.
@@ -34,6 +35,7 @@ async def save_questions(
         quiz_id: Quiz identifier
         question_type: Type of questions being saved
         questions_data: List of question data dictionaries
+        module_id: Optional module ID for tracking question source
 
     Returns:
         Dictionary with save results
@@ -78,6 +80,7 @@ async def save_questions(
                 difficulty=difficulty,
                 tags=tags,
                 is_approved=False,
+                module_id=module_id,
             )
 
             session.add(question)
