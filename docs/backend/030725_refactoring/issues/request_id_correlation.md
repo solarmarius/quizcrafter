@@ -307,7 +307,7 @@ from app.core.logging_config import setup_logging
 # Setup logging first
 setup_logging()
 
-app = FastAPI(title="Rag@UiT Backend")
+app = FastAPI(title="QuizCrafter Backend")
 
 # Add request ID middleware early in the chain
 app.add_middleware(RequestIDMiddleware)
@@ -734,16 +734,19 @@ class TracingMiddleware(BaseHTTPMiddleware):
 ## Migration Strategy
 
 ### Phase 1: Add Infrastructure
+
 1. Implement RequestContext
 2. Update logging configuration
 3. Add RequestIDMiddleware
 
 ### Phase 2: Update Services
+
 1. Update all route handlers
 2. Update background tasks
 3. Add context decorators
 
 ### Phase 3: Monitoring
+
 1. Add log aggregation queries
 2. Create debugging tools
 3. Train team on usage

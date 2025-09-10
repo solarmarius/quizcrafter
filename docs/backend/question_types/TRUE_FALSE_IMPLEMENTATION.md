@@ -2,7 +2,7 @@
 
 **Document Date**: January 30, 2025
 **Feature**: True/False Question Type Support
-**Target System**: Rag@UiT Canvas LMS Quiz Generator
+**Target System**: QuizCrafter Canvas LMS Quiz Generator
 
 ## 1. Feature Overview
 
@@ -35,7 +35,7 @@ The True/False question type allows instructors to create quiz questions where s
 
 ### High-Level Architecture
 
-The True/False question type follows Rag@UiT's established polymorphic question architecture:
+The True/False question type follows QuizCrafter's established polymorphic question architecture:
 
 ```
 Question Generation Pipeline:
@@ -380,7 +380,7 @@ def _initialize_default_types(self) -> None:
 
 **Complete Template**:
 
-```json
+````json
 {
   "name": "batch_true_false",
   "version": "1.0",
@@ -397,17 +397,13 @@ def _initialize_default_types(self) -> None:
     "custom_instructions": "Additional custom instructions (optional)"
   },
   "author": "System",
-  "tags": [
-    "batch",
-    "true_false",
-    "module"
-  ],
+  "tags": ["batch", "true_false", "module"],
   "created_at": null,
   "updated_at": null,
   "min_content_length": 100,
   "max_content_length": 50000
 }
-```
+````
 
 **Testing**: After this step:
 
@@ -421,7 +417,7 @@ def _initialize_default_types(self) -> None:
 
 **Complete Template**:
 
-```json
+````json
 {
   "name": "batch_true_false_no",
   "version": "1.0",
@@ -439,18 +435,13 @@ def _initialize_default_types(self) -> None:
     "custom_instructions": "Ytterligere tilpassede instruksjoner (valgfritt)"
   },
   "author": "System",
-  "tags": [
-    "batch",
-    "true_false",
-    "module",
-    "norsk"
-  ],
+  "tags": ["batch", "true_false", "module", "norsk"],
   "created_at": null,
   "updated_at": null,
   "min_content_length": 100,
   "max_content_length": 50000
 }
-```
+````
 
 **Testing**: After this step:
 
@@ -613,20 +604,20 @@ class TrueFalseData(BaseQuestionData):
 
 ```json
 {
-    "title": "Question Python is a programming language...",
-    "item_body": "<p>Python is a programming language.</p>",
-    "calculator_type": "none",
-    "interaction_data": {
-        "true_choice": "True",
-        "false_choice": "False"
-    },
-    "properties": {},
-    "scoring_data": {"value": true},
-    "answer_feedback": {},
-    "scoring_algorithm": "Equivalence",
-    "interaction_type_slug": "true-false",
-    "feedback": {},
-    "points_possible": 1
+  "title": "Question Python is a programming language...",
+  "item_body": "<p>Python is a programming language.</p>",
+  "calculator_type": "none",
+  "interaction_data": {
+    "true_choice": "True",
+    "false_choice": "False"
+  },
+  "properties": {},
+  "scoring_data": { "value": true },
+  "answer_feedback": {},
+  "scoring_algorithm": "Equivalence",
+  "interaction_type_slug": "true-false",
+  "feedback": {},
+  "points_possible": 1
 }
 ```
 
@@ -662,17 +653,20 @@ Both English and Norwegian templates support:
 ### Test Coverage Areas
 
 1. **Data Model Validation**
+
    - Valid true/false data creation
    - Validation of required fields
    - Field length limits
    - Type validation (boolean enforcement)
 
 2. **Question Type Implementation**
+
    - All abstract method implementations
    - Data formatting for display, Canvas, and export
    - Error handling for wrong data types
 
 3. **Canvas Integration**
+
    - Proper Canvas API format
    - HTML wrapping behavior
    - Scoring data structure
@@ -684,6 +678,7 @@ Both English and Norwegian templates support:
 ### Manual Testing Steps
 
 1. **Template Validation**:
+
    ```bash
    # Test template loading
    curl -X POST http://localhost:8000/api/v1/questions/generate \
@@ -692,6 +687,7 @@ Both English and Norwegian templates support:
    ```
 
 2. **Canvas Export Testing**:
+
    - Generate True/False questions through UI
    - Export to Canvas and verify format
    - Check Canvas quiz display and functionality
@@ -713,6 +709,7 @@ Both English and Norwegian templates support:
 ### Step-by-Step Deployment
 
 1. **Pre-deployment Validation**:
+
    ```bash
    cd backend
    source .venv/bin/activate
@@ -721,12 +718,14 @@ Both English and Norwegian templates support:
    ```
 
 2. **Database Migration** (if needed):
+
    ```bash
    # No migration required - uses existing polymorphic Question model
    # Verify existing structure supports new question type
    ```
 
 3. **Application Deployment**:
+
    ```bash
    # Standard deployment process
    docker compose build backend
@@ -845,16 +844,19 @@ item_body = f"<p>{data.question_text}</p>"  # Safe HTML generation
 ### Potential Improvements
 
 1. **Enhanced Question Types**:
+
    - True/False with multiple statements
    - Confidence-based scoring
    - Certainty indicators
 
 2. **Advanced AI Generation**:
+
    - Context-aware difficulty adjustment
    - Topic-specific balanced generation
    - Fact-checking integration
 
 3. **Extended Canvas Support**:
+
    - Canvas Classic quiz compatibility
    - Rich media support (images, videos)
    - Custom feedback per choice

@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document outlines a minimal refactoring strategy for the Rag@UiT question module to support multiple question types beyond Multiple Choice Questions (MCQs). The approach leverages the existing polymorphic architecture while making minimal changes to support new question types like Fill in the Blank.
+This document outlines a minimal refactoring strategy for the QuizCrafter question module to support multiple question types beyond Multiple Choice Questions (MCQs). The approach leverages the existing polymorphic architecture while making minimal changes to support new question types like Fill in the Blank.
 
 ## Current Architecture Strengths
 
@@ -287,6 +287,7 @@ def _initialize_default_types(self) -> None:
 Create template files for the new question type:
 
 **English Template** (`batch_fill_in_blank.json`):
+
 ```json
 {
   "name": "batch_fill_in_blank",
@@ -310,6 +311,7 @@ Create template files for the new question type:
 ```
 
 **Norwegian Template** (`batch_fill_in_blank_no.json`):
+
 ```json
 {
   "name": "batch_fill_in_blank_no",
@@ -394,16 +396,19 @@ def test_fib_canvas_format():
 ## Testing Strategy
 
 ### Unit Tests
+
 - Test each question type implementation in isolation
 - Verify validation rules work correctly
 - Test formatting methods for display and Canvas export
 
 ### Integration Tests
+
 - Test question creation through the service layer
 - Verify template loading for each question type
 - Test question generation with mock LLM responses
 
 ### End-to-End Tests
+
 - Test complete flow from quiz creation to question generation
 - Verify Canvas export works for all question types
 

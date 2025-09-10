@@ -421,7 +421,7 @@
   "refresh": "30s",
   "schemaVersion": 37,
   "style": "dark",
-  "tags": ["ragatuit", "application"],
+  "tags": ["quizcrafter", "application"],
   "templating": {
     "list": []
   },
@@ -431,8 +431,8 @@
   },
   "timepicker": {},
   "timezone": "",
-  "title": "Rag@UiT Application Monitoring",
-  "uid": "ragatuit-app-monitoring",
+  "title": "QuizCrafter Application Monitoring",
+  "uid": "quizcrafter-app-monitoring",
   "version": 1,
   "weekStart": ""
 }

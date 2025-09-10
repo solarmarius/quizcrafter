@@ -1,13 +1,13 @@
 # Consolidated Quiz Status System Implementation Specification and history
 
 **Date**: July 9, 2025
-**Project**: Rag@UiT - Canvas LMS Quiz Generator
+**Project**: QuizCrafter - Canvas LMS Quiz Generator
 **Implementation**: Consolidated Status System Migration
 **Author**: Claude Code Assistant
 
 ## Executive Summary
 
-This document provides a comprehensive history of the migration from a 3-field status system (`content_extraction_status`, `llm_generation_status`, `export_status`) to a consolidated single-field status system (`status` + `failure_reason`) in the Rag@UiT application.
+This document provides a comprehensive history of the migration from a 3-field status system (`content_extraction_status`, `llm_generation_status`, `export_status`) to a consolidated single-field status system (`status` + `failure_reason`) in the QuizCrafter application.
 
 ## Project Overview
 
@@ -334,7 +334,7 @@ Consolidated to a single `status` field with 7 states:
 
 ## Conclusion
 
-The consolidated status implementation successfully transformed the Rag@UiT application from a complex 3-field status system to a clean, maintainable single-field system. The migration improved code quality, user experience, and system maintainability while reducing overall complexity.
+The consolidated status implementation successfully transformed the QuizCrafter application from a complex 3-field status system to a clean, maintainable single-field system. The migration improved code quality, user experience, and system maintainability while reducing overall complexity.
 
 The implementation demonstrates best practices in:
 

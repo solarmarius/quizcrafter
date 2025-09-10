@@ -65,8 +65,8 @@ jobs:
           DOMAIN=localhost
           FRONTEND_HOST=http://localhost:5173
           ENVIRONMENT=local
-          PROJECT_NAME=RAGatUIT
-          STACK_NAME=ragatuit
+          PROJECT_NAME=QuizCrafter
+          STACK_NAME=quizcrafter
           BACKEND_CORS_ORIGINS="http://localhost,http://localhost:5173,https://localhost,https://localhost:5173,http://localhost.tiangolo.com"
           SECRET_KEY=${{ secrets.SECRET_KEY }}
           FIRST_SUPERUSER=${{ secrets.FIRST_SUPERUSER }}

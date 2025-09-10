@@ -10,28 +10,33 @@
 ## 1. Feature Overview
 
 ### Description
+
 The Manual Question Addition feature allows instructors to manually create quiz questions outside of the AI-powered question generation workflow. This feature provides a user-friendly interface for creating questions in any of the five supported question types: Multiple Choice, True/False, Fill in the Blank, Matching, and Categorization.
 
 ### Business Value
+
 - **Flexibility**: Instructors can add specific questions they have in mind that complement AI-generated content
 - **Quality Control**: Teachers can ensure critical concepts are covered with questions they've crafted themselves
 - **Workflow Integration**: Manually created questions seamlessly integrate with the existing review and approval process
 - **Content Completeness**: Fills gaps in AI-generated question sets with instructor expertise
 
 ### User Benefits
+
 - Familiar, intuitive question creation interface
 - Real-time validation and error feedback
 - Seamless integration with existing quiz workflow
 - Support for all question types available in the system
 
 ### Context
-This feature is part of the Rag@UiT Canvas LMS quiz generator application. It extends the existing question generation and review system by allowing manual question creation during the review phase of quiz development.
+
+This feature is part of the QuizCrafter Canvas LMS quiz generator application. It extends the existing question generation and review system by allowing manual question creation during the review phase of quiz development.
 
 ---
 
 ## 2. Technical Architecture
 
 ### High-Level Architecture
+
 The feature follows a layered architecture pattern:
 
 ```
@@ -67,12 +72,14 @@ The feature follows a layered architecture pattern:
 ```
 
 ### Integration Points
+
 - **Existing Question System**: Reuses all question editors, validation schemas, and display components
 - **API Layer**: Utilizes existing question creation endpoint without backend modifications
 - **State Management**: Integrates with TanStack Query for caching and invalidation
 - **UI Framework**: Built with Chakra UI v3 components following established patterns
 
 ### Data Flow
+
 1. User clicks "Add Question" button (visible only in review states)
 2. Dialog opens with question type selection step
 3. User selects question type → transitions to creation step
@@ -85,6 +92,7 @@ The feature follows a layered architecture pattern:
 ## 3. Dependencies & Prerequisites
 
 ### External Dependencies
+
 All dependencies are already present in the existing codebase:
 
 - **React** ^18.0.0 - Core UI framework
@@ -96,13 +104,15 @@ All dependencies are already present in the existing codebase:
 - **zod** ^3.x - Schema validation library
 
 ### Prerequisites
-- Existing Rag@UiT application setup
+
+- Existing QuizCrafter application setup
 - Node.js 18+ environment
 - TypeScript configuration
 - Existing question types and validation schemas
 - Backend question creation API endpoint
 
 ### Environment Setup
+
 No additional environment setup required. The feature uses existing infrastructure.
 
 ---
@@ -112,6 +122,7 @@ No additional environment setup required. The feature uses existing infrastructu
 ### 4.1 File Structure
 
 #### Files to Create
+
 ```
 frontend/src/components/Questions/
 ├── ManualQuestionDialog.tsx       # Main dialog component
@@ -120,6 +131,7 @@ frontend/src/components/Questions/
 ```
 
 #### Files to Modify
+
 ```
 frontend/src/routes/_layout/quiz.$id.questions.tsx  # Add "Add Question" button
 ```
@@ -127,21 +139,25 @@ frontend/src/routes/_layout/quiz.$id.questions.tsx  # Add "Add Question" button
 #### Purpose of Each File
 
 **ManualQuestionDialog.tsx**
+
 - Main orchestrator component managing the two-step workflow
 - Handles dialog state, API calls, and error handling
 - Provides full-screen dialog experience
 
 **QuestionTypeSelector.tsx**
+
 - First step of the workflow
 - Displays 5 question types as selectable cards
 - Handles type selection and navigation to next step
 
 **ManualQuestionCreator.tsx**
+
 - Second step of the workflow
 - Wraps existing question editors, hiding tags/difficulty
 - Transforms form data for API submission
 
 **quiz.$id.questions.tsx**
+
 - Integration point for the feature
 - Adds "Add Question" button with conditional visibility
 - Imports and renders the dialog component
@@ -152,17 +168,17 @@ frontend/src/routes/_layout/quiz.$id.questions.tsx  # Add "Add Question" button
 
 **File:** `frontend/src/components/Questions/QuestionTypeSelector.tsx`
 
-```tsx
-import { Box, Button, Card, SimpleGrid, Text, VStack } from "@chakra-ui/react"
-import { memo } from "react"
+````tsx
+import { Box, Button, Card, SimpleGrid, Text, VStack } from "@chakra-ui/react";
+import { memo } from "react";
 
-import { QUESTION_TYPES, QUESTION_TYPE_LABELS } from "@/lib/constants"
+import { QUESTION_TYPES, QUESTION_TYPE_LABELS } from "@/lib/constants";
 
 interface QuestionTypeSelectorProps {
   /** Callback when a question type is selected */
-  onSelectType: (questionType: string) => void
+  onSelectType: (questionType: string) => void;
   /** Whether the selection process is loading */
-  isLoading?: boolean
+  isLoading?: boolean;
 }
 
 /**
@@ -213,7 +229,7 @@ export const QuestionTypeSelector = memo(function QuestionTypeSelector({
       description: "Group items into appropriate categories",
       icon: "📊",
     },
-  ]
+  ];
 
   return (
     <VStack gap={6} align="stretch">
@@ -258,16 +274,17 @@ export const QuestionTypeSelector = memo(function QuestionTypeSelector({
 
       <Box>
         <Text fontSize="sm" color="gray.500" textAlign="center">
-          All question types support real-time validation and will be added to your quiz
-          in pending status for review.
+          All question types support real-time validation and will be added to
+          your quiz in pending status for review.
         </Text>
       </Box>
     </VStack>
-  )
-})
-```
+  );
+});
+````
 
 **Key Implementation Notes:**
+
 - Uses existing constants for question types and labels
 - Provides clear descriptions for each question type
 - Responsive grid layout for different screen sizes
@@ -278,24 +295,24 @@ export const QuestionTypeSelector = memo(function QuestionTypeSelector({
 
 **File:** `frontend/src/components/Questions/ManualQuestionCreator.tsx`
 
-```tsx
-import { memo, useCallback } from "react"
+````tsx
+import { memo, useCallback } from "react";
 
-import type { QuestionCreateRequest, QuestionUpdateRequest } from "@/client"
-import { QuestionEditor } from "@/components/Questions/editors/QuestionEditor"
-import { QUESTION_TYPES } from "@/lib/constants"
+import type { QuestionCreateRequest, QuestionUpdateRequest } from "@/client";
+import { QuestionEditor } from "@/components/Questions/editors/QuestionEditor";
+import { QUESTION_TYPES } from "@/lib/constants";
 
 interface ManualQuestionCreatorProps {
   /** The selected question type */
-  questionType: string
+  questionType: string;
   /** Quiz ID for the question */
-  quizId: string
+  quizId: string;
   /** Callback when question is saved */
-  onSave: (questionData: QuestionCreateRequest) => void
+  onSave: (questionData: QuestionCreateRequest) => void;
   /** Callback when creation is canceled */
-  onCancel: () => void
+  onCancel: () => void;
   /** Whether the save operation is loading */
-  isLoading?: boolean
+  isLoading?: boolean;
 }
 
 /**
@@ -325,8 +342,8 @@ export const ManualQuestionCreator = memo(function ManualQuestionCreator({
   const handleSave = useCallback(
     (updateData: QuestionUpdateRequest) => {
       if (!updateData.question_data) {
-        console.error("No question data provided")
-        return
+        console.error("No question data provided");
+        return;
       }
 
       // Transform to create request format with defaults
@@ -336,12 +353,12 @@ export const ManualQuestionCreator = memo(function ManualQuestionCreator({
         question_data: updateData.question_data,
         difficulty: "MEDIUM", // Default difficulty as specified in requirements
         tags: [], // Empty tags array as specified in requirements
-      }
+      };
 
-      onSave(createData)
+      onSave(createData);
     },
     [questionType, quizId, onSave]
-  )
+  );
 
   // Create a mock question response object for the editor
   // This allows us to reuse existing editor components without modification
@@ -355,7 +372,7 @@ export const ManualQuestionCreator = memo(function ManualQuestionCreator({
     is_approved: false,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
-  }
+  };
 
   return (
     <QuestionEditor
@@ -364,8 +381,8 @@ export const ManualQuestionCreator = memo(function ManualQuestionCreator({
       onCancel={onCancel}
       isLoading={isLoading}
     />
-  )
-})
+  );
+});
 
 /**
  * Provides default question data based on question type.
@@ -382,21 +399,21 @@ function getDefaultQuestionData(questionType: string): Record<string, any> {
         option_d: "",
         correct_answer: "A",
         explanation: null,
-      }
+      };
 
     case QUESTION_TYPES.TRUE_FALSE:
       return {
         question_text: "",
         correct_answer: true,
         explanation: null,
-      }
+      };
 
     case QUESTION_TYPES.FILL_IN_BLANK:
       return {
         question_text: "",
         blanks: [],
         explanation: null,
-      }
+      };
 
     case QUESTION_TYPES.MATCHING:
       return {
@@ -408,7 +425,7 @@ function getDefaultQuestionData(questionType: string): Record<string, any> {
         ],
         distractors: [],
         explanation: null,
-      }
+      };
 
     case QUESTION_TYPES.CATEGORIZATION:
       return {
@@ -420,18 +437,19 @@ function getDefaultQuestionData(questionType: string): Record<string, any> {
         items: [],
         distractors: [],
         explanation: null,
-      }
+      };
 
     default:
       return {
         question_text: "",
         explanation: null,
-      }
+      };
   }
 }
-```
+````
 
 **Key Implementation Notes:**
+
 - Wraps existing QuestionEditor without modifying it
 - Sets default difficulty to "MEDIUM" and empty tags
 - Creates mock question object for editor compatibility
@@ -442,12 +460,12 @@ function getDefaultQuestionData(questionType: string): Record<string, any> {
 
 **File:** `frontend/src/components/Questions/ManualQuestionDialog.tsx`
 
-```tsx
-import { Button, VStack } from "@chakra-ui/react"
-import { memo, useState } from "react"
+````tsx
+import { Button, VStack } from "@chakra-ui/react";
+import { memo, useState } from "react";
 
-import type { QuestionCreateRequest } from "@/client"
-import { QuestionsService } from "@/client"
+import type { QuestionCreateRequest } from "@/client";
+import { QuestionsService } from "@/client";
 import {
   DialogActionTrigger,
   DialogBody,
@@ -456,24 +474,24 @@ import {
   DialogHeader,
   DialogRoot,
   DialogTitle,
-} from "@/components/ui/dialog"
-import { useApiMutation } from "@/hooks/common"
-import { QUIZ_STATUS } from "@/lib/constants"
-import { queryKeys } from "@/lib/queryConfig"
-import { ManualQuestionCreator } from "./ManualQuestionCreator"
-import { QuestionTypeSelector } from "./QuestionTypeSelector"
+} from "@/components/ui/dialog";
+import { useApiMutation } from "@/hooks/common";
+import { QUIZ_STATUS } from "@/lib/constants";
+import { queryKeys } from "@/lib/queryConfig";
+import { ManualQuestionCreator } from "./ManualQuestionCreator";
+import { QuestionTypeSelector } from "./QuestionTypeSelector";
 
-type DialogStep = "type-selection" | "question-creation"
+type DialogStep = "type-selection" | "question-creation";
 
 interface ManualQuestionDialogProps {
   /** Quiz ID for creating questions */
-  quizId: string
+  quizId: string;
   /** Quiz object to check status permissions */
-  quiz: { status: string }
+  quiz: { status: string };
   /** Whether the dialog is open */
-  isOpen: boolean
+  isOpen: boolean;
   /** Callback when dialog open state changes */
-  onOpenChange: (isOpen: boolean) => void
+  onOpenChange: (isOpen: boolean) => void;
 }
 
 /**
@@ -503,17 +521,17 @@ export const ManualQuestionDialog = memo(function ManualQuestionDialog({
   isOpen,
   onOpenChange,
 }: ManualQuestionDialogProps) {
-  const [currentStep, setCurrentStep] = useState<DialogStep>("type-selection")
-  const [selectedQuestionType, setSelectedQuestionType] = useState<string>("")
+  const [currentStep, setCurrentStep] = useState<DialogStep>("type-selection");
+  const [selectedQuestionType, setSelectedQuestionType] = useState<string>("");
 
   // Reset dialog state when it closes
   const handleOpenChange = (open: boolean) => {
     if (!open) {
-      setCurrentStep("type-selection")
-      setSelectedQuestionType("")
+      setCurrentStep("type-selection");
+      setSelectedQuestionType("");
     }
-    onOpenChange(open)
-  }
+    onOpenChange(open);
+  };
 
   // Create question mutation with proper error handling and query invalidation
   const createQuestionMutation = useApiMutation(
@@ -521,7 +539,7 @@ export const ManualQuestionDialog = memo(function ManualQuestionDialog({
       return await QuestionsService.createQuestion({
         quizId,
         requestBody: questionData,
-      })
+      });
     },
     {
       successMessage: "Question created successfully",
@@ -532,35 +550,35 @@ export const ManualQuestionDialog = memo(function ManualQuestionDialog({
       ],
       onSuccess: () => {
         // Auto-close dialog on successful creation as specified in requirements
-        handleOpenChange(false)
+        handleOpenChange(false);
       },
     }
-  )
+  );
 
   // Handle question type selection and navigation to next step
   const handleSelectType = (questionType: string) => {
-    setSelectedQuestionType(questionType)
-    setCurrentStep("question-creation")
-  }
+    setSelectedQuestionType(questionType);
+    setCurrentStep("question-creation");
+  };
 
   // Handle back navigation to type selection
   const handleBackToTypeSelection = () => {
-    setCurrentStep("type-selection")
-    setSelectedQuestionType("")
-  }
+    setCurrentStep("type-selection");
+    setSelectedQuestionType("");
+  };
 
   // Handle question creation
   const handleCreateQuestion = (questionData: QuestionCreateRequest) => {
-    createQuestionMutation.mutate(questionData)
-  }
+    createQuestionMutation.mutate(questionData);
+  };
 
   // Check if manual question creation is allowed based on quiz status
   const canCreateQuestions =
     quiz.status === QUIZ_STATUS.READY_FOR_REVIEW ||
-    quiz.status === QUIZ_STATUS.READY_FOR_REVIEW_PARTIAL
+    quiz.status === QUIZ_STATUS.READY_FOR_REVIEW_PARTIAL;
 
   if (!canCreateQuestions) {
-    return null // Don't render dialog if not allowed
+    return null; // Don't render dialog if not allowed
   }
 
   return (
@@ -576,7 +594,9 @@ export const ManualQuestionDialog = memo(function ManualQuestionDialog({
           <DialogTitle>
             {currentStep === "type-selection"
               ? "Add Question"
-              : `Create ${selectedQuestionType.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase())} Question`}
+              : `Create ${selectedQuestionType
+                  .replace(/_/g, " ")
+                  .replace(/\b\w/g, (l) => l.toUpperCase())} Question`}
           </DialogTitle>
         </DialogHeader>
 
@@ -615,11 +635,12 @@ export const ManualQuestionDialog = memo(function ManualQuestionDialog({
         </DialogBody>
       </DialogContent>
     </DialogRoot>
-  )
-})
-```
+  );
+});
+````
 
 **Key Implementation Notes:**
+
 - Full-screen dialog for optimal editing experience
 - Two-step workflow with proper state management
 - Status-based access control (only review states)
@@ -634,12 +655,14 @@ export const ManualQuestionDialog = memo(function ManualQuestionDialog({
 **Modifications to make:**
 
 1. **Add imports at the top:**
+
 ```tsx
 // Add this import with existing imports
-import { ManualQuestionDialog } from "@/components/Questions/ManualQuestionDialog"
+import { ManualQuestionDialog } from "@/components/Questions/ManualQuestionDialog";
 ```
 
 2. **Add state management in QuizQuestions component:**
+
 ```tsx
 function QuizQuestions() {
   const { id } = Route.useParams()
@@ -655,48 +678,52 @@ function QuizQuestions() {
 Replace the existing filter buttons section (around lines 198-215) with:
 
 ```tsx
-      {/* Filter Toggle Buttons and Add Question Button */}
-      {(quiz.status === QUIZ_STATUS.READY_FOR_REVIEW ||
-        quiz.status === QUIZ_STATUS.READY_FOR_REVIEW_PARTIAL ||
-        quiz.status === QUIZ_STATUS.EXPORTING_TO_CANVAS ||
-        quiz.status === QUIZ_STATUS.PUBLISHED ||
-        (quiz.status === QUIZ_STATUS.FAILED &&
-          quiz.failure_reason === FAILURE_REASON.CANVAS_EXPORT_ERROR)) && (
-        <HStack gap={3} justify="space-between">
-          <HStack gap={3}>
-            {/* Add Question Button - Only show in review states */}
-            {(quiz.status === QUIZ_STATUS.READY_FOR_REVIEW ||
-              quiz.status === QUIZ_STATUS.READY_FOR_REVIEW_PARTIAL) && (
-              <Button
-                variant="solid"
-                colorPalette="green"
-                size="sm"
-                onClick={() => setIsManualQuestionDialogOpen(true)}
-              >
-                Add Question
-              </Button>
-            )}
+{
+  /* Filter Toggle Buttons and Add Question Button */
+}
+{
+  (quiz.status === QUIZ_STATUS.READY_FOR_REVIEW ||
+    quiz.status === QUIZ_STATUS.READY_FOR_REVIEW_PARTIAL ||
+    quiz.status === QUIZ_STATUS.EXPORTING_TO_CANVAS ||
+    quiz.status === QUIZ_STATUS.PUBLISHED ||
+    (quiz.status === QUIZ_STATUS.FAILED &&
+      quiz.failure_reason === FAILURE_REASON.CANVAS_EXPORT_ERROR)) && (
+    <HStack gap={3} justify="space-between">
+      <HStack gap={3}>
+        {/* Add Question Button - Only show in review states */}
+        {(quiz.status === QUIZ_STATUS.READY_FOR_REVIEW ||
+          quiz.status === QUIZ_STATUS.READY_FOR_REVIEW_PARTIAL) && (
+          <Button
+            variant="solid"
+            colorPalette="green"
+            size="sm"
+            onClick={() => setIsManualQuestionDialogOpen(true)}
+          >
+            Add Question
+          </Button>
+        )}
 
-            {/* Existing Filter Buttons */}
-            <Button
-              variant={filterView === "pending" ? "solid" : "outline"}
-              colorPalette="blue"
-              size="sm"
-              onClick={() => setFilterView("pending")}
-            >
-              Pending Approval ({pendingCount})
-            </Button>
-            <Button
-              variant={filterView === "all" ? "solid" : "outline"}
-              colorPalette="blue"
-              size="sm"
-              onClick={() => setFilterView("all")}
-            >
-              All Questions ({totalCount})
-            </Button>
-          </HStack>
-        </HStack>
-      )}
+        {/* Existing Filter Buttons */}
+        <Button
+          variant={filterView === "pending" ? "solid" : "outline"}
+          colorPalette="blue"
+          size="sm"
+          onClick={() => setFilterView("pending")}
+        >
+          Pending Approval ({pendingCount})
+        </Button>
+        <Button
+          variant={filterView === "all" ? "solid" : "outline"}
+          colorPalette="blue"
+          size="sm"
+          onClick={() => setFilterView("all")}
+        >
+          All Questions ({totalCount})
+        </Button>
+      </HStack>
+    </HStack>
+  );
+}
 ```
 
 4. **Add the dialog component before the closing VStack:**
@@ -716,9 +743,10 @@ Replace the existing filter buttons section (around lines 198-215) with:
 ```
 
 5. **Add missing import:**
+
 ```tsx
 // Add this import with existing imports
-import { useState } from "react"
+import { useState } from "react";
 ```
 
 **Complete Modified Section:**
@@ -727,42 +755,45 @@ Here's the complete modified QuizQuestions component with the integration:
 
 ```tsx
 function QuizQuestions() {
-  const { id } = Route.useParams()
+  const { id } = Route.useParams();
 
   // Add dialog state management
-  const [isManualQuestionDialogOpen, setIsManualQuestionDialogOpen] = useState(false)
+  const [isManualQuestionDialogOpen, setIsManualQuestionDialogOpen] =
+    useState(false);
 
   // Custom polling for questions route - stops polling during review state
   const questionsPolling = useConditionalPolling<Quiz>((data) => {
-    if (!data?.status) return true // Poll if no status yet
+    if (!data?.status) return true; // Poll if no status yet
 
     // Stop polling for stable states where user is actively working or quiz is complete
     const stableReviewStates = [
       QUIZ_STATUS.READY_FOR_REVIEW, // User is actively reviewing questions
-      QUIZ_STATUS.PUBLISHED,        // Quiz completed and exported
-      QUIZ_STATUS.FAILED           // Terminal error state
-    ] as const
+      QUIZ_STATUS.PUBLISHED, // Quiz completed and exported
+      QUIZ_STATUS.FAILED, // Terminal error state
+    ] as const;
 
-    return !stableReviewStates.includes(data.status as typeof stableReviewStates[number])
-  }, 5000) // Continue polling every 5 seconds for active processing states
+    return !stableReviewStates.includes(
+      data.status as (typeof stableReviewStates)[number]
+    );
+  }, 5000); // Continue polling every 5 seconds for active processing states
 
   const { data: quiz, isLoading } = useQuery({
     queryKey: queryKeys.quiz(id),
     queryFn: async () => {
-      const response = await QuizService.getQuiz({ quizId: id })
-      return response
+      const response = await QuizService.getQuiz({ quizId: id });
+      return response;
     },
     ...quizQueryConfig,
     refetchInterval: questionsPolling, // Use questions-specific polling logic
-  })
+  });
 
   // Only show skeleton when loading and no cached data exists
   if (isLoading && !quiz) {
-    return <QuizQuestionsSkeleton />
+    return <QuizQuestionsSkeleton />;
   }
 
   if (!quiz) {
-    return <QuizQuestionsSkeleton />
+    return <QuizQuestionsSkeleton />;
   }
 
   return (
@@ -864,24 +895,26 @@ function QuizQuestions() {
         onOpenChange={setIsManualQuestionDialogOpen}
       />
     </VStack>
-  )
+  );
 }
 ```
 
 ### 4.3 Data Models & Schemas
 
 #### QuestionCreateRequest Schema
+
 ```typescript
 interface QuestionCreateRequest {
-  quiz_id: string           // UUID of the quiz
-  question_type: QuestionType // One of 5 supported types
-  question_data: Record<string, any> // Polymorphic question data
-  difficulty: "EASY" | "MEDIUM" | "HARD" | null // Default: "MEDIUM"
-  tags: string[]           // Array of tags, default: []
+  quiz_id: string; // UUID of the quiz
+  question_type: QuestionType; // One of 5 supported types
+  question_data: Record<string, any>; // Polymorphic question data
+  difficulty: "EASY" | "MEDIUM" | "HARD" | null; // Default: "MEDIUM"
+  tags: string[]; // Array of tags, default: []
 }
 ```
 
 #### Question Type Validation
+
 The system uses existing Zod validation schemas:
 
 - **Multiple Choice**: `mcqSchema` - validates A/B/C/D options and correct answer
@@ -893,6 +926,7 @@ The system uses existing Zod validation schemas:
 #### Example Question Data Structures
 
 **Multiple Choice:**
+
 ```typescript
 {
   question_text: "What is the capital of France?",
@@ -906,6 +940,7 @@ The system uses existing Zod validation schemas:
 ```
 
 **True/False:**
+
 ```typescript
 {
   question_text: "The Earth is flat.",
@@ -917,6 +952,7 @@ The system uses existing Zod validation schemas:
 ### 4.4 Configuration
 
 #### Feature Configuration
+
 No additional configuration required. The feature uses existing application settings:
 
 - Question types are defined in `QUESTION_TYPES` constant
@@ -925,12 +961,13 @@ No additional configuration required. The feature uses existing application sett
 - UI components use existing Chakra UI theme
 
 #### Status-Based Access Control
+
 ```typescript
 // Feature is only available in these quiz states
 const ALLOWED_STATUSES = [
   QUIZ_STATUS.READY_FOR_REVIEW,
-  QUIZ_STATUS.READY_FOR_REVIEW_PARTIAL
-]
+  QUIZ_STATUS.READY_FOR_REVIEW_PARTIAL,
+];
 ```
 
 ---
@@ -940,68 +977,73 @@ const ALLOWED_STATUSES = [
 ### 5.1 Unit Tests
 
 #### QuestionTypeSelector Tests
+
 ```typescript
-describe('QuestionTypeSelector', () => {
-  it('should render all 5 question types', () => {
-    render(<QuestionTypeSelector onSelectType={jest.fn()} />)
+describe("QuestionTypeSelector", () => {
+  it("should render all 5 question types", () => {
+    render(<QuestionTypeSelector onSelectType={jest.fn()} />);
 
-    expect(screen.getByText('Multiple Choice')).toBeInTheDocument()
-    expect(screen.getByText('True/False')).toBeInTheDocument()
-    expect(screen.getByText('Fill in the Blank')).toBeInTheDocument()
-    expect(screen.getByText('Matching')).toBeInTheDocument()
-    expect(screen.getByText('Categorization')).toBeInTheDocument()
-  })
+    expect(screen.getByText("Multiple Choice")).toBeInTheDocument();
+    expect(screen.getByText("True/False")).toBeInTheDocument();
+    expect(screen.getByText("Fill in the Blank")).toBeInTheDocument();
+    expect(screen.getByText("Matching")).toBeInTheDocument();
+    expect(screen.getByText("Categorization")).toBeInTheDocument();
+  });
 
-  it('should call onSelectType when a card is clicked', () => {
-    const mockOnSelect = jest.fn()
-    render(<QuestionTypeSelector onSelectType={mockOnSelect} />)
+  it("should call onSelectType when a card is clicked", () => {
+    const mockOnSelect = jest.fn();
+    render(<QuestionTypeSelector onSelectType={mockOnSelect} />);
 
-    fireEvent.click(screen.getByText('Multiple Choice'))
+    fireEvent.click(screen.getByText("Multiple Choice"));
 
-    expect(mockOnSelect).toHaveBeenCalledWith(QUESTION_TYPES.MULTIPLE_CHOICE)
-  })
-})
+    expect(mockOnSelect).toHaveBeenCalledWith(QUESTION_TYPES.MULTIPLE_CHOICE);
+  });
+});
 ```
 
 #### ManualQuestionCreator Tests
+
 ```typescript
-describe('ManualQuestionCreator', () => {
-  it('should transform form data correctly for MCQ', () => {
-    const mockOnSave = jest.fn()
+describe("ManualQuestionCreator", () => {
+  it("should transform form data correctly for MCQ", () => {
+    const mockOnSave = jest.fn();
     const props = {
       questionType: QUESTION_TYPES.MULTIPLE_CHOICE,
-      quizId: 'quiz-123',
+      quizId: "quiz-123",
       onSave: mockOnSave,
-      onCancel: jest.fn()
-    }
+      onCancel: jest.fn(),
+    };
 
-    render(<ManualQuestionCreator {...props} />)
+    render(<ManualQuestionCreator {...props} />);
 
     // Fill out form and submit
     // ... form interactions ...
 
     expect(mockOnSave).toHaveBeenCalledWith({
-      quiz_id: 'quiz-123',
-      question_type: 'multiple_choice',
+      quiz_id: "quiz-123",
+      question_type: "multiple_choice",
       question_data: expect.objectContaining({
         question_text: expect.any(String),
         option_a: expect.any(String),
         // ... other fields
       }),
-      difficulty: 'MEDIUM',
-      tags: []
-    })
-  })
-})
+      difficulty: "MEDIUM",
+      tags: [],
+    });
+  });
+});
 ```
 
 ### 5.2 Integration Tests
 
 #### Dialog Workflow Tests
+
 ```typescript
-describe('ManualQuestionDialog Integration', () => {
-  it('should complete full workflow for creating a question', async () => {
-    const mockCreateQuestion = jest.fn().mockResolvedValue({ id: 'new-question' })
+describe("ManualQuestionDialog Integration", () => {
+  it("should complete full workflow for creating a question", async () => {
+    const mockCreateQuestion = jest
+      .fn()
+      .mockResolvedValue({ id: "new-question" });
 
     render(
       <ManualQuestionDialog
@@ -1010,30 +1052,31 @@ describe('ManualQuestionDialog Integration', () => {
         isOpen={true}
         onOpenChange={jest.fn()}
       />
-    )
+    );
 
     // Step 1: Select question type
-    fireEvent.click(screen.getByText('Multiple Choice'))
+    fireEvent.click(screen.getByText("Multiple Choice"));
 
     // Step 2: Fill out question form
-    fireEvent.change(screen.getByLabelText('Question Text'), {
-      target: { value: 'Test question?' }
-    })
+    fireEvent.change(screen.getByLabelText("Question Text"), {
+      target: { value: "Test question?" },
+    });
     // ... fill out other fields ...
 
     // Step 3: Submit
-    fireEvent.click(screen.getByText('Save Changes'))
+    fireEvent.click(screen.getByText("Save Changes"));
 
     await waitFor(() => {
-      expect(mockCreateQuestion).toHaveBeenCalled()
-    })
-  })
-})
+      expect(mockCreateQuestion).toHaveBeenCalled();
+    });
+  });
+});
 ```
 
 ### 5.3 Manual Testing Steps
 
 #### Happy Path Testing
+
 1. **Setup**: Navigate to a quiz in `ready_for_review` status
 2. **Verify Button**: Confirm "Add Question" button is visible and accessible
 3. **Open Dialog**: Click button and verify dialog opens full-screen
@@ -1046,12 +1089,14 @@ describe('ManualQuestionDialog Integration', () => {
 7. **Data Verification**: Verify new question appears in question list
 
 #### Error Case Testing
+
 1. **Status Restrictions**: Verify button is hidden in non-review states
 2. **Validation Errors**: Test form validation for each question type
 3. **API Errors**: Test handling of backend validation failures
 4. **Network Errors**: Test behavior with network connectivity issues
 
 #### Accessibility Testing
+
 1. **Keyboard Navigation**: Verify full functionality with keyboard only
 2. **Screen Reader**: Test with screen reader for proper announcements
 3. **Focus Management**: Verify focus behavior in dialog
@@ -1060,6 +1105,7 @@ describe('ManualQuestionDialog Integration', () => {
 ### 5.4 Performance Considerations
 
 #### Expected Performance Metrics
+
 - **Dialog Open Time**: < 100ms
 - **Type Selection Response**: < 50ms
 - **Form Validation**: < 10ms per field
@@ -1067,21 +1113,22 @@ describe('ManualQuestionDialog Integration', () => {
 - **Question List Refresh**: < 500ms
 
 #### Performance Testing
-```typescript
-describe('Performance Tests', () => {
-  it('should open dialog within 100ms', async () => {
-    const start = performance.now()
 
-    render(<ManualQuestionDialog {...props} isOpen={true} />)
+```typescript
+describe("Performance Tests", () => {
+  it("should open dialog within 100ms", async () => {
+    const start = performance.now();
+
+    render(<ManualQuestionDialog {...props} isOpen={true} />);
 
     await waitFor(() => {
-      expect(screen.getByText('Select Question Type')).toBeInTheDocument()
-    })
+      expect(screen.getByText("Select Question Type")).toBeInTheDocument();
+    });
 
-    const end = performance.now()
-    expect(end - start).toBeLessThan(100)
-  })
-})
+    const end = performance.now();
+    expect(end - start).toBeLessThan(100);
+  });
+});
 ```
 
 ---
@@ -1091,16 +1138,19 @@ describe('Performance Tests', () => {
 ### 6.1 Pre-Deployment Checklist
 
 1. **Code Quality**: Ensure all TypeScript errors are resolved
+
    ```bash
    cd frontend && npx tsc --noEmit
    ```
 
 2. **Linting**: Run linting checks
+
    ```bash
    cd frontend && npm run lint
    ```
 
 3. **Testing**: Run all tests
+
    ```bash
    cd frontend && npm test
    ```
@@ -1113,12 +1163,15 @@ describe('Performance Tests', () => {
 ### 6.2 Deployment Steps
 
 #### Development Environment
+
 1. **Install Dependencies** (if needed):
+
    ```bash
    cd frontend && npm install
    ```
 
 2. **Start Development Server**:
+
    ```bash
    cd frontend && npm run dev
    ```
@@ -1126,7 +1179,9 @@ describe('Performance Tests', () => {
 3. **Verify Feature**: Test the feature in development environment
 
 #### Staging Environment
+
 1. **Build Application**:
+
    ```bash
    cd frontend && npm run build
    ```
@@ -1138,7 +1193,9 @@ describe('Performance Tests', () => {
 4. **User Acceptance Testing**: Have stakeholders test the feature
 
 #### Production Environment
+
 1. **Final Build**:
+
    ```bash
    cd frontend && npm run build
    ```
@@ -1152,15 +1209,18 @@ describe('Performance Tests', () => {
 ### 6.3 Rollback Procedures
 
 #### Immediate Rollback (Feature Toggle)
+
 If a feature toggle system exists, disable the manual question feature:
+
 ```typescript
 // In feature configuration
 const FEATURES = {
   MANUAL_QUESTION_CREATION: false, // Disable feature
-}
+};
 ```
 
 #### Code Rollback
+
 1. **Identify Commit**: Find the commit before feature deployment
 2. **Create Rollback Branch**:
    ```bash
@@ -1171,6 +1231,7 @@ const FEATURES = {
 4. **Deploy Rollback**: Deploy the rollback version
 
 #### Database Considerations
+
 - No database changes required for this feature
 - No data migration rollback needed
 - Manually created questions will remain in database but won't be creatable
@@ -1182,18 +1243,21 @@ const FEATURES = {
 ### 7.1 Key Metrics to Monitor
 
 #### Usage Metrics
+
 - **Manual Question Creation Rate**: Number of questions created per day/week
 - **Question Type Distribution**: Which types are created most frequently
 - **Success Rate**: Percentage of successful question creations
 - **User Adoption**: Number of unique users creating manual questions
 
 #### Performance Metrics
+
 - **Dialog Load Time**: Time to render question creation dialog
 - **API Response Time**: Time for question creation API calls
 - **Form Validation Performance**: Time for real-time validation
 - **Error Rate**: Percentage of failed question creation attempts
 
 #### User Experience Metrics
+
 - **Completion Rate**: Percentage of users who complete question creation
 - **Drop-off Points**: Where users abandon the creation process
 - **Error Recovery**: How often users retry after errors
@@ -1201,6 +1265,7 @@ const FEATURES = {
 ### 7.2 Log Entries to Monitor
 
 #### Success Logs
+
 ```typescript
 // Successful question creation
 {
@@ -1214,6 +1279,7 @@ const FEATURES = {
 ```
 
 #### Error Logs
+
 ```typescript
 // Question creation failure
 {
@@ -1229,6 +1295,7 @@ const FEATURES = {
 ```
 
 #### Performance Logs
+
 ```typescript
 // Slow question creation
 {
@@ -1244,33 +1311,41 @@ const FEATURES = {
 ### 7.3 Common Issues and Troubleshooting
 
 #### Issue: "Add Question" Button Not Visible
+
 **Symptoms**: Users report they can't find the add question button
 **Diagnosis**: Check quiz status - button only appears in review states
 **Resolution**:
+
 1. Verify quiz is in `ready_for_review` or `ready_for_review_partial` status
 2. Check for any status-checking logic errors
 3. Ensure proper conditional rendering
 
 #### Issue: Dialog Won't Open
+
 **Symptoms**: Button clicks don't open the dialog
 **Diagnosis**: Check browser console for JavaScript errors
 **Resolution**:
+
 1. Verify dialog state management is working
 2. Check for any React rendering errors
 3. Ensure proper event handling
 
 #### Issue: Question Creation Fails
+
 **Symptoms**: Form submission results in errors
 **Diagnosis**: Check both frontend validation and backend API responses
 **Resolution**:
+
 1. Review validation error messages
 2. Check API endpoint availability
 3. Verify question data format matches expected schema
 
 #### Issue: Real-time Validation Not Working
+
 **Symptoms**: Form doesn't show validation errors as user types
 **Diagnosis**: Check Zod schema integration and react-hook-form setup
 **Resolution**:
+
 1. Verify form validation configuration
 2. Check for any schema validation errors
 3. Ensure proper error state management
@@ -1278,16 +1353,19 @@ const FEATURES = {
 ### 7.4 Maintenance Tasks
 
 #### Weekly Tasks
+
 - Review error logs for patterns
 - Check performance metrics for degradation
 - Verify feature usage statistics
 
 #### Monthly Tasks
+
 - Update dependencies if needed
 - Review and optimize performance
 - Analyze user feedback and usage patterns
 
 #### Quarterly Tasks
+
 - Comprehensive security review
 - Performance optimization analysis
 - User experience evaluation and improvements
@@ -1299,11 +1377,13 @@ const FEATURES = {
 ### 8.1 Authentication & Authorization
 
 #### Access Control
+
 - **User Authentication**: Feature requires valid Canvas OAuth authentication
 - **Quiz Ownership**: Users can only create questions for quizzes they own
 - **Status-Based Access**: Question creation restricted to appropriate quiz states
 
 #### API Security
+
 ```typescript
 // Backend endpoint security (existing)
 @router.post("/{quiz_id}", response_model=QuestionResponse)
@@ -1320,11 +1400,13 @@ async def create_question(
 ### 8.2 Data Privacy & Validation
 
 #### Input Sanitization
+
 - **XSS Prevention**: All user inputs are sanitized through React's built-in protections
 - **SQL Injection**: Backend uses parameterized queries through SQLModel
 - **Content Validation**: Comprehensive validation through Zod schemas
 
 #### Data Handling
+
 - **No Sensitive Data**: Question content is educational, not sensitive
 - **Audit Trail**: All question creation events are logged
 - **Data Retention**: Questions persist as educational content
@@ -1332,12 +1414,15 @@ async def create_question(
 ### 8.3 Frontend Security
 
 #### Content Security Policy
+
 Ensure CSP headers allow necessary resources:
+
 ```
 Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'
 ```
 
 #### XSS Protection
+
 - React automatically escapes content in JSX
 - No use of `dangerouslySetInnerHTML`
 - All user inputs go through controlled components
@@ -1345,7 +1430,9 @@ Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'
 ### 8.4 Backend Security
 
 #### Rate Limiting
+
 Consider implementing rate limiting for question creation:
+
 ```python
 # Example rate limiting (if needed)
 @rate_limit("10/minute")  # Max 10 questions per minute
@@ -1353,6 +1440,7 @@ async def create_question(...):
 ```
 
 #### Validation Security
+
 - Server-side validation prevents malicious data
 - Polymorphic validation ensures type safety
 - Schema validation prevents injection attacks
@@ -1364,12 +1452,14 @@ async def create_question(...):
 ### 9.1 Known Limitations
 
 #### Current Limitations
+
 1. **No Bulk Creation**: Users must create questions one at a time
 2. **No Templates**: No question templates or presets available
 3. **No Import/Export**: Cannot import questions from external sources
 4. **Single Language**: No multi-language question creation in single session
 
 #### Technical Debt
+
 - No comprehensive audit logging for question modifications
 - Limited performance optimization for large question sets
 - No offline support for question creation
@@ -1377,18 +1467,21 @@ async def create_question(...):
 ### 9.2 Potential Improvements
 
 #### Short-term Enhancements (Next 3 months)
+
 1. **Question Templates**: Pre-built templates for common question patterns
 2. **Bulk Operations**: Create multiple questions in single workflow
 3. **Question Preview**: Preview mode before saving
 4. **Auto-save Drafts**: Prevent loss of work during creation
 
 #### Medium-term Features (3-6 months)
+
 1. **Question Import**: Import from Word/Excel/CSV formats
 2. **Collaboration**: Multiple users editing same quiz
 3. **Version History**: Track question modifications over time
 4. **Advanced Validation**: More sophisticated content validation
 
 #### Long-term Vision (6+ months)
+
 1. **AI Assistance**: AI-powered question suggestions and improvements
 2. **Analytics**: Detailed analytics on question performance
 3. **Integration**: Integration with external question banks
@@ -1397,16 +1490,19 @@ async def create_question(...):
 ### 9.3 Scalability Considerations
 
 #### Performance Scaling
+
 - **Question List Virtualization**: Already implemented for large question sets
 - **Database Indexing**: Proper indexes on question queries
 - **API Caching**: Consider caching for frequently accessed data
 
 #### Architecture Scaling
+
 - **Microservices**: Question service could be extracted to separate service
 - **Event-Driven**: Question creation could trigger events for other services
 - **CDN**: Static assets could be served via CDN for better performance
 
 #### Data Scaling
+
 - **Question Storage**: Consider file storage for complex question media
 - **Search Indexing**: Full-text search capabilities for large question banks
 - **Archival**: Archive old questions to maintain performance
@@ -1414,11 +1510,13 @@ async def create_question(...):
 ### 9.4 Technology Evolution
 
 #### Framework Updates
+
 - **React 19**: Prepare for React 19 when released
 - **Chakra UI v4**: Monitor for next major version
 - **TypeScript 6**: Stay current with TypeScript releases
 
 #### Browser Support
+
 - **Modern Browsers**: Focus on evergreen browsers
 - **Performance APIs**: Utilize new browser performance features
 - **Accessibility**: Keep up with latest a11y standards
@@ -1427,7 +1525,7 @@ async def create_question(...):
 
 ## Conclusion
 
-This implementation document provides a comprehensive guide for implementing the Manual Question Addition feature. The feature integrates seamlessly with the existing Rag@UiT application architecture while providing instructors with the flexibility to create custom questions alongside AI-generated content.
+This implementation document provides a comprehensive guide for implementing the Manual Question Addition feature. The feature integrates seamlessly with the existing QuizCrafter application architecture while providing instructors with the flexibility to create custom questions alongside AI-generated content.
 
 The implementation follows established patterns in the codebase, maintains type safety throughout, and provides a robust user experience with proper error handling and validation. The feature enhances the overall value of the quiz generation system by combining the efficiency of AI with the expertise of human instructors.
 

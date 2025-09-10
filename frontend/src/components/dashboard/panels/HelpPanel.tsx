@@ -7,8 +7,8 @@ import {
   Link,
   Text,
   VStack,
-} from "@chakra-ui/react"
-import { LuExternalLink } from "react-icons/lu"
+} from "@chakra-ui/react";
+import { LuExternalLink } from "react-icons/lu";
 
 export function HelpPanel() {
   return (
@@ -18,7 +18,7 @@ export function HelpPanel() {
           Help and Resources
         </Text>
         <Text fontSize="sm" color="gray.600">
-          Learn how to use Rag@UiT effectively
+          Learn how to use QuizCrafter effectively
         </Text>
       </Card.Header>
       <Card.Body>
@@ -26,12 +26,12 @@ export function HelpPanel() {
           {/* About Section */}
           <Box>
             <Text fontSize="sm" fontWeight="semibold" mb={2} color="gray.700">
-              About Rag@UiT
+              About QuizCrafter
             </Text>
             <Text fontSize="sm" color="gray.600" lineHeight="relaxed">
-              Rag@UiT uses LLMs to generate multiple-choice questions from your
-              Canvas course materials. The system analyzes the modules from a
-              course and creates relevant questions that you can review,
+              QuizCrafter uses LLMs to generate multiple-choice questions from
+              your Canvas course materials. The system analyzes the modules from
+              a course and creates relevant questions that you can review,
               approve, and export directly to Canvas.
             </Text>
           </Box>
@@ -111,7 +111,7 @@ export function HelpPanel() {
                 Contact Developer
               </Link>
               <Link
-                href="https://github.com/uit-no/ragatuit"
+                href="https://github.com/uit-no/quizcrafter"
                 fontSize="sm"
                 color="blue.600"
                 _hover={{ textDecoration: "underline" }}
@@ -164,5 +164,5 @@ export function HelpPanel() {
         </VStack>
       </Card.Body>
     </Card.Root>
-  )
+  );
 }

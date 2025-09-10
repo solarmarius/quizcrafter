@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Rag@UiT is a Canvas LMS quiz generator application that uses language models to generate multiple-choice questions based on course content. The application consists of a FastAPI backend with PostgreSQL database and a React frontend with TypeScript.
+QuizCrafter is a Canvas LMS quiz generator application that uses language models to generate multiple-choice questions based on course content. The application consists of a FastAPI backend with PostgreSQL database and a React frontend with TypeScript.
 
 **Key Features:**
 
@@ -149,6 +149,7 @@ Comprehensive documentation for the refactored frontend architecture:
 The application uses a **consolidated status system** with a single `status` field and detailed failure tracking:
 
 ### QuizStatus Enum
+
 - `created` - Quiz created, ready to start
 - `extracting_content` - Extracting content from Canvas modules
 - `generating_questions` - AI generating questions from extracted content
@@ -158,6 +159,7 @@ The application uses a **consolidated status system** with a single `status` fie
 - `failed` - Process failed (see failure_reason for details)
 
 ### FailureReason Enum
+
 - `content_extraction_error` - Failed to extract content from Canvas
 - `no_content_found` - No content found in selected modules
 - `llm_generation_error` - AI question generation failed
@@ -167,6 +169,7 @@ The application uses a **consolidated status system** with a single `status` fie
 - `validation_error` - Data validation failed
 
 ### Status Light Color System
+
 - 🔴 **Red**: `failed` - Any process failed
 - 🟠 **Orange**: `created`, `extracting_content`, `generating_questions` - Processing
 - 🟡 **Yellow**: `exporting_to_canvas` - Exporting to Canvas

@@ -2,14 +2,14 @@
 
 **Document Date**: July 22, 2025
 **Feature**: Frontend Matching Question Type Support
-**Target System**: Rag@UiT Canvas LMS Quiz Generator Frontend
+**Target System**: QuizCrafter Canvas LMS Quiz Generator Frontend
 **Author**: Implementation Guide
 
 ## 1. Feature Overview
 
 ### What It Does
 
-The Matching Question Type frontend implementation adds comprehensive user interface support for matching questions in the Rag@UiT quiz generator. This feature allows instructors to:
+The Matching Question Type frontend implementation adds comprehensive user interface support for matching questions in the QuizCrafter quiz generator. This feature allows instructors to:
 
 - **Create Matching Questions**: Through the quiz creation interface, selecting matching as a question type
 - **Review Generated Questions**: View AI-generated matching questions with proper formatting

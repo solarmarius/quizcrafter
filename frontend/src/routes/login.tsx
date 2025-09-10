@@ -6,12 +6,12 @@ import {
   Image,
   Text,
   VStack,
-} from "@chakra-ui/react"
-import { createFileRoute, redirect } from "@tanstack/react-router"
+} from "@chakra-ui/react";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 
-import CanvasLoginButton from "@/components/ui/canvas-button"
-import { isLoggedIn } from "@/hooks/auth"
-import Illustration from "/assets/images/test-illustration.svg"
+import CanvasLoginButton from "@/components/ui/canvas-button";
+import { isLoggedIn } from "@/hooks/auth";
+import Illustration from "/assets/images/test-illustration.svg";
 
 export const Route = createFileRoute("/login")({
   component: Login,
@@ -19,18 +19,18 @@ export const Route = createFileRoute("/login")({
     if (isLoggedIn()) {
       throw redirect({
         to: "/",
-      })
+      });
     }
   },
   validateSearch: (search: Record<string, unknown>) => {
     return {
       error: typeof search.error === "string" ? search.error : undefined,
-    }
+    };
   },
-})
+});
 
 function Login() {
-  const { error } = Route.useSearch()
+  const { error } = Route.useSearch();
 
   return (
     <Container
@@ -47,7 +47,7 @@ function Login() {
         {/* App Title/Logo */}
         <VStack mb={4}>
           <Text fontSize="2xl" fontWeight="bold" textAlign="center">
-            Welcome to Rag@UiT
+            Welcome to QuizCrafter
           </Text>
           <Text fontSize="sm" color="gray.600" textAlign="center">
             Turn your Canvas course material into high-quality quizzes with
@@ -91,11 +91,11 @@ function Login() {
             />
           </AspectRatio>
           <Text fontSize="xs" color="gray.600">
-            Watch how Rag@UiT seamlessly integrates with Canvas to analyze your
-            course materials and generate high-quality quizzes.
+            Watch how QuizCrafter seamlessly integrates with Canvas to analyze
+            your course materials and generate high-quality quizzes.
           </Text>
         </Box>
       </VStack>
     </Container>
-  )
+  );
 }

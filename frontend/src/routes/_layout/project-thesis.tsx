@@ -1,9 +1,9 @@
-import { Box, Container, Heading, List, Text, VStack } from "@chakra-ui/react"
-import { createFileRoute } from "@tanstack/react-router"
+import { Box, Container, Heading, List, Text, VStack } from "@chakra-ui/react";
+import { createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/_layout/project-thesis")({
   component: ProjectThesis,
-})
+});
 
 function ProjectThesis() {
   return (
@@ -40,9 +40,9 @@ function ProjectThesis() {
             educational content.
           </Text>
           <Text mb={4}>
-            The RAG@UiT application, developed to generate quiz questions from
-            Canvas course content, provides an unique opportunity to study this
-            research gap. With teachers actively validating, editing, and
+            The QuizCrafter application, developed to generate quiz questions
+            from Canvas course content, provides an unique opportunity to study
+            this research gap. With teachers actively validating, editing, and
             rejecting AI-generated questions, the system provides rich human
             expert feedback that can be used to assess and improve automatic
             quality evaluation methods.
@@ -86,7 +86,7 @@ function ProjectThesis() {
             <strong>Data Collection:</strong>
           </Text>
           <Text mb={4}>
-            The primary source of data will be collected from RAG@UiT
+            The primary source of data will be collected from QuizCrafter
             application, which is deployed at Institute of Informatics. We
             expect to collect least 200 AI-generated questions, primarily in
             Norwegian, but also in English. Each question is stored along with
@@ -222,5 +222,5 @@ function ProjectThesis() {
         </Box>
       </VStack>
     </Container>
-  )
+  );
 }

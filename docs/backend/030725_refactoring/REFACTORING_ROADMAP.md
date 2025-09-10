@@ -1,8 +1,8 @@
-# Rag@UiT Backend Refactoring Roadmap
+# QuizCrafter Backend Refactoring Roadmap
 
 ## Executive Summary
 
-This roadmap provides a structured approach to refactoring the Rag@UiT FastAPI backend codebase. After analyzing 22 identified issues, we've organized them using a **dependency-first approach** rather than pure criticality-based prioritization. This ensures continuous, unblocked progress throughout the refactoring process.
+This roadmap provides a structured approach to refactoring the QuizCrafter FastAPI backend codebase. After analyzing 22 identified issues, we've organized them using a **dependency-first approach** rather than pure criticality-based prioritization. This ensures continuous, unblocked progress throughout the refactoring process.
 
 ### Key Principles
 

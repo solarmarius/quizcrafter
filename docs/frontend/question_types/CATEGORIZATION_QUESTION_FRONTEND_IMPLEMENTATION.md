@@ -2,14 +2,14 @@
 
 **Document Date**: July 23, 2025
 **Feature**: Frontend Categorization Question Type Support
-**Target System**: Rag@UiT Canvas LMS Quiz Generator Frontend
+**Target System**: QuizCrafter Canvas LMS Quiz Generator Frontend
 **Author**: Implementation Guide
 
 ## 1. Feature Overview
 
 ### What It Does
 
-The Categorization Question Type frontend implementation adds comprehensive user interface support for categorization questions in the Rag@UiT quiz generator. This feature allows instructors to:
+The Categorization Question Type frontend implementation adds comprehensive user interface support for categorization questions in the QuizCrafter quiz generator. This feature allows instructors to:
 
 - **Create Categorization Questions**: Through the quiz creation interface, selecting categorization as a question type
 - **Review Generated Questions**: View AI-generated categorization questions with proper visual formatting

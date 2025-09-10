@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document describes the implementation of multi-language support in the Rag@UiT quiz generation system. The feature allows users to select the language (English or Norwegian) for AI-generated quiz questions during the quiz creation process.
+This document describes the implementation of multi-language support in the QuizCrafter quiz generation system. The feature allows users to select the language (English or Norwegian) for AI-generated quiz questions during the quiz creation process.
 
 ## Architecture Overview
 
@@ -16,14 +16,17 @@ User Selection → Quiz Creation → Content Extraction → Question Generation 
 ### Key Components
 
 1. **QuizLanguage Enum** (`question/types/base.py`)
+
    - Defines supported languages: ENGLISH = "en", NORWEGIAN = "no"
    - Placed in question module to avoid circular imports
 
 2. **Quiz Model** (`quiz/models.py`)
+
    - Added `language` field with default value `QuizLanguage.ENGLISH`
    - Persisted in database for entire quiz lifecycle
 
 3. **Template System** (`question/templates/`)
+
    - Language-aware template selection
    - Norwegian templates use `_no` suffix convention
    - Automatic fallback to English if Norwegian template not found
@@ -38,6 +41,7 @@ User Selection → Quiz Creation → Content Extraction → Question Generation 
 ### Backend Implementation
 
 #### 1. Database Schema
+
 ```python
 # quiz/models.py
 class Quiz(SQLModel, table=True):
@@ -49,12 +53,14 @@ class Quiz(SQLModel, table=True):
 ```
 
 #### 2. Template Naming Convention
+
 ```
 English:    default_multiple_choice.json
 Norwegian:  default_multiple_choice_no.json
 ```
 
 #### 3. Template Selection Logic
+
 ```python
 # question/templates/manager.py
 def get_template(self, question_type, template_name=None, language=None):
@@ -70,6 +76,7 @@ def get_template(self, question_type, template_name=None, language=None):
 ```
 
 #### 4. Generation Flow Integration
+
 ```python
 # quiz/orchestrator.py
 async def orchestrate_quiz_question_generation(
@@ -90,6 +97,7 @@ async def orchestrate_quiz_question_generation(
 ### Frontend Implementation
 
 #### 1. UI Component
+
 ```tsx
 // components/QuizCreation/QuizSettingsStep.tsx
 const languageOptions = [
@@ -119,20 +127,22 @@ const languageOptions = [
 ```
 
 #### 2. Type Definitions
+
 ```typescript
 // Generated from backend OpenAPI
-export type QuizLanguage = "en" | "no"
+export type QuizLanguage = "en" | "no";
 
 // Constants
 export const QUIZ_LANGUAGES = {
   ENGLISH: "en",
   NORWEGIAN: "no",
-} as const
+} as const;
 ```
 
 ## Template Structure
 
 ### English Template Example
+
 ```json
 {
   "name": "default_multiple_choice",
@@ -149,6 +159,7 @@ export const QUIZ_LANGUAGES = {
 ```
 
 ### Norwegian Template Example
+
 ```json
 {
   "name": "default_multiple_choice_no",
@@ -167,12 +178,14 @@ export const QUIZ_LANGUAGES = {
 ## Error Handling
 
 ### Missing Template Handling
+
 1. System attempts to load language-specific template
 2. If not found, falls back to English template
 3. If English template also missing, raises TemplateNotFoundError
 4. Quiz status set to FAILED with appropriate failure reason
 
 ### Validation
+
 - Language field validated at API level
 - Only accepts values from QuizLanguage enum
 - Default to English if not specified
@@ -180,12 +193,14 @@ export const QUIZ_LANGUAGES = {
 ## Testing Strategy
 
 ### Backend Tests
+
 - Unit tests for language field validation
 - Template selection logic tests
 - Integration tests for full generation flow
 - Fallback mechanism tests
 
 ### Frontend Tests
+
 - UI component rendering tests
 - Form validation with language field
 - API integration tests
@@ -196,6 +211,7 @@ export const QUIZ_LANGUAGES = {
 ### Adding New Languages
 
 1. **Update Enum**
+
    ```python
    class QuizLanguage(str, Enum):
        ENGLISH = "en"
@@ -204,17 +220,19 @@ export const QUIZ_LANGUAGES = {
    ```
 
 2. **Create Templates**
+
    - Copy existing templates
    - Add language suffix (e.g., `_sv`)
    - Translate content
 
 3. **Update Frontend**
+
    ```typescript
    export const QUIZ_LANGUAGES = {
      ENGLISH: "en",
      NORWEGIAN: "no",
-     SWEDISH: "sv",  // New language
-   } as const
+     SWEDISH: "sv", // New language
+   } as const;
    ```
 
 4. **Add UI Option**
@@ -226,7 +244,7 @@ export const QUIZ_LANGUAGES = {
        label: "Swedish",
        description: "Generate questions in Swedish",
      },
-   ]
+   ];
    ```
 
 ### Considerations for Scale
@@ -239,11 +257,13 @@ export const QUIZ_LANGUAGES = {
 ## Migration Guide
 
 ### Database Migration
+
 ```sql
 ALTER TABLE quiz ADD COLUMN language VARCHAR(2) DEFAULT 'en';
 ```
 
 ### Data Migration
+
 - Existing quizzes default to English
 - No data transformation required
 
