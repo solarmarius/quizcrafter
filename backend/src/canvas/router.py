@@ -8,7 +8,7 @@ import httpx
 from fastapi import APIRouter, HTTPException
 
 from src.auth.dependencies import CurrentUser
-from src.config import get_logger
+from src.config import get_logger, settings
 
 from .dependencies import CanvasToken, CanvasURLBuilderDep
 from .schemas import CanvasCourse, CanvasModule
@@ -152,6 +152,17 @@ async def get_courses(
                     error=str(e),
                 )
                 continue
+
+        # Apply course prefix filtering if configured
+        if settings.canvas_course_prefixes:
+            teacher_courses = [
+                course
+                for course in teacher_courses
+                if any(
+                    course.name.startswith(prefix)
+                    for prefix in settings.canvas_course_prefixes
+                )
+            ]
 
         logger.info(
             "courses_fetch_completed",
