@@ -2,14 +2,14 @@
 
 **Document Date**: January 30, 2025
 **Feature**: Frontend True/False Question Type Support
-**Target System**: Rag@UiT Canvas LMS Quiz Generator Frontend
+**Target System**: QuizCrafter Canvas LMS Quiz Generator Frontend
 **Author**: Implementation Guide
 
 ## 1. Feature Overview
 
 ### What It Does
 
-The True/False Question Type frontend implementation adds comprehensive user interface support for true/false questions in the Rag@UiT quiz generator. This feature allows instructors to:
+The True/False Question Type frontend implementation adds comprehensive user interface support for true/false questions in the QuizCrafter quiz generator. This feature allows instructors to:
 
 - **Create True/False Questions**: Through the quiz creation interface, selecting true/false as a question type
 - **Review Generated Questions**: View AI-generated true/false questions with proper visual formatting
@@ -182,7 +182,7 @@ export const QUESTION_TYPES = {
   MATCHING: "matching",
   CATEGORIZATION: "categorization",
   TRUE_FALSE: "true_false", // ← ADD THIS LINE
-} as const
+} as const;
 
 // Find the QUESTION_TYPE_LABELS constant and add true/false
 export const QUESTION_TYPE_LABELS = {
@@ -191,7 +191,7 @@ export const QUESTION_TYPE_LABELS = {
   matching: "Matching",
   categorization: "Categorization",
   true_false: "True/False", // ← ADD THIS LINE
-} as const
+} as const;
 ```
 
 **Purpose**: These constants ensure type safety and provide consistent labels throughout the application.
@@ -208,9 +208,9 @@ Add the true/false data interface and update the discriminated union:
 // Add after the existing CategorizationData interface
 // True/False Question Data
 export interface TrueFalseData {
-  question_text: string
-  correct_answer: boolean
-  explanation?: string | null
+  question_text: string;
+  correct_answer: boolean;
+  explanation?: string | null;
 }
 
 // Update the discriminated union to include true/false
@@ -219,104 +219,104 @@ export type QuestionData =
   | ({ type: "fill_in_blank" } & FillInBlankData)
   | ({ type: "matching" } & MatchingData)
   | ({ type: "categorization" } & CategorizationData)
-  | ({ type: "true_false" } & TrueFalseData) // ← ADD THIS LINE
+  | ({ type: "true_false" } & TrueFalseData); // ← ADD THIS LINE
 
 // Update the TypedQuestionResponse to include true/false
 export interface TypedQuestionResponse<T extends QuestionType = QuestionType> {
-  id: string
-  quiz_id: string
-  question_type: T
+  id: string;
+  quiz_id: string;
+  question_type: T;
   question_data: T extends "multiple_choice"
     ? MCQData
     : T extends "fill_in_blank"
-      ? FillInBlankData
-      : T extends "matching"
-        ? MatchingData
-        : T extends "categorization"
-          ? CategorizationData
-          : T extends "true_false" // ← ADD THIS LINE
-            ? TrueFalseData // ← ADD THIS LINE
-            : never
-  difficulty?: QuestionDifficulty | null
-  tags?: string[] | null
-  is_approved: boolean
-  approved_at?: string | null
-  created_at?: string | null
-  updated_at?: string | null
-  canvas_item_id?: string | null
+    ? FillInBlankData
+    : T extends "matching"
+    ? MatchingData
+    : T extends "categorization"
+    ? CategorizationData
+    : T extends "true_false" // ← ADD THIS LINE
+    ? TrueFalseData // ← ADD THIS LINE
+    : never;
+  difficulty?: QuestionDifficulty | null;
+  tags?: string[] | null;
+  is_approved: boolean;
+  approved_at?: string | null;
+  created_at?: string | null;
+  updated_at?: string | null;
+  canvas_item_id?: string | null;
 }
 
 // Add specific typed question response type
-export type TrueFalseQuestionResponse = TypedQuestionResponse<"true_false">
+export type TrueFalseQuestionResponse = TypedQuestionResponse<"true_false">;
 
 // Add type guard for runtime validation
 export function isTrueFalseData(data: unknown): data is TrueFalseData {
   if (typeof data !== "object" || data === null) {
-    return false
+    return false;
   }
 
-  const obj = data as Record<string, unknown>
+  const obj = data as Record<string, unknown>;
 
   // Validate required fields
   if (typeof obj.question_text !== "string") {
-    return false
+    return false;
   }
 
   if (typeof obj.correct_answer !== "boolean") {
-    return false
+    return false;
   }
 
   // Validate optional explanation
   if (obj.explanation !== undefined && obj.explanation !== null) {
     if (typeof obj.explanation !== "string") {
-      return false
+      return false;
     }
   }
 
-  return true
+  return true;
 }
 
 // Update extractQuestionData function to handle true/false
 export function extractQuestionData<T extends QuestionType>(
   question: QuestionResponse,
-  type: T,
+  type: T
 ): TypedQuestionResponse<T>["question_data"] {
   if (question.question_type !== type) {
-    throw new Error(`Expected ${type} question, got ${question.question_type}`)
+    throw new Error(`Expected ${type} question, got ${question.question_type}`);
   }
 
-  const data = question.question_data
+  const data = question.question_data;
 
   switch (type) {
     case "multiple_choice":
       if (!isMCQData(data)) {
-        throw new Error("Invalid MCQ question data structure")
+        throw new Error("Invalid MCQ question data structure");
       }
-      return data as unknown as TypedQuestionResponse<T>["question_data"]
+      return data as unknown as TypedQuestionResponse<T>["question_data"];
     case "fill_in_blank":
       if (!isFillInBlankData(data)) {
-        throw new Error("Invalid Fill in Blank question data structure")
+        throw new Error("Invalid Fill in Blank question data structure");
       }
-      return data as unknown as TypedQuestionResponse<T>["question_data"]
+      return data as unknown as TypedQuestionResponse<T>["question_data"];
     case "matching":
       if (!isMatchingData(data)) {
-        throw new Error("Invalid Matching question data structure")
+        throw new Error("Invalid Matching question data structure");
       }
-      return data as unknown as TypedQuestionResponse<T>["question_data"]
+      return data as unknown as TypedQuestionResponse<T>["question_data"];
     case "categorization":
       if (!isCategorizationData(data)) {
-        throw new Error("Invalid Categorization question data structure")
+        throw new Error("Invalid Categorization question data structure");
       }
-      return data as unknown as TypedQuestionResponse<T>["question_data"]
+      return data as unknown as TypedQuestionResponse<T>["question_data"];
     case "true_false": // ← ADD THIS CASE
       if (!isTrueFalseData(data)) {
-        throw new Error("Invalid True/False question data structure")
+        throw new Error("Invalid True/False question data structure");
       }
-      return data as unknown as TypedQuestionResponse<T>["question_data"]
+      return data as unknown as TypedQuestionResponse<T>["question_data"];
     default: {
       // TypeScript exhaustiveness check - this should never happen
-      const _exhaustiveCheck: never = type
-      throw new Error(`Unsupported question type: ${String(_exhaustiveCheck)}`)
+      const _exhaustiveCheck: never = type;
+      throw new Error(`Unsupported question type: ${String(_exhaustiveCheck)}`);
     }
   }
 }
@@ -349,25 +349,25 @@ export const trueFalseSchema = z.object({
     required_error: "Please select the correct answer",
   }),
   explanation: optionalString,
-})
+});
 
-export type TrueFalseFormData = z.infer<typeof trueFalseSchema>
+export type TrueFalseFormData = z.infer<typeof trueFalseSchema>;
 
 // Update getSchemaByType function
 export function getSchemaByType(questionType: QuestionType): z.ZodSchema<any> {
   switch (questionType) {
     case QUESTION_TYPES.MULTIPLE_CHOICE:
-      return mcqSchema
+      return mcqSchema;
     case QUESTION_TYPES.FILL_IN_BLANK:
-      return fillInBlankSchema
+      return fillInBlankSchema;
     case QUESTION_TYPES.MATCHING:
-      return matchingSchema
+      return matchingSchema;
     case QUESTION_TYPES.CATEGORIZATION:
-      return categorizationSchema
+      return categorizationSchema;
     case QUESTION_TYPES.TRUE_FALSE: // ← ADD THIS CASE
-      return trueFalseSchema
+      return trueFalseSchema;
     default:
-      throw new Error(`No schema defined for question type: ${questionType}`)
+      throw new Error(`No schema defined for question type: ${questionType}`);
   }
 }
 
@@ -376,14 +376,14 @@ export type FormDataByType<T extends QuestionType> =
   T extends typeof QUESTION_TYPES.MULTIPLE_CHOICE
     ? MCQFormData
     : T extends typeof QUESTION_TYPES.FILL_IN_BLANK
-      ? FillInBlankFormData
-      : T extends typeof QUESTION_TYPES.MATCHING
-        ? MatchingFormData
-        : T extends typeof QUESTION_TYPES.CATEGORIZATION
-          ? CategorizationFormData
-          : T extends typeof QUESTION_TYPES.TRUE_FALSE // ← ADD THIS LINE
-            ? TrueFalseFormData // ← ADD THIS LINE
-            : never
+    ? FillInBlankFormData
+    : T extends typeof QUESTION_TYPES.MATCHING
+    ? MatchingFormData
+    : T extends typeof QUESTION_TYPES.CATEGORIZATION
+    ? CategorizationFormData
+    : T extends typeof QUESTION_TYPES.TRUE_FALSE // ← ADD THIS LINE
+    ? TrueFalseFormData // ← ADD THIS LINE
+    : never;
 ```
 
 **Purpose**: Provides form validation with business rules and user-friendly error messages.
@@ -403,17 +403,17 @@ export type FormDataByType<T extends QuestionType> =
 Complete display component following established patterns:
 
 ```typescript
-import type { QuestionResponse } from "@/client"
-import { extractQuestionData } from "@/types/questionTypes"
-import { Box, HStack, Text, VStack } from "@chakra-ui/react"
-import { memo } from "react"
-import { ExplanationBox } from "../shared/ExplanationBox"
-import { ErrorDisplay } from "./ErrorDisplay"
+import type { QuestionResponse } from "@/client";
+import { extractQuestionData } from "@/types/questionTypes";
+import { Box, HStack, Text, VStack } from "@chakra-ui/react";
+import { memo } from "react";
+import { ExplanationBox } from "../shared/ExplanationBox";
+import { ErrorDisplay } from "./ErrorDisplay";
 
 interface TrueFalseDisplayProps {
-  question: QuestionResponse
-  showCorrectAnswer: boolean
-  showExplanation: boolean
+  question: QuestionResponse;
+  showCorrectAnswer: boolean;
+  showExplanation: boolean;
 }
 
 /**
@@ -426,7 +426,7 @@ export const TrueFalseDisplay = memo(function TrueFalseDisplay({
   showExplanation,
 }: TrueFalseDisplayProps) {
   try {
-    const trueFalseData = extractQuestionData(question, "true_false")
+    const trueFalseData = extractQuestionData(question, "true_false");
 
     return (
       <VStack gap={4} align="stretch">
@@ -493,12 +493,12 @@ export const TrueFalseDisplay = memo(function TrueFalseDisplay({
           <ExplanationBox explanation={trueFalseData.explanation} />
         )}
       </VStack>
-    )
+    );
   } catch (error) {
-    console.error("Error rendering true/false question:", error)
-    return <ErrorDisplay error="Error loading true/false question data" />
+    console.error("Error rendering true/false question:", error);
+    return <ErrorDisplay error="Error loading true/false question data" />;
   }
-})
+});
 ```
 
 **Purpose**: Renders true/false questions with side-by-side boxes and blue highlighting for correct answers.
@@ -514,14 +514,14 @@ export const TrueFalseDisplay = memo(function TrueFalseDisplay({
 **Update exports in** `frontend/src/components/Questions/display/index.ts`:
 
 ```typescript
-export * from "./QuestionDisplay"
-export * from "./MCQDisplay"
-export * from "./FillInBlankDisplay"
-export * from "./MatchingDisplay"
-export * from "./CategorizationDisplay"
-export * from "./TrueFalseDisplay" // ← ADD THIS LINE
-export * from "./UnsupportedDisplay"
-export * from "./ErrorDisplay"
+export * from "./QuestionDisplay";
+export * from "./MCQDisplay";
+export * from "./FillInBlankDisplay";
+export * from "./MatchingDisplay";
+export * from "./CategorizationDisplay";
+export * from "./TrueFalseDisplay"; // ← ADD THIS LINE
+export * from "./UnsupportedDisplay";
+export * from "./ErrorDisplay";
 ```
 
 **Testing**: Run `npx tsc --noEmit` to verify TypeScript compilation passes.
@@ -533,26 +533,22 @@ export * from "./ErrorDisplay"
 Complete editor component with form management:
 
 ```typescript
-import type { QuestionResponse, QuestionUpdateRequest } from "@/client"
-import { FormField, FormGroup } from "@/components/forms"
-import { Radio, RadioGroup } from "@/components/ui/radio"
-import { type TrueFalseFormData, trueFalseSchema } from "@/lib/validation"
-import { extractQuestionData } from "@/types/questionTypes"
-import {
-  Button,
-  HStack,
-  Textarea,
-} from "@chakra-ui/react"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { memo } from "react"
-import { Controller, useForm } from "react-hook-form"
-import { ErrorEditor } from "./ErrorEditor"
+import type { QuestionResponse, QuestionUpdateRequest } from "@/client";
+import { FormField, FormGroup } from "@/components/forms";
+import { Radio, RadioGroup } from "@/components/ui/radio";
+import { type TrueFalseFormData, trueFalseSchema } from "@/lib/validation";
+import { extractQuestionData } from "@/types/questionTypes";
+import { Button, HStack, Textarea } from "@chakra-ui/react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { memo } from "react";
+import { Controller, useForm } from "react-hook-form";
+import { ErrorEditor } from "./ErrorEditor";
 
 interface TrueFalseEditorProps {
-  question: QuestionResponse
-  onSave: (updateData: QuestionUpdateRequest) => void
-  onCancel: () => void
-  isLoading: boolean
+  question: QuestionResponse;
+  onSave: (updateData: QuestionUpdateRequest) => void;
+  onCancel: () => void;
+  isLoading: boolean;
 }
 
 /**
@@ -566,7 +562,7 @@ export const TrueFalseEditor = memo(function TrueFalseEditor({
   isLoading,
 }: TrueFalseEditorProps) {
   try {
-    const trueFalseData = extractQuestionData(question, "true_false")
+    const trueFalseData = extractQuestionData(question, "true_false");
 
     const {
       control,
@@ -579,7 +575,7 @@ export const TrueFalseEditor = memo(function TrueFalseEditor({
         correctAnswer: trueFalseData.correct_answer,
         explanation: trueFalseData.explanation || "",
       },
-    })
+    });
 
     const onSubmit = (data: TrueFalseFormData) => {
       const updateData: QuestionUpdateRequest = {
@@ -588,9 +584,9 @@ export const TrueFalseEditor = memo(function TrueFalseEditor({
           correct_answer: data.correctAnswer,
           explanation: data.explanation || null,
         },
-      }
-      onSave(updateData)
-    }
+      };
+      onSave(updateData);
+    };
 
     return (
       <FormGroup>
@@ -626,7 +622,7 @@ export const TrueFalseEditor = memo(function TrueFalseEditor({
               <RadioGroup
                 value={value?.toString()}
                 onValueChange={(details) => {
-                  onChange(details.value === "true")
+                  onChange(details.value === "true");
                 }}
               >
                 <HStack gap={4}>
@@ -671,17 +667,17 @@ export const TrueFalseEditor = memo(function TrueFalseEditor({
           </Button>
         </HStack>
       </FormGroup>
-    )
+    );
   } catch (error) {
-    console.error("Error rendering true/false question editor:", error)
+    console.error("Error rendering true/false question editor:", error);
     return (
       <ErrorEditor
         error="Error loading question data for editing"
         onCancel={onCancel}
       />
-    )
+    );
   }
-})
+});
 ```
 
 **Purpose**: Provides comprehensive editing interface for true/false questions with validation and form management.
@@ -697,14 +693,14 @@ export const TrueFalseEditor = memo(function TrueFalseEditor({
 **Update exports in** `frontend/src/components/Questions/editors/index.ts`:
 
 ```typescript
-export * from "./QuestionEditor"
-export * from "./MCQEditor"
-export * from "./FillInBlankEditor"
-export * from "./MatchingEditor"
-export * from "./CategorizationEditor"
-export * from "./TrueFalseEditor" // ← ADD THIS LINE
-export * from "./UnsupportedEditor"
-export * from "./ErrorEditor"
+export * from "./QuestionEditor";
+export * from "./MCQEditor";
+export * from "./FillInBlankEditor";
+export * from "./MatchingEditor";
+export * from "./CategorizationEditor";
+export * from "./TrueFalseEditor"; // ← ADD THIS LINE
+export * from "./UnsupportedEditor";
+export * from "./ErrorEditor";
 ```
 
 **Testing**: Run `npx tsc --noEmit` to verify TypeScript compilation passes.
@@ -716,21 +712,21 @@ export * from "./ErrorEditor"
 Add true/false case to the switch statement:
 
 ```typescript
-import { memo } from "react"
+import { memo } from "react";
 
-import type { QuestionResponse } from "@/client"
-import { QUESTION_TYPES } from "@/lib/constants"
-import { CategorizationDisplay } from "./CategorizationDisplay"
-import { FillInBlankDisplay } from "./FillInBlankDisplay"
-import { MCQDisplay } from "./MCQDisplay"
-import { MatchingDisplay } from "./MatchingDisplay"
-import { TrueFalseDisplay } from "./TrueFalseDisplay" // ← ADD THIS IMPORT
-import { UnsupportedDisplay } from "./UnsupportedDisplay"
+import type { QuestionResponse } from "@/client";
+import { QUESTION_TYPES } from "@/lib/constants";
+import { CategorizationDisplay } from "./CategorizationDisplay";
+import { FillInBlankDisplay } from "./FillInBlankDisplay";
+import { MCQDisplay } from "./MCQDisplay";
+import { MatchingDisplay } from "./MatchingDisplay";
+import { TrueFalseDisplay } from "./TrueFalseDisplay"; // ← ADD THIS IMPORT
+import { UnsupportedDisplay } from "./UnsupportedDisplay";
 
 interface QuestionDisplayProps {
-  question: QuestionResponse
-  showCorrectAnswer?: boolean
-  showExplanation?: boolean
+  question: QuestionResponse;
+  showCorrectAnswer?: boolean;
+  showExplanation?: boolean;
 }
 
 export const QuestionDisplay = memo(function QuestionDisplay({
@@ -742,23 +738,23 @@ export const QuestionDisplay = memo(function QuestionDisplay({
     question,
     showCorrectAnswer,
     showExplanation,
-  }
+  };
 
   switch (question.question_type) {
     case QUESTION_TYPES.MULTIPLE_CHOICE:
-      return <MCQDisplay {...commonProps} />
+      return <MCQDisplay {...commonProps} />;
     case QUESTION_TYPES.FILL_IN_BLANK:
-      return <FillInBlankDisplay {...commonProps} />
+      return <FillInBlankDisplay {...commonProps} />;
     case QUESTION_TYPES.MATCHING:
-      return <MatchingDisplay {...commonProps} />
+      return <MatchingDisplay {...commonProps} />;
     case QUESTION_TYPES.CATEGORIZATION:
-      return <CategorizationDisplay {...commonProps} />
+      return <CategorizationDisplay {...commonProps} />;
     case QUESTION_TYPES.TRUE_FALSE: // ← ADD THIS CASE
-      return <TrueFalseDisplay {...commonProps} />
+      return <TrueFalseDisplay {...commonProps} />;
     default:
-      return <UnsupportedDisplay questionType={question.question_type} />
+      return <UnsupportedDisplay questionType={question.question_type} />;
   }
-})
+});
 ```
 
 **File**: `frontend/src/components/Questions/editors/QuestionEditor.tsx`
@@ -766,22 +762,22 @@ export const QuestionDisplay = memo(function QuestionDisplay({
 Add true/false case to the switch statement:
 
 ```typescript
-import { memo } from "react"
+import { memo } from "react";
 
-import type { QuestionResponse, QuestionUpdateRequest } from "@/client"
-import { QUESTION_TYPES } from "@/lib/constants"
-import { CategorizationEditor } from "./CategorizationEditor"
-import { FillInBlankEditor } from "./FillInBlankEditor"
-import { MCQEditor } from "./MCQEditor"
-import { MatchingEditor } from "./MatchingEditor"
-import { TrueFalseEditor } from "./TrueFalseEditor" // ← ADD THIS IMPORT
-import { UnsupportedEditor } from "./UnsupportedEditor"
+import type { QuestionResponse, QuestionUpdateRequest } from "@/client";
+import { QUESTION_TYPES } from "@/lib/constants";
+import { CategorizationEditor } from "./CategorizationEditor";
+import { FillInBlankEditor } from "./FillInBlankEditor";
+import { MCQEditor } from "./MCQEditor";
+import { MatchingEditor } from "./MatchingEditor";
+import { TrueFalseEditor } from "./TrueFalseEditor"; // ← ADD THIS IMPORT
+import { UnsupportedEditor } from "./UnsupportedEditor";
 
 interface QuestionEditorProps {
-  question: QuestionResponse
-  onSave: (updateData: QuestionUpdateRequest) => void
-  onCancel: () => void
-  isLoading?: boolean
+  question: QuestionResponse;
+  onSave: (updateData: QuestionUpdateRequest) => void;
+  onCancel: () => void;
+  isLoading?: boolean;
 }
 
 export const QuestionEditor = memo(function QuestionEditor({
@@ -795,28 +791,28 @@ export const QuestionEditor = memo(function QuestionEditor({
     onSave,
     onCancel,
     isLoading,
-  }
+  };
 
   switch (question.question_type) {
     case QUESTION_TYPES.MULTIPLE_CHOICE:
-      return <MCQEditor {...commonProps} />
+      return <MCQEditor {...commonProps} />;
     case QUESTION_TYPES.FILL_IN_BLANK:
-      return <FillInBlankEditor {...commonProps} />
+      return <FillInBlankEditor {...commonProps} />;
     case QUESTION_TYPES.MATCHING:
-      return <MatchingEditor {...commonProps} />
+      return <MatchingEditor {...commonProps} />;
     case QUESTION_TYPES.CATEGORIZATION:
-      return <CategorizationEditor {...commonProps} />
+      return <CategorizationEditor {...commonProps} />;
     case QUESTION_TYPES.TRUE_FALSE: // ← ADD THIS CASE
-      return <TrueFalseEditor {...commonProps} />
+      return <TrueFalseEditor {...commonProps} />;
     default:
       return (
         <UnsupportedEditor
           questionType={question.question_type}
           onCancel={onCancel}
         />
-      )
+      );
   }
-})
+});
 ```
 
 **Purpose**: Integrates true/false components into the polymorphic router system.
@@ -855,7 +851,7 @@ const questionTypeCollection = createListCollection({
       label: "True/False",
     },
   ],
-})
+});
 ```
 
 **Purpose**: Allows users to select true/false as a question type during quiz creation.
@@ -868,9 +864,9 @@ const questionTypeCollection = createListCollection({
 
 ```typescript
 interface TrueFalseData {
-  question_text: string    // Main question statement (1-1000 characters)
-  correct_answer: boolean  // True or False - the correct answer
-  explanation?: string | null // Optional explanation text (up to 500 characters)
+  question_text: string; // Main question statement (1-1000 characters)
+  correct_answer: boolean; // True or False - the correct answer
+  explanation?: string | null; // Optional explanation text (up to 500 characters)
 }
 ```
 
@@ -878,9 +874,9 @@ interface TrueFalseData {
 
 ```typescript
 interface TrueFalseFormData {
-  questionText: string     // Question statement for form
-  correctAnswer: boolean   // True/False selection
-  explanation?: string     // Optional explanation
+  questionText: string; // Question statement for form
+  correctAnswer: boolean; // True/False selection
+  explanation?: string; // Optional explanation
 }
 ```
 
@@ -940,7 +936,7 @@ VITE_API_BASE_URL=http://localhost:8000
 
 ```typescript
 // Test file: src/types/__tests__/questionTypes.test.ts
-import { isTrueFalseData } from "@/types/questionTypes"
+import { isTrueFalseData } from "@/types/questionTypes";
 
 describe("isTrueFalseData", () => {
   it("should return true for valid true/false data", () => {
@@ -948,48 +944,48 @@ describe("isTrueFalseData", () => {
       question_text: "The Earth is round.",
       correct_answer: true,
       explanation: "Scientific evidence supports this fact.",
-    }
+    };
 
-    expect(isTrueFalseData(validData)).toBe(true)
-  })
+    expect(isTrueFalseData(validData)).toBe(true);
+  });
 
   it("should return false for missing question_text", () => {
     const invalidData = {
       correct_answer: true,
       explanation: "Missing question text",
-    }
+    };
 
-    expect(isTrueFalseData(invalidData)).toBe(false)
-  })
+    expect(isTrueFalseData(invalidData)).toBe(false);
+  });
 
   it("should return false for non-boolean correct_answer", () => {
     const invalidData = {
       question_text: "Test question",
       correct_answer: "true", // String instead of boolean
       explanation: "Test explanation",
-    }
+    };
 
-    expect(isTrueFalseData(invalidData)).toBe(false)
-  })
+    expect(isTrueFalseData(invalidData)).toBe(false);
+  });
 
   it("should return true for data without explanation", () => {
     const validData = {
       question_text: "The Earth is round.",
       correct_answer: false,
-    }
+    };
 
-    expect(isTrueFalseData(validData)).toBe(true)
-  })
-})
+    expect(isTrueFalseData(validData)).toBe(true);
+  });
+});
 ```
 
 #### Component Testing
 
 ```typescript
 // Test file: src/components/Questions/display/__tests__/TrueFalseDisplay.test.tsx
-import { render, screen } from "@testing-library/react"
-import { TrueFalseDisplay } from "../TrueFalseDisplay"
-import type { QuestionResponse } from "@/client"
+import { render, screen } from "@testing-library/react";
+import { TrueFalseDisplay } from "../TrueFalseDisplay";
+import type { QuestionResponse } from "@/client";
 
 const mockTrueFalseQuestion: QuestionResponse = {
   id: "test-id",
@@ -1003,18 +999,16 @@ const mockTrueFalseQuestion: QuestionResponse = {
   is_approved: false,
   created_at: "2025-01-30T10:00:00Z",
   updated_at: "2025-01-30T10:00:00Z",
-}
+};
 
 describe("TrueFalseDisplay", () => {
   it("renders question text and True/False boxes", () => {
-    render(<TrueFalseDisplay question={mockTrueFalseQuestion} />)
+    render(<TrueFalseDisplay question={mockTrueFalseQuestion} />);
 
-    expect(
-      screen.getByText("The sun rises in the east.")
-    ).toBeInTheDocument()
-    expect(screen.getByText("True")).toBeInTheDocument()
-    expect(screen.getByText("False")).toBeInTheDocument()
-  })
+    expect(screen.getByText("The sun rises in the east.")).toBeInTheDocument();
+    expect(screen.getByText("True")).toBeInTheDocument();
+    expect(screen.getByText("False")).toBeInTheDocument();
+  });
 
   it("highlights correct answer when showCorrectAnswer is true", () => {
     render(
@@ -1022,16 +1016,16 @@ describe("TrueFalseDisplay", () => {
         question={mockTrueFalseQuestion}
         showCorrectAnswer={true}
       />
-    )
+    );
 
-    const trueBox = screen.getByText("True").closest("div")
-    const falseBox = screen.getByText("False").closest("div")
+    const trueBox = screen.getByText("True").closest("div");
+    const falseBox = screen.getByText("False").closest("div");
 
     // True should be highlighted (blue border)
-    expect(trueBox).toHaveStyle({ borderColor: "blue.400" })
+    expect(trueBox).toHaveStyle({ borderColor: "blue.400" });
     // False should not be highlighted
-    expect(falseBox).toHaveStyle({ borderColor: "gray.200" })
-  })
+    expect(falseBox).toHaveStyle({ borderColor: "gray.200" });
+  });
 
   it("shows explanation when showExplanation is true", () => {
     render(
@@ -1039,13 +1033,13 @@ describe("TrueFalseDisplay", () => {
         question={mockTrueFalseQuestion}
         showExplanation={true}
       />
-    )
+    );
 
     expect(
       screen.getByText("The Earth rotates from west to east.")
-    ).toBeInTheDocument()
-  })
-})
+    ).toBeInTheDocument();
+  });
+});
 ```
 
 ### Integration Test Scenarios
@@ -1054,17 +1048,17 @@ describe("TrueFalseDisplay", () => {
 
 ```typescript
 // Test file: src/components/Questions/editors/__tests__/TrueFalseEditor.integration.test.tsx
-import { render, screen, fireEvent, waitFor } from "@testing-library/react"
-import userEvent from "@testing-library/user-event"
-import { TrueFalseEditor } from "../TrueFalseEditor"
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { TrueFalseEditor } from "../TrueFalseEditor";
 
 describe("TrueFalseEditor Integration", () => {
-  const mockOnSave = jest.fn()
-  const mockOnCancel = jest.fn()
+  const mockOnSave = jest.fn();
+  const mockOnCancel = jest.fn();
 
   beforeEach(() => {
-    jest.clearAllMocks()
-  })
+    jest.clearAllMocks();
+  });
 
   it("validates required fields", async () => {
     render(
@@ -1074,25 +1068,23 @@ describe("TrueFalseEditor Integration", () => {
         onCancel={mockOnCancel}
         isLoading={false}
       />
-    )
+    );
 
     // Clear question text
     const questionInput = screen.getByPlaceholderText(
       "Enter your true/false statement..."
-    )
-    await userEvent.clear(questionInput)
+    );
+    await userEvent.clear(questionInput);
 
-    const saveBtn = screen.getByText("Save Changes")
-    await userEvent.click(saveBtn)
+    const saveBtn = screen.getByText("Save Changes");
+    await userEvent.click(saveBtn);
 
     await waitFor(() => {
-      expect(
-        screen.getByText("This field is required")
-      ).toBeInTheDocument()
-    })
+      expect(screen.getByText("This field is required")).toBeInTheDocument();
+    });
 
-    expect(mockOnSave).not.toHaveBeenCalled()
-  })
+    expect(mockOnSave).not.toHaveBeenCalled();
+  });
 
   it("saves valid form data", async () => {
     render(
@@ -1102,21 +1094,21 @@ describe("TrueFalseEditor Integration", () => {
         onCancel={mockOnCancel}
         isLoading={false}
       />
-    )
+    );
 
     // Modify question text
     const questionInput = screen.getByPlaceholderText(
       "Enter your true/false statement..."
-    )
-    await userEvent.clear(questionInput)
-    await userEvent.type(questionInput, "Updated question text")
+    );
+    await userEvent.clear(questionInput);
+    await userEvent.type(questionInput, "Updated question text");
 
     // Select False as correct answer
-    const falseRadio = screen.getByLabelText("False")
-    await userEvent.click(falseRadio)
+    const falseRadio = screen.getByLabelText("False");
+    await userEvent.click(falseRadio);
 
-    const saveBtn = screen.getByText("Save Changes")
-    await userEvent.click(saveBtn)
+    const saveBtn = screen.getByText("Save Changes");
+    await userEvent.click(saveBtn);
 
     await waitFor(() => {
       expect(mockOnSave).toHaveBeenCalledWith({
@@ -1125,10 +1117,10 @@ describe("TrueFalseEditor Integration", () => {
           correct_answer: false,
           explanation: expect.any(String),
         },
-      })
-    })
-  })
-})
+      });
+    });
+  });
+});
 ```
 
 ### Manual Testing Steps
@@ -1288,29 +1280,32 @@ describe("TrueFalseEditor Integration", () => {
 
 ```javascript
 // Component mounting successfully
-console.log("TrueFalseDisplay rendered successfully", { questionId })
+console.log("TrueFalseDisplay rendered successfully", { questionId });
 
 // Form validation passing
 console.log("True/false question validation passed", {
   questionText: "...",
   correctAnswer: true,
-})
+});
 
 // Successful saves
-console.log("True/false question saved successfully", { questionId, updateData })
+console.log("True/false question saved successfully", {
+  questionId,
+  updateData,
+});
 ```
 
 #### Error Indicators
 
 ```javascript
 // Component errors
-console.error("Error rendering true/false question:", error)
+console.error("Error rendering true/false question:", error);
 
 // Validation errors
-console.error("True/false question validation failed:", validationError)
+console.error("True/false question validation failed:", validationError);
 
 // Type errors
-console.error("Invalid true/false question data structure:", dataError)
+console.error("Invalid true/false question data structure:", dataError);
 ```
 
 #### Browser Console Monitoring
@@ -1356,13 +1351,16 @@ grep -r "TrueFalseDisplay\|TrueFalseEditor" src/components/
 
 ```javascript
 // Debug in browser console
-console.log("Question data:", question.question_data)
-console.log("Is valid true/false data:", isTrueFalseData(question.question_data))
+console.log("Question data:", question.question_data);
+console.log(
+  "Is valid true/false data:",
+  isTrueFalseData(question.question_data)
+);
 
 // Check backend response format
 fetch("/api/v1/questions/{id}")
   .then((r) => r.json())
-  .then((data) => console.log("Backend question data:", data))
+  .then((data) => console.log("Backend question data:", data));
 ```
 
 #### Issue: "TypeScript compilation errors"
@@ -1405,7 +1403,7 @@ grep -A 10 "type QuestionData" src/types/questionTypes.ts
 const { data: questions } = useQuery({
   queryKey: ["quiz", quizId, "questions"],
   queryFn: () => QuestionsService.getQuizQuestions({ quizId }), // Secured endpoint
-})
+});
 ```
 
 ### Data Privacy
@@ -1421,9 +1419,9 @@ const { data: questions } = useQuery({
 ```typescript
 // True/false questions follow same data patterns
 interface TrueFalseData {
-  question_text: string // Encrypted at rest
-  correct_answer: boolean // Encrypted at rest
-  explanation?: string | null // Optional, encrypted at rest
+  question_text: string; // Encrypted at rest
+  correct_answer: boolean; // Encrypted at rest
+  explanation?: string | null; // Optional, encrypted at rest
 }
 ```
 
@@ -1437,7 +1435,7 @@ export const trueFalseSchema = z.object({
   questionText: nonEmptyString.max(1000), // Length limits
   correctAnswer: z.boolean(), // Type validation
   explanation: optionalString.max(500), // Reasonable limits
-})
+});
 
 // Runtime type checking
 export function isTrueFalseData(data: unknown): data is TrueFalseData {
@@ -1468,7 +1466,7 @@ const updateMutation = useApiMutation(
     successMessage: "Question updated successfully!",
     invalidateQueries: [["quiz", quizId, "questions"]], // Cache invalidation
   }
-)
+);
 ```
 
 ### Cross-Site Scripting (XSS) Prevention
@@ -1487,7 +1485,7 @@ const trueFalseSchema = z.object({
   questionText: nonEmptyString.max(1000), // Length limits
   correctAnswer: z.boolean(), // Strict type validation
   explanation: optionalString.max(500), // Prevent large payloads
-})
+});
 ```
 
 ### Cross-Site Request Forgery (CSRF) Prevention
@@ -1505,14 +1503,14 @@ const trueFalseSchema = z.object({
 ```typescript
 export function isTrueFalseData(data: unknown): data is TrueFalseData {
   // Prevents type confusion attacks
-  if (typeof data !== "object" || data === null) return false
+  if (typeof data !== "object" || data === null) return false;
 
   // Validates all required fields exist and have correct types
   // Prevents prototype pollution and injection
-  const obj = data as Record<string, unknown>
+  const obj = data as Record<string, unknown>;
 
   // Strict validation prevents malicious data structures
-  return validateAllFields(obj)
+  return validateAllFields(obj);
 }
 ```
 
@@ -1520,10 +1518,10 @@ export function isTrueFalseData(data: unknown): data is TrueFalseData {
 
 ```typescript
 // Zod provides additional runtime protection
-const result = trueFalseSchema.safeParse(formData)
+const result = trueFalseSchema.safeParse(formData);
 if (!result.success) {
   // Prevents invalid data from reaching backend
-  throw new ValidationError(result.error)
+  throw new ValidationError(result.error);
 }
 ```
 
@@ -1564,15 +1562,15 @@ if (!result.success) {
 // Future: Configurable binary options
 interface ConfigurableTrueFalseData extends TrueFalseData {
   options: {
-    positive: string // "True", "Yes", "Correct", etc.
-    negative: string // "False", "No", "Incorrect", etc.
-  }
+    positive: string; // "True", "Yes", "Correct", etc.
+    negative: string; // "False", "No", "Incorrect", etc.
+  };
 }
 
 // Future: Confidence-based true/false
 interface ConfidenceTrueFalseData extends TrueFalseData {
-  requireConfidence: boolean
-  confidenceScale: 1 | 2 | 3 | 4 | 5 // 1-5 confidence rating
+  requireConfidence: boolean;
+  confidenceScale: 1 | 2 | 3 | 4 | 5; // 1-5 confidence rating
 }
 ```
 
@@ -1583,10 +1581,10 @@ interface ConfidenceTrueFalseData extends TrueFalseData {
    ```typescript
    // Enhanced display with layout options
    interface TrueFalseDisplayProps {
-     question: QuestionResponse
-     showCorrectAnswer: boolean
-     showExplanation: boolean
-     layout: "side-by-side" | "vertical" | "buttons" | "toggle" // New layout options
+     question: QuestionResponse;
+     showCorrectAnswer: boolean;
+     showExplanation: boolean;
+     layout: "side-by-side" | "vertical" | "buttons" | "toggle"; // New layout options
    }
    ```
 
@@ -1595,10 +1593,10 @@ interface ConfidenceTrueFalseData extends TrueFalseData {
    ```typescript
    // Custom styling options
    interface TrueFalseTheme {
-     trueColor: string
-     falseColor: string
-     correctHighlight: string
-     animations: boolean
+     trueColor: string;
+     falseColor: string;
+     correctHighlight: string;
+     animations: boolean;
    }
    ```
 
@@ -1607,12 +1605,12 @@ interface ConfidenceTrueFalseData extends TrueFalseData {
    // Enhanced accessibility features
    interface AccessibleTrueFalseProps {
      ariaLabels: {
-       question: string
-       trueOption: string
-       falseOption: string
-     }
-     keyboardShortcuts: boolean
-     highContrast: boolean
+       question: string;
+       trueOption: string;
+       falseOption: string;
+     };
+     keyboardShortcuts: boolean;
+     highContrast: boolean;
    }
    ```
 
@@ -1635,18 +1633,18 @@ interface ConfidenceTrueFalseData extends TrueFalseData {
    ```typescript
    // Extensible type system for future true/false variants
    interface BaseTrueFalseData {
-     question_text: string
-     explanation?: string
+     question_text: string;
+     explanation?: string;
    }
 
    // Different true/false implementations can extend base
    interface StandardTrueFalseData extends BaseTrueFalseData {
-     correct_answer: boolean
+     correct_answer: boolean;
    }
 
    interface ConfigurableTrueFalseData extends BaseTrueFalseData {
-     correct_answer: boolean
-     options: BinaryOptions
+     correct_answer: boolean;
+     options: BinaryOptions;
    }
    ```
 
@@ -1666,19 +1664,19 @@ const questionComponents = {
   matching: () => import("./MatchingDisplay"),
   categorization: () => import("./CategorizationDisplay"),
   true_false: () => import("./TrueFalseDisplay"), // Loaded on demand
-}
+};
 
 // Code splitting by question type usage
 function DynamicQuestionDisplay({ questionType, ...props }) {
-  const [Component, setComponent] = useState(null)
+  const [Component, setComponent] = useState(null);
 
   useEffect(() => {
     questionComponents[questionType]().then((module) => {
-      setComponent(() => module.default)
-    })
-  }, [questionType])
+      setComponent(() => module.default);
+    });
+  }, [questionType]);
 
-  return Component ? <Component {...props} /> : <LoadingDisplay />
+  return Component ? <Component {...props} /> : <LoadingDisplay />;
 }
 ```
 
@@ -1689,19 +1687,19 @@ function DynamicQuestionDisplay({ questionType, ...props }) {
 ```typescript
 // Future: Plugin system for custom question types
 interface QuestionTypePlugin {
-  type: string
-  displayName: string
-  displayComponent: ComponentType<BaseQuestionDisplayProps>
-  editorComponent: ComponentType<BaseQuestionEditorProps>
-  validationSchema: ZodSchema
-  typeGuard: (data: unknown) => boolean
+  type: string;
+  displayName: string;
+  displayComponent: ComponentType<BaseQuestionDisplayProps>;
+  editorComponent: ComponentType<BaseQuestionEditorProps>;
+  validationSchema: ZodSchema;
+  typeGuard: (data: unknown) => boolean;
 }
 
 // Plugin registration system
-const questionTypeRegistry = new Map<string, QuestionTypePlugin>()
+const questionTypeRegistry = new Map<string, QuestionTypePlugin>();
 
 export function registerQuestionType(plugin: QuestionTypePlugin) {
-  questionTypeRegistry.set(plugin.type, plugin)
+  questionTypeRegistry.set(plugin.type, plugin);
 }
 ```
 
@@ -1711,18 +1709,18 @@ export function registerQuestionType(plugin: QuestionTypePlugin) {
 // Versioned API support for backward compatibility
 interface TrueFalseDataV1 {
   // Current implementation
-  question_text: string
-  correct_answer: boolean
-  explanation?: string | null
+  question_text: string;
+  correct_answer: boolean;
+  explanation?: string | null;
 }
 
 interface TrueFalseDataV2 {
   // Future enhanced version
-  question_text: string
-  correct_answer: boolean
-  explanation?: string | null
-  options?: BinaryOptions // Custom True/False labels
-  theme?: TrueFalseTheme // Visual customization
+  question_text: string;
+  correct_answer: boolean;
+  explanation?: string | null;
+  options?: BinaryOptions; // Custom True/False labels
+  theme?: TrueFalseTheme; // Visual customization
 }
 
 // Migration strategy
@@ -1732,7 +1730,7 @@ function migrateTrueFalseData(data: TrueFalseDataV1): TrueFalseDataV2 {
     // Add new fields with sensible defaults
     options: { positive: "True", negative: "False" },
     theme: getDefaultTheme(),
-  }
+  };
 }
 ```
 
@@ -1746,8 +1744,8 @@ function migrateTrueFalseData(data: TrueFalseDataV1): TrueFalseDataV2 {
    // New features extend existing interfaces
    interface EnhancedTrueFalseData extends TrueFalseData {
      // New optional fields don't break existing data
-     options?: BinaryOptions
-     layout?: LayoutOptions
+     options?: BinaryOptions;
+     layout?: LayoutOptions;
    }
    ```
 
@@ -1756,27 +1754,29 @@ function migrateTrueFalseData(data: TrueFalseDataV1): TrueFalseDataV2 {
    ```typescript
    // Future components handle legacy data
    function EnhancedTrueFalseDisplay({ question }: Props) {
-     const data = extractQuestionData(question, "true_false")
+     const data = extractQuestionData(question, "true_false");
 
      // Detect data version and render appropriately
      if (isLegacyTrueFalseData(data)) {
-       return <LegacyTrueFalseView data={data} />
+       return <LegacyTrueFalseView data={data} />;
      }
 
-     return <EnhancedTrueFalseView data={data} />
+     return <EnhancedTrueFalseView data={data} />;
    }
    ```
 
 3. **Incremental Migration**
    ```typescript
    // Database migration strategy
-   function upgradeTrueFalseQuestion(oldData: TrueFalseDataV1): TrueFalseDataV2 {
+   function upgradeTrueFalseQuestion(
+     oldData: TrueFalseDataV1
+   ): TrueFalseDataV2 {
      return {
        ...oldData,
        // Add new fields with sensible defaults
        options: getDefaultBinaryOptions(),
        layout: "side-by-side",
-     }
+     };
    }
    ```
 

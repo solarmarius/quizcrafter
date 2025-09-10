@@ -1,6 +1,6 @@
 # Custom Hooks Documentation
 
-This document provides comprehensive documentation for all custom React hooks in the Rag@UiT frontend application. These hooks encapsulate reusable logic and provide consistent patterns for common operations.
+This document provides comprehensive documentation for all custom React hooks in the QuizCrafter frontend application. These hooks encapsulate reusable logic and provide consistent patterns for common operations.
 
 ## Table of Contents
 
@@ -26,6 +26,7 @@ This document provides comprehensive documentation for all custom React hooks in
 ## Status System Notes
 
 The application uses a **consolidated status system** with a single `status` field instead of separate status fields. Quiz status values are:
+
 - `created` - Quiz created, ready to start
 - `extracting_content` - Extracting content from Canvas
 - `generating_questions` - AI generating questions
@@ -50,16 +51,16 @@ When using polling hooks, check `quiz.status` instead of separate extraction/gen
 
 ```typescript
 interface UseApiMutationOptions<TData, TVariables> {
-  successMessage?: string
-  invalidateQueries?: QueryKey[]
-  onSuccess?: (data: TData, variables: TVariables) => void
-  onError?: (error: unknown) => void
+  successMessage?: string;
+  invalidateQueries?: QueryKey[];
+  onSuccess?: (data: TData, variables: TVariables) => void;
+  onError?: (error: unknown) => void;
 }
 
 function useApiMutation<TData, TVariables>(
   mutationFn: (variables: TVariables) => Promise<TData>,
   options?: UseApiMutationOptions<TData, TVariables>
-)
+);
 ```
 
 #### Features
@@ -77,31 +78,31 @@ const createQuizMutation = useApiMutation(
   (data: CreateQuizData) => QuizzesService.createQuiz(data),
   {
     successMessage: "Quiz created successfully!",
-    invalidateQueries: [['quizzes']],
+    invalidateQueries: [["quizzes"]],
   }
-)
+);
 
 // Usage with custom callbacks
 const updateQuizMutation = useApiMutation(
   (data: UpdateQuizData) => QuizzesService.updateQuiz(data),
   {
     successMessage: "Quiz updated successfully!",
-    invalidateQueries: [['quizzes'], ['quiz', data.id]],
+    invalidateQueries: [["quizzes"], ["quiz", data.id]],
     onSuccess: (data, variables) => {
-      console.log('Quiz updated:', data)
-      navigate(`/quiz/${data.id}`)
+      console.log("Quiz updated:", data);
+      navigate(`/quiz/${data.id}`);
     },
     onError: (error) => {
-      console.error('Update failed:', error)
+      console.error("Update failed:", error);
       // Custom error handling
-    }
+    },
   }
-)
+);
 
 // Trigger mutation
 const handleSubmit = (formData) => {
-  createQuizMutation.mutate(formData)
-}
+  createQuizMutation.mutate(formData);
+};
 ```
 
 #### Best Practices
@@ -123,17 +124,17 @@ const handleSubmit = (formData) => {
 
 ```typescript
 interface UseCanvasDataFetchingOptions {
-  enabled?: boolean
-  staleTime?: number
-  retry?: number
-  retryDelay?: number
+  enabled?: boolean;
+  staleTime?: number;
+  retry?: number;
+  retryDelay?: number;
 }
 
 function useCanvasDataFetching<T>(
   queryKey: QueryKey,
   queryFn: () => Promise<T>,
   options?: UseCanvasDataFetchingOptions
-)
+);
 ```
 
 #### Features
@@ -147,35 +148,39 @@ function useCanvasDataFetching<T>(
 
 ```tsx
 // Basic usage for fetching Canvas courses
-const { data: courses, isLoading, error } = useCanvasDataFetching(
-  ['canvas', 'courses'],
+const {
+  data: courses,
+  isLoading,
+  error,
+} = useCanvasDataFetching(
+  ["canvas", "courses"],
   () => CanvasService.getCourses(),
   {
     staleTime: 60000, // 1 minute
-    retry: 2
+    retry: 2,
   }
-)
+);
 
 // Conditional fetching based on user state
 const { data: modules, isLoading } = useCanvasDataFetching(
-  ['canvas', 'modules', courseId],
+  ["canvas", "modules", courseId],
   () => CanvasService.getModules(courseId),
   {
     enabled: !!courseId && !!user?.canvas_tokens,
     staleTime: 120000, // 2 minutes
   }
-)
+);
 
 // Custom retry configuration for unstable endpoints
 const { data: assignments } = useCanvasDataFetching(
-  ['canvas', 'assignments', courseId],
+  ["canvas", "assignments", courseId],
   () => CanvasService.getAssignments(courseId),
   {
     retry: 3,
     retryDelay: 2000,
     staleTime: 300000, // 5 minutes
   }
-)
+);
 ```
 
 #### Best Practices
@@ -199,11 +204,11 @@ const { data: assignments } = useCanvasDataFetching(
 
 ```typescript
 function useEditingState<T>(getId: (item: T) => string): {
-  editingId: string | null
-  startEditing: (item: T) => void
-  cancelEditing: () => void
-  isEditing: (item: T) => boolean
-}
+  editingId: string | null;
+  startEditing: (item: T) => void;
+  cancelEditing: () => void;
+  isEditing: (item: T) => boolean;
+};
 ```
 
 #### Features
@@ -219,12 +224,12 @@ function useEditingState<T>(getId: (item: T) => string): {
 // Basic usage with quiz items
 const { editingId, startEditing, cancelEditing, isEditing } = useEditingState(
   (quiz: Quiz) => quiz.id
-)
+);
 
 // In component render
 return (
   <div>
-    {quizzes.map(quiz => (
+    {quizzes.map((quiz) => (
       <div key={quiz.id}>
         {isEditing(quiz) ? (
           <QuizEditForm
@@ -233,23 +238,20 @@ return (
             onCancel={cancelEditing}
           />
         ) : (
-          <QuizDisplayCard
-            quiz={quiz}
-            onEdit={() => startEditing(quiz)}
-          />
+          <QuizDisplayCard quiz={quiz} onEdit={() => startEditing(quiz)} />
         )}
       </div>
     ))}
   </div>
-)
+);
 
 // Usage with custom ID extraction
 const { startEditing, cancelEditing, isEditing } = useEditingState(
   (question: Question) => `${question.quiz_id}-${question.id}`
-)
+);
 
 // Conditional rendering based on editing state
-const isCurrentlyEditing = isEditing(question)
+const isCurrentlyEditing = isEditing(question);
 ```
 
 #### Best Practices
@@ -271,21 +273,21 @@ const isCurrentlyEditing = isEditing(question)
 
 ```typescript
 interface UseDeleteConfirmationOptions {
-  successMessage: string
-  onSuccess?: () => void
-  invalidateQueries?: QueryKey[]
+  successMessage: string;
+  onSuccess?: () => void;
+  invalidateQueries?: QueryKey[];
 }
 
 function useDeleteConfirmation(
   deleteFn: () => Promise<void>,
   options: UseDeleteConfirmationOptions
 ): {
-  isOpen: boolean
-  openDialog: () => void
-  closeDialog: () => void
-  handleConfirm: () => void
-  isDeleting: boolean
-}
+  isOpen: boolean;
+  openDialog: () => void;
+  closeDialog: () => void;
+  handleConfirm: () => void;
+  isDeleting: boolean;
+};
 ```
 
 #### Features
@@ -303,24 +305,25 @@ const deleteConfirmation = useDeleteConfirmation(
   () => QuizzesService.deleteQuiz(quizId),
   {
     successMessage: "Quiz deleted successfully!",
-    invalidateQueries: [['quizzes']],
+    invalidateQueries: [["quizzes"]],
   }
-)
+);
 
 // Usage with custom success callback
 const deleteConfirmation = useDeleteConfirmation(
   () => QuizzesService.deleteQuiz(quizId),
   {
     successMessage: "Quiz deleted successfully!",
-    invalidateQueries: [['quizzes'], ['quiz', quizId]],
+    invalidateQueries: [["quizzes"], ["quiz", quizId]],
     onSuccess: () => {
-      navigate('/quizzes')
-    }
+      navigate("/quizzes");
+    },
   }
-)
+);
 
 // In component JSX
-const { isOpen, openDialog, closeDialog, handleConfirm, isDeleting } = deleteConfirmation
+const { isOpen, openDialog, closeDialog, handleConfirm, isDeleting } =
+  deleteConfirmation;
 
 return (
   <>
@@ -336,13 +339,13 @@ return (
         <AlertDialogFooter>
           <AlertDialogCancel onClick={closeDialog}>Cancel</AlertDialogCancel>
           <AlertDialogAction onClick={handleConfirm} disabled={isDeleting}>
-            {isDeleting ? 'Deleting...' : 'Delete'}
+            {isDeleting ? "Deleting..." : "Delete"}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
   </>
-)
+);
 ```
 
 #### Best Practices
@@ -368,7 +371,7 @@ return (
 function useConditionalPolling<T>(
   shouldPoll: (data: T | undefined) => boolean,
   interval?: number
-): (query: { state: { data?: T } }) => number | false
+): (query: { state: { data?: T } }) => number | false;
 ```
 
 #### Features
@@ -383,25 +386,24 @@ function useConditionalPolling<T>(
 ```tsx
 // Basic usage with custom condition
 const pollWhileProcessing = useConditionalPolling(
-  (data: QuizData) => data?.status === 'processing',
+  (data: QuizData) => data?.status === "processing",
   3000 // Poll every 3 seconds
-)
+);
 
 const { data: quiz } = useQuery({
-  queryKey: ['quiz', quizId],
+  queryKey: ["quiz", quizId],
   queryFn: () => QuizzesService.getQuiz(quizId),
   refetchInterval: pollWhileProcessing,
-})
+});
 
 // Usage with multiple conditions
-const pollWhileAnyProcessing = useConditionalPolling(
-  (data: QuizData) => {
-    return data?.status === 'extracting_content' ||
-           data?.status === 'generating_questions' ||
-           data?.status === 'exporting_to_canvas'
-  },
-  2000
-)
+const pollWhileAnyProcessing = useConditionalPolling((data: QuizData) => {
+  return (
+    data?.status === "extracting_content" ||
+    data?.status === "generating_questions" ||
+    data?.status === "exporting_to_canvas"
+  );
+}, 2000);
 ```
 
 #### Best Practices
@@ -422,7 +424,9 @@ const pollWhileAnyProcessing = useConditionalPolling(
 #### Interface
 
 ```typescript
-function useQuizStatusPolling(interval?: number): (query: any) => number | false
+function useQuizStatusPolling(
+  interval?: number
+): (query: any) => number | false;
 ```
 
 #### Features
@@ -436,17 +440,17 @@ function useQuizStatusPolling(interval?: number): (query: any) => number | false
 ```tsx
 // Use with quiz queries to poll while processing
 const { data: quiz, isLoading } = useQuery({
-  queryKey: ['quiz', quizId],
+  queryKey: ["quiz", quizId],
   queryFn: () => QuizzesService.getQuiz(quizId),
   refetchInterval: useQuizStatusPolling(3000), // Poll every 3 seconds
-})
+});
 
 // Custom interval for different polling needs
 const { data: quizProgress } = useQuery({
-  queryKey: ['quiz', 'progress', quizId],
+  queryKey: ["quiz", "progress", quizId],
   queryFn: () => QuizzesService.getQuizProgress(quizId),
   refetchInterval: useQuizStatusPolling(10000), // Poll every 10 seconds
-})
+});
 ```
 
 #### Best Practices
@@ -469,9 +473,9 @@ const { data: quizProgress } = useQuery({
 
 ```typescript
 function useCustomToast(): {
-  showSuccessToast: (description: string) => void
-  showErrorToast: (description: string) => void
-}
+  showSuccessToast: (description: string) => void;
+  showErrorToast: (description: string) => void;
+};
 ```
 
 #### Features
@@ -483,27 +487,27 @@ function useCustomToast(): {
 #### Usage Examples
 
 ```tsx
-const { showSuccessToast, showErrorToast } = useCustomToast()
+const { showSuccessToast, showErrorToast } = useCustomToast();
 
 // Show success notification
 const handleSuccess = () => {
-  showSuccessToast("Quiz created successfully!")
-}
+  showSuccessToast("Quiz created successfully!");
+};
 
 // Show error notification
 const handleError = () => {
-  showErrorToast("Failed to create quiz. Please try again.")
-}
+  showErrorToast("Failed to create quiz. Please try again.");
+};
 
 // Usage in async functions
 const handleSubmit = async (data: FormData) => {
   try {
-    await submitForm(data)
-    showSuccessToast("Form submitted successfully!")
+    await submitForm(data);
+    showSuccessToast("Form submitted successfully!");
   } catch (error) {
-    showErrorToast("Failed to submit form. Please try again.")
+    showErrorToast("Failed to submit form. Please try again.");
   }
-}
+};
 ```
 
 #### Best Practices
@@ -524,13 +528,13 @@ const handleSubmit = async (data: FormData) => {
 #### Interface
 
 ```typescript
-type DateFormat = "default" | "short" | "long" | "time-only"
+type DateFormat = "default" | "short" | "long" | "time-only";
 
 function useFormattedDate(
   date: string | Date | null | undefined,
   format?: DateFormat,
   locale?: string
-): string | null
+): string | null;
 ```
 
 #### Features
@@ -544,26 +548,26 @@ function useFormattedDate(
 
 ```tsx
 // Basic usage with default format
-const formattedDate = useFormattedDate(quiz.created_at)
+const formattedDate = useFormattedDate(quiz.created_at);
 // Result: "12 January 2024, 14:30"
 
 // Using different formats
-const shortDate = useFormattedDate(quiz.created_at, "short")
+const shortDate = useFormattedDate(quiz.created_at, "short");
 // Result: "12 Jan 2024, 14:30"
 
-const longDate = useFormattedDate(quiz.created_at, "long")
+const longDate = useFormattedDate(quiz.created_at, "long");
 // Result: "12 January 2024, 14:30:45"
 
-const timeOnly = useFormattedDate(quiz.created_at, "time-only")
+const timeOnly = useFormattedDate(quiz.created_at, "time-only");
 // Result: "14:30"
 
 // Using custom locale
-const usDate = useFormattedDate(quiz.created_at, "default", "en-US")
+const usDate = useFormattedDate(quiz.created_at, "default", "en-US");
 // Result: "January 12, 2024, 02:30 PM"
 
 // Safe handling of null/undefined dates
-const safeDate = useFormattedDate(null) // Returns null
-const invalidDate = useFormattedDate("invalid-date") // Returns null
+const safeDate = useFormattedDate(null); // Returns null
+const invalidDate = useFormattedDate("invalid-date"); // Returns null
 
 // Usage in components
 return (
@@ -572,7 +576,7 @@ return (
     <p>Updated: {useFormattedDate(quiz.updated_at, "short")}</p>
     <p>Time: {useFormattedDate(quiz.created_at, "time-only")}</p>
   </div>
-)
+);
 ```
 
 #### Best Practices
@@ -596,8 +600,8 @@ return (
 
 ```typescript
 function useErrorHandler(): {
-  handleError: (error: ApiError | Error | unknown) => void
-}
+  handleError: (error: ApiError | Error | unknown) => void;
+};
 ```
 
 #### Features
@@ -611,38 +615,38 @@ function useErrorHandler(): {
 
 ```tsx
 // Basic usage in a mutation
-const { handleError } = useErrorHandler()
+const { handleError } = useErrorHandler();
 
 const createQuizMutation = useMutation({
   mutationFn: createQuiz,
   onError: (error) => {
-    handleError(error) // Displays appropriate error toast
-  }
-})
+    handleError(error); // Displays appropriate error toast
+  },
+});
 
 // Usage in async functions
-const { handleError } = useErrorHandler()
+const { handleError } = useErrorHandler();
 
 const handleSubmit = async (data: FormData) => {
   try {
-    await submitForm(data)
+    await submitForm(data);
   } catch (error) {
-    handleError(error) // Automatically shows error toast
+    handleError(error); // Automatically shows error toast
   }
-}
+};
 
 // Usage with different error types
-const { handleError } = useErrorHandler()
+const { handleError } = useErrorHandler();
 
 // Handles ApiError with detailed messages
-handleError(new ApiError('API request failed', 400))
+handleError(new ApiError("API request failed", 400));
 
 // Handles generic Error objects
-handleError(new Error('Something went wrong'))
+handleError(new Error("Something went wrong"));
 
 // Handles unknown error types with fallbacks
-handleError('String error message')
-handleError({ message: 'Custom error object' })
+handleError("String error message");
+handleError({ message: "Custom error object" });
 ```
 
 #### Best Practices
@@ -666,17 +670,17 @@ handleError({ message: 'Custom error object' })
 
 ```typescript
 function useOnboarding(): {
-  currentStep: number
-  isOpen: boolean
-  isOnboardingCompleted: boolean
-  startOnboarding: () => void
-  nextStep: () => void
-  previousStep: () => void
-  markOnboardingCompleted: () => void
-  skipOnboarding: () => void
-  setIsOpen: (open: boolean) => void
-  isLoading: boolean
-}
+  currentStep: number;
+  isOpen: boolean;
+  isOnboardingCompleted: boolean;
+  startOnboarding: () => void;
+  nextStep: () => void;
+  previousStep: () => void;
+  markOnboardingCompleted: () => void;
+  skipOnboarding: () => void;
+  setIsOpen: (open: boolean) => void;
+  isLoading: boolean;
+};
 ```
 
 #### Features
@@ -699,21 +703,21 @@ const {
   markOnboardingCompleted,
   skipOnboarding,
   setIsOpen,
-  isLoading
-} = useOnboarding()
+  isLoading,
+} = useOnboarding();
 
 // Start onboarding manually
 if (!isOnboardingCompleted) {
-  startOnboarding()
+  startOnboarding();
 }
 
 // Navigate through steps
 if (currentStep < 3) {
-  nextStep()
+  nextStep();
 }
 
 // Complete onboarding
-markOnboardingCompleted()
+markOnboardingCompleted();
 
 // Onboarding modal component
 return (
@@ -732,7 +736,7 @@ return (
       )}
     </ModalContent>
   </Modal>
-)
+);
 ```
 
 #### Best Practices
@@ -753,33 +757,33 @@ return (
 function useQuizManagement(quizId: string) {
   // Data fetching
   const { data: quiz, isLoading } = useCanvasDataFetching(
-    ['quiz', quizId],
+    ["quiz", quizId],
     () => QuizService.getQuiz({ quizId })
-  )
+  );
 
   // State management
   const { isEditing, startEditing, cancelEditing } = useEditingState(
     (quiz: Quiz) => quiz.id
-  )
+  );
 
   // API mutations
   const updateMutation = useApiMutation(
     (data) => QuizService.updateQuiz({ quizId, data }),
     {
       successMessage: "Quiz updated!",
-      invalidateQueries: [['quiz', quizId]],
+      invalidateQueries: [["quiz", quizId]],
       onSuccess: cancelEditing,
     }
-  )
+  );
 
   // Delete confirmation
   const deleteConfirmation = useDeleteConfirmation(
     () => QuizService.deleteQuiz({ quizId }),
     {
       successMessage: "Quiz deleted!",
-      invalidateQueries: [['quizzes']],
+      invalidateQueries: [["quizzes"]],
     }
-  )
+  );
 
   return {
     quiz,
@@ -790,7 +794,7 @@ function useQuizManagement(quizId: string) {
     updateQuiz: updateMutation.mutate,
     isUpdating: updateMutation.isPending,
     deleteConfirmation,
-  }
+  };
 }
 ```
 
@@ -799,8 +803,8 @@ function useQuizManagement(quizId: string) {
 ```tsx
 // Centralized error handling across multiple operations
 function useQuizOperations(quizId: string) {
-  const { handleError } = useErrorHandler()
-  const { showSuccessToast } = useCustomToast()
+  const { handleError } = useErrorHandler();
+  const { showSuccessToast } = useCustomToast();
 
   const operations = {
     create: useApiMutation(createQuiz, {
@@ -815,9 +819,9 @@ function useQuizOperations(quizId: string) {
       successMessage: "Quiz deleted!",
       onError: handleError,
     }),
-  }
+  };
 
-  return operations
+  return operations;
 }
 ```
 
@@ -826,70 +830,69 @@ function useQuizOperations(quizId: string) {
 ### Basic Hook Testing
 
 ```tsx
-import { renderHook, act } from '@testing-library/react'
-import { useEditingState } from '@/hooks/common'
+import { renderHook, act } from "@testing-library/react";
+import { useEditingState } from "@/hooks/common";
 
-test('useEditingState manages editing state correctly', () => {
+test("useEditingState manages editing state correctly", () => {
   const { result } = renderHook(() =>
     useEditingState((item: { id: string }) => item.id)
-  )
+  );
 
   // Initial state
-  expect(result.current.editingId).toBeNull()
+  expect(result.current.editingId).toBeNull();
 
   // Start editing
   act(() => {
-    result.current.startEditing({ id: 'test-id' })
-  })
+    result.current.startEditing({ id: "test-id" });
+  });
 
-  expect(result.current.editingId).toBe('test-id')
+  expect(result.current.editingId).toBe("test-id");
 
   // Cancel editing
   act(() => {
-    result.current.cancelEditing()
-  })
+    result.current.cancelEditing();
+  });
 
-  expect(result.current.editingId).toBeNull()
-})
+  expect(result.current.editingId).toBeNull();
+});
 ```
 
 ### Testing with TanStack Query
 
 ```tsx
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { renderHook, waitFor } from '@testing-library/react'
-import { useApiMutation } from '@/hooks/common'
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { renderHook, waitFor } from "@testing-library/react";
+import { useApiMutation } from "@/hooks/common";
 
-test('useApiMutation handles success correctly', async () => {
+test("useApiMutation handles success correctly", async () => {
   const queryClient = new QueryClient({
-    defaultOptions: { queries: { retry: false } }
-  })
+    defaultOptions: { queries: { retry: false } },
+  });
 
   const wrapper = ({ children }) => (
-    <QueryClientProvider client={queryClient}>
-      {children}
-    </QueryClientProvider>
-  )
+    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+  );
 
-  const mockMutationFn = jest.fn().mockResolvedValue({ id: 'test' })
+  const mockMutationFn = jest.fn().mockResolvedValue({ id: "test" });
 
   const { result } = renderHook(
-    () => useApiMutation(mockMutationFn, {
-      successMessage: "Success!",
-    }),
+    () =>
+      useApiMutation(mockMutationFn, {
+        successMessage: "Success!",
+      }),
     { wrapper }
-  )
+  );
 
   act(() => {
-    result.current.mutate({ test: 'data' })
-  })
+    result.current.mutate({ test: "data" });
+  });
 
   await waitFor(() => {
-    expect(result.current.isSuccess).toBe(true)
-  })
+    expect(result.current.isSuccess).toBe(true);
+  });
 
-  expect(mockMutationFn).toHaveBeenCalledWith({ test: 'data' })
-})
+  expect(mockMutationFn).toHaveBeenCalledWith({ test: "data" });
+});
 ```
 
 ## Migration Guide
@@ -901,48 +904,45 @@ test('useApiMutation handles success correctly', async () => {
 const createQuizMutation = useMutation({
   mutationFn: createQuiz,
   onSuccess: () => {
-    toast.success("Quiz created!")
-    queryClient.invalidateQueries(['quizzes'])
+    toast.success("Quiz created!");
+    queryClient.invalidateQueries(["quizzes"]);
   },
   onError: (error) => {
-    toast.error(error.message)
-  }
-})
+    toast.error(error.message);
+  },
+});
 
 // After: Using custom hook
 const createQuizMutation = useApiMutation(createQuiz, {
   successMessage: "Quiz created!",
-  invalidateQueries: [['quizzes']],
-})
+  invalidateQueries: [["quizzes"]],
+});
 ```
 
 ### From Component State to Custom Hooks
 
 ```tsx
 // Before: Managing state in component
-const [editingId, setEditingId] = useState(null)
-const [isDeleting, setIsDeleting] = useState(false)
+const [editingId, setEditingId] = useState(null);
+const [isDeleting, setIsDeleting] = useState(false);
 
-const startEditing = (id) => setEditingId(id)
-const cancelEditing = () => setEditingId(null)
+const startEditing = (id) => setEditingId(id);
+const cancelEditing = () => setEditingId(null);
 
 // After: Using custom hooks
 const { editingId, startEditing, cancelEditing, isEditing } = useEditingState(
   (item) => item.id
-)
+);
 
-const deleteConfirmation = useDeleteConfirmation(
-  () => deleteItem(id),
-  {
-    successMessage: "Item deleted!",
-    invalidateQueries: [['items']],
-  }
-)
+const deleteConfirmation = useDeleteConfirmation(() => deleteItem(id), {
+  successMessage: "Item deleted!",
+  invalidateQueries: [["items"]],
+});
 ```
 
 ## Conclusion
 
-The custom hooks system in Rag@UiT provides a robust foundation for building consistent, maintainable React applications. Each hook serves a specific purpose while working together to create a cohesive development experience.
+The custom hooks system in QuizCrafter provides a robust foundation for building consistent, maintainable React applications. Each hook serves a specific purpose while working together to create a cohesive development experience.
 
 ### Key Benefits
 

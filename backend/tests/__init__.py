@@ -1,1 +1,1 @@
-"""Test package for ragatuit backend."""
+"""Test package for quizcrafter backend."""

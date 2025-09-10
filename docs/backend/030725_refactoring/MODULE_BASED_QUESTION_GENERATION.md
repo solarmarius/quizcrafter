@@ -4,7 +4,7 @@
 
 ### Description
 
-The Module-Based Question Generation feature transforms how quiz questions are created in Rag@UiT. Instead of generating questions one at a time from content chunks, this feature allows users to specify how many questions (1-20) they want from each Canvas module. The system then generates all questions for a module in a single AI request, processing multiple modules in parallel for improved efficiency.
+The Module-Based Question Generation feature transforms how quiz questions are created in QuizCrafter. Instead of generating questions one at a time from content chunks, this feature allows users to specify how many questions (1-20) they want from each Canvas module. The system then generates all questions for a module in a single AI request, processing multiple modules in parallel for improved efficiency.
 
 ### Business Value
 
@@ -105,7 +105,7 @@ langgraph = "^0.2.60"
 ### 4.1 File Structure
 
 ```
-ragatuit/
+quizcrafter/
 ├── backend/
 │   ├── src/
 │   │   ├── quiz/

@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document provides comprehensive documentation for the Fill-in-Blank question type implementation in Rag@UiT. The implementation adds support for generating, validating, and exporting fill-in-blank questions that integrate seamlessly with the existing question generation workflow and Canvas LMS export functionality.
+This document provides comprehensive documentation for the Fill-in-Blank question type implementation in QuizCrafter. The implementation adds support for generating, validating, and exporting fill-in-blank questions that integrate seamlessly with the existing question generation workflow and Canvas LMS export functionality.
 
 ## Architecture
 
@@ -11,15 +11,18 @@ The Fill-in-Blank question type follows the established polymorphic architecture
 ### Key Components
 
 1. **Data Models** (`backend/src/question/types/fill_in_blank.py`)
+
    - `BlankData`: Individual blank configuration
    - `FillInBlankData`: Complete question data structure
    - `FillInBlankQuestionType`: Question type implementation
 
 2. **AI Generation Templates** (`backend/src/question/templates/files/`)
+
    - `batch_fill_in_blank.json`: English question generation
    - `batch_fill_in_blank_no.json`: Norwegian question generation
 
 3. **Registry Integration** (`backend/src/question/types/registry.py`)
+
    - Automatic registration in question type registry
    - Dynamic type discovery support
 
@@ -43,6 +46,7 @@ class BlankData(BaseModel):
 ```
 
 **Field Specifications:**
+
 - `position`: Unique position number (1-100) for the blank
 - `correct_answer`: Primary correct answer (1-200 characters)
 - `answer_variations`: Optional list of acceptable alternative answers (max 10)
@@ -58,6 +62,7 @@ class FillInBlankData(BaseQuestionData):
 ```
 
 **Validation Rules:**
+
 - Minimum 1 blank, maximum 10 blanks per question
 - Each blank must have a unique position
 - Blanks are automatically sorted by position
@@ -111,16 +116,16 @@ Both English and Norwegian templates follow the same structure:
 
 ```json
 {
-    "name": "batch_fill_in_blank",
-    "version": "1.0",
-    "question_type": "fill_in_blank",
-    "system_prompt": "Detailed instructions for AI model...",
-    "user_prompt": "Template with variables...",
-    "variables": {
-        "module_name": "The name of the module",
-        "module_content": "The module content to generate questions from",
-        "question_count": "Number of questions to generate"
-    }
+  "name": "batch_fill_in_blank",
+  "version": "1.0",
+  "question_type": "fill_in_blank",
+  "system_prompt": "Detailed instructions for AI model...",
+  "user_prompt": "Template with variables...",
+  "variables": {
+    "module_name": "The name of the module",
+    "module_content": "The module content to generate questions from",
+    "question_count": "Number of questions to generate"
+  }
 }
 ```
 
@@ -130,24 +135,24 @@ The AI model generates JSON arrays with this structure:
 
 ```json
 [
-    {
-        "question_text": "The capital of France is _____ and it has _____ residents.",
-        "blanks": [
-            {
-                "position": 1,
-                "correct_answer": "Paris",
-                "answer_variations": ["paris", "PARIS"],
-                "case_sensitive": false
-            },
-            {
-                "position": 2,
-                "correct_answer": "2.2 million",
-                "answer_variations": ["2.2M", "2,200,000"],
-                "case_sensitive": false
-            }
-        ],
-        "explanation": "Paris is the capital and largest city of France."
-    }
+  {
+    "question_text": "The capital of France is _____ and it has _____ residents.",
+    "blanks": [
+      {
+        "position": 1,
+        "correct_answer": "Paris",
+        "answer_variations": ["paris", "PARIS"],
+        "case_sensitive": false
+      },
+      {
+        "position": 2,
+        "correct_answer": "2.2 million",
+        "answer_variations": ["2.2M", "2,200,000"],
+        "case_sensitive": false
+      }
+    ],
+    "explanation": "Paris is the capital and largest city of France."
+  }
 ]
 ```
 
@@ -156,10 +161,12 @@ The AI model generates JSON arrays with this structure:
 ### Validation Features
 
 1. **Position Validation**
+
    - Positions must be unique integers between 1-100
    - Automatic sorting by position for consistency
 
 2. **Answer Validation**
+
    - Correct answers: 1-200 characters, non-empty
    - Answer variations: maximum 10 per blank
    - Automatic filtering of empty variations
@@ -175,14 +182,14 @@ The backend data structure is designed to match the existing frontend expectatio
 
 ```typescript
 interface FillInBlankData {
-    question_text: string;
-    blanks: Array<{
-        position: number;
-        correct_answer: string;
-        answer_variations?: string[];
-        case_sensitive?: boolean;
-    }>;
-    explanation?: string | null;
+  question_text: string;
+  blanks: Array<{
+    position: number;
+    correct_answer: string;
+    answer_variations?: string[];
+    case_sensitive?: boolean;
+  }>;
+  explanation?: string | null;
 }
 ```
 
@@ -243,16 +250,19 @@ canvas_format = question_type.format_for_canvas(validated_data)
 The implementation includes comprehensive tests covering:
 
 - **Data Model Validation** (8 tests)
+
   - BlankData creation and validation
   - Position and answer validation
   - Answer variations processing
 
 - **Question Type Implementation** (10 tests)
+
   - Data validation and formatting
   - Canvas export format
   - Error handling
 
 - **Registry Integration** (3 tests)
+
   - Type registration verification
   - Registry access functionality
 
@@ -283,6 +293,7 @@ No additional environment variables are required. The implementation uses existi
 ### Template Configuration
 
 Templates are automatically loaded from:
+
 - `backend/src/question/templates/files/batch_fill_in_blank.json`
 - `backend/src/question/templates/files/batch_fill_in_blank_no.json`
 
@@ -311,17 +322,21 @@ Templates are automatically loaded from:
 ### Common Issues
 
 1. **Template Not Found**
+
    ```
    ValueError: No template found for question type fill_in_blank
    ```
+
    - Verify template files exist in correct location
    - Check template naming convention
    - Ensure `question_type` field matches enum value
 
 2. **Validation Errors**
+
    ```
    ValidationError: Each blank must have a unique position
    ```
+
    - Check for duplicate position values
    - Ensure positions are integers ≥ 1
    - Verify blanks array is not empty
@@ -345,11 +360,13 @@ logging.getLogger("question_type_registry").setLevel(logging.DEBUG)
 ### Planned Features
 
 1. **Advanced Scoring Options**
+
    - Partial credit for close answers
    - Custom scoring algorithms
    - Weighted blank scoring
 
 2. **Enhanced AI Generation**
+
    - Context-aware blank placement
    - Difficulty level targeting
    - Topic-specific templates
@@ -374,6 +391,7 @@ The implementation is designed for easy extension:
 For users migrating from Multiple Choice Questions:
 
 1. **Question Structure**
+
    ```python
    # MCQ
    {
@@ -411,41 +429,53 @@ No database migration required - uses existing polymorphic structure.
 ### Question Type Methods
 
 #### `validate_data(data: dict[str, Any]) -> FillInBlankData`
+
 Validates and parses raw question data.
 
 **Parameters:**
+
 - `data`: Dictionary with question_text, blanks, and optional explanation
 
 **Returns:**
+
 - `FillInBlankData`: Validated question data
 
 **Raises:**
+
 - `ValidationError`: If data is invalid
 
 #### `format_for_display(data: BaseQuestionData) -> dict[str, Any]`
+
 Formats question data for API display.
 
 **Parameters:**
+
 - `data`: FillInBlankData instance
 
 **Returns:**
+
 - Dictionary with formatted question data
 
 #### `format_for_canvas(data: BaseQuestionData) -> dict[str, Any]`
+
 Formats question data for Canvas Rich Fill In The Blank export.
 
 **Parameters:**
+
 - `data`: FillInBlankData instance
 
 **Returns:**
+
 - Dictionary with Canvas-formatted question data
 
 ### Data Model Methods
 
 #### `FillInBlankData.get_blank_by_position(position: int) -> BlankData | None`
+
 Retrieves a blank by its position.
 
 #### `FillInBlankData.get_all_answers() -> dict[int, list[str]]`
+
 Returns all possible answers for each blank position.
 
 ## Contributing
@@ -453,11 +483,13 @@ Returns all possible answers for each blank position.
 ### Adding New Features
 
 1. **New Validation Rules**
+
    - Add validators to `BlankData` or `FillInBlankData`
    - Update tests to cover new validation
    - Document validation behavior
 
 2. **Canvas Format Extensions**
+
    - Modify `format_for_canvas` method
    - Test with Canvas LMS integration
    - Update documentation
@@ -470,6 +502,7 @@ Returns all possible answers for each blank position.
 ### Code Style
 
 Follow existing patterns:
+
 - Use type hints for all parameters
 - Include comprehensive docstrings
 - Add validation for user inputs
@@ -530,6 +563,6 @@ This refactoring improves the system's design by decoupling the service layer fr
 
 ## Conclusion
 
-The Fill-in-Blank question type implementation provides a complete, production-ready solution that integrates seamlessly with Rag@UiT's existing architecture. The implementation follows established patterns, includes comprehensive testing, and supports both English and Norwegian question generation with Canvas LMS integration.
+The Fill-in-Blank question type implementation provides a complete, production-ready solution that integrates seamlessly with QuizCrafter's existing architecture. The implementation follows established patterns, includes comprehensive testing, and supports both English and Norwegian question generation with Canvas LMS integration.
 
 The feature is immediately usable and provides a solid foundation for future enhancements while maintaining full backward compatibility with existing Multiple Choice functionality.

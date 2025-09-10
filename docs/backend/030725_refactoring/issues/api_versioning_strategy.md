@@ -584,7 +584,7 @@ def custom_openapi():
         title=app.title,
         version=CURRENT_VERSION.value,
         description=f"""
-        # Rag@UiT API Documentation
+        # QuizCrafter API Documentation
 
         **Current Version**: {CURRENT_VERSION.value}
         **Minimum Supported Version**: {MINIMUM_VERSION.value}
@@ -814,16 +814,19 @@ def test_gradual_migration(client: TestClient):
 ## Migration Strategy
 
 ### Phase 1: Add Versioning Infrastructure
+
 1. Implement versioning core
 2. Add version detection
 3. Create version middleware
 
 ### Phase 2: Create Version-Specific Code
+
 1. Split models by version
 2. Create versioned routes
 3. Add adaptation layer
 
 ### Phase 3: Deprecation Process
+
 1. Mark v1 as deprecated
 2. Add sunset dates
 3. Monitor usage

@@ -2,7 +2,7 @@
 
 **Document Date**: July 23, 2025
 **Feature**: Categorization Question Type Support
-**Target System**: Rag@UiT Canvas LMS Quiz Generator
+**Target System**: QuizCrafter Canvas LMS Quiz Generator
 
 ## 1. Feature Overview
 
@@ -36,7 +36,7 @@ The Categorization question type allows instructors to create quiz questions whe
 
 ### High-Level Architecture
 
-The Categorization question type follows Rag@UiT's established polymorphic question architecture:
+The Categorization question type follows QuizCrafter's established polymorphic question architecture:
 
 ```
 Question Generation Pipeline:

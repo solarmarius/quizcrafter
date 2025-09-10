@@ -2,7 +2,7 @@
 
 ## Overview
 
-The Rag@UiT frontend is a modern React application built with TypeScript, leveraging a modular and scalable architecture. The codebase has undergone comprehensive refactoring to establish clear separation of concerns, reusable patterns, and excellent developer experience.
+The QuizCrafter frontend is a modern React application built with TypeScript, leveraging a modular and scalable architecture. The codebase has undergone comprehensive refactoring to establish clear separation of concerns, reusable patterns, and excellent developer experience.
 
 ## Technology Stack
 
@@ -88,12 +88,14 @@ The application maintains 100% type safety:
 ### 4. **State Management Strategy**
 
 #### Server State
+
 - **TanStack Query**: Manages all server-side data
 - **Automatic caching**: Smart caching with proper invalidation
 - **Background updates**: Automatic refetching and synchronization
 - **Optimistic updates**: Immediate UI updates with rollback on failure
 
 #### Local State
+
 - **React Context**: For application-wide state (auth, theme)
 - **useState/useReducer**: For component-local state
 - **Custom hooks**: For reusable stateful logic
@@ -101,18 +103,19 @@ The application maintains 100% type safety:
 ### 5. **Component Patterns**
 
 #### Container/Presentation Pattern
+
 ```tsx
 // Container component handles data fetching and state
 function QuestionReviewContainer({ quizId }: { quizId: string }) {
   const { data, isLoading, error } = useCanvasDataFetching(
-    ['quiz', quizId, 'questions'],
+    ["quiz", quizId, "questions"],
     () => QuestionsService.getQuizQuestions({ quizId })
-  )
+  );
 
-  if (isLoading) return <QuestionReviewSkeleton />
-  if (error) return <ErrorState />
+  if (isLoading) return <QuestionReviewSkeleton />;
+  if (error) return <ErrorState />;
 
-  return <QuestionReview questions={data} onUpdate={handleUpdate} />
+  return <QuestionReview questions={data} onUpdate={handleUpdate} />;
 }
 
 // Presentation component focuses on UI rendering
@@ -122,6 +125,7 @@ function QuestionReview({ questions, onUpdate }) {
 ```
 
 #### Compound Component Pattern
+
 ```tsx
 // For complex components with multiple parts
 <Card.Root>
@@ -135,9 +139,10 @@ function QuestionReview({ questions, onUpdate }) {
 ```
 
 #### Render Props Pattern
+
 ```tsx
 // For flexible component composition
-<DataProvider queryKey={['quiz', id]}>
+<DataProvider queryKey={["quiz", id]}>
   {({ data, isLoading, error }) => (
     <QuizDisplay data={data} loading={isLoading} error={error} />
   )}
@@ -155,42 +160,47 @@ Frontend → API Client → Backend → Database
 ```
 
 #### Auto-generated API Client
+
 - Generated from backend OpenAPI specification
 - Type-safe API calls with proper error handling
 - Automatic request/response serialization
 
 #### Query Management
+
 ```tsx
 // Declarative data fetching
 const { data: quiz, isLoading } = useQuery({
-  queryKey: ['quiz', quizId],
+  queryKey: ["quiz", quizId],
   queryFn: () => QuizService.getQuiz({ quizId }),
   staleTime: 30000,
-})
+});
 
 // Optimistic mutations
 const updateQuiz = useApiMutation(
   (data) => QuizService.updateQuiz({ quizId, data }),
   {
     successMessage: "Quiz updated successfully!",
-    invalidateQueries: [['quiz', quizId], ['quizzes']],
+    invalidateQueries: [["quiz", quizId], ["quizzes"]],
   }
-)
+);
 ```
 
 ### 2. **Component Communication**
 
 #### Parent-Child Communication
+
 - Props for data down
 - Callbacks for events up
 - Context for deeply nested data
 
 #### Sibling Communication
+
 - Shared state in common parent
 - Global state via Context
 - Server state via TanStack Query
 
 #### Cross-Feature Communication
+
 - URL state for navigation data
 - Global context for user preferences
 - Event system for decoupled features
@@ -200,44 +210,50 @@ const updateQuiz = useApiMutation(
 ### 1. **Memoization Strategy**
 
 #### Component Memoization
+
 ```tsx
 // Expensive components wrapped with memo
 export const QuestionDisplay = memo(function QuestionDisplay({ question }) {
   // Component implementation
-})
+});
 
 // Custom comparison for complex props
 export const QuizList = memo(QuizListComponent, (prevProps, nextProps) => {
-  return prevProps.quizzes.length === nextProps.quizzes.length
-})
+  return prevProps.quizzes.length === nextProps.quizzes.length;
+});
 ```
 
 #### Hook Memoization
+
 ```tsx
 function useQuizProcessing(quiz) {
   // Memoized calculations
   const processingStatus = useMemo(() => {
-    return calculateProcessingStatus(quiz)
-  }, [quiz.status])
+    return calculateProcessingStatus(quiz);
+  }, [quiz.status]);
 
   // Memoized callbacks
-  const handleStatusUpdate = useCallback((newStatus) => {
-    updateQuizStatus(quiz.id, newStatus)
-  }, [quiz.id])
+  const handleStatusUpdate = useCallback(
+    (newStatus) => {
+      updateQuizStatus(quiz.id, newStatus);
+    },
+    [quiz.id]
+  );
 
-  return { processingStatus, handleStatusUpdate }
+  return { processingStatus, handleStatusUpdate };
 }
 ```
 
 ### 2. **Loading States**
 
 #### Skeleton Components
+
 ```tsx
 // Consistent loading experience
 function QuizListSkeleton() {
   return (
     <VStack gap={4}>
-      {[1, 2, 3].map(i => (
+      {[1, 2, 3].map((i) => (
         <LoadingSkeleton
           key={i}
           height={UI_SIZES.SKELETON.HEIGHT.LG}
@@ -245,11 +261,12 @@ function QuizListSkeleton() {
         />
       ))}
     </VStack>
-  )
+  );
 }
 ```
 
 #### Progressive Loading
+
 - Critical content loads first
 - Secondary content loads progressively
 - Graceful degradation for slow connections
@@ -257,15 +274,17 @@ function QuizListSkeleton() {
 ### 3. **Bundle Optimization**
 
 #### Code Splitting
+
 ```tsx
 // Route-level splitting
-const LazyQuizDetail = lazy(() => import('./routes/quiz.$id'))
+const LazyQuizDetail = lazy(() => import("./routes/quiz.$id"));
 
 // Component-level splitting for heavy components
-const LazyQuestionEditor = lazy(() => import('./components/Questions/editors'))
+const LazyQuestionEditor = lazy(() => import("./components/Questions/editors"));
 ```
 
 #### Tree Shaking
+
 - ES modules for all code
 - Selective imports from large libraries
 - Dead code elimination
@@ -290,13 +309,13 @@ const LazyQuestionEditor = lazy(() => import('./components/Questions/editors'))
 
 ```tsx
 // Centralized error handling
-const { handleError } = useErrorHandler()
+const { handleError } = useErrorHandler();
 
 // Consistent error processing
 try {
-  await apiCall()
+  await apiCall();
 } catch (error) {
-  handleError(error) // Shows appropriate toast message
+  handleError(error); // Shows appropriate toast message
 }
 ```
 
@@ -311,16 +330,19 @@ try {
 ### 1. **Testing Strategy**
 
 #### Unit Tests
+
 - Custom hooks testing with React Testing Library
 - Utility function testing
 - Component behavior testing
 
 #### Integration Tests
+
 - Component integration with hooks
 - API integration testing
 - State management testing
 
 #### End-to-End Tests
+
 - Complete user workflows
 - Cross-browser compatibility
 - Mobile responsiveness
@@ -341,14 +363,14 @@ tests/
 // Page Object Model for E2E tests
 class QuizCreationPage {
   async selectCourse(courseName: string) {
-    await this.page.getByRole('combobox', { name: 'Course' }).click()
-    await this.page.getByRole('option', { name: courseName }).click()
+    await this.page.getByRole("combobox", { name: "Course" }).click();
+    await this.page.getByRole("option", { name: courseName }).click();
   }
 
   async createQuiz(quizData: QuizData) {
-    await this.fillQuizForm(quizData)
-    await this.submitForm()
-    await this.waitForCreation()
+    await this.fillQuizForm(quizData);
+    await this.submitForm();
+    await this.waitForCreation();
   }
 }
 ```
@@ -365,74 +387,67 @@ class QuizCreationPage {
 ### 2. **Component Guidelines**
 
 #### Props Interface
+
 ```tsx
 // Always define props interface
 interface QuizCardProps {
-  quiz: Quiz
-  onEdit?: (quiz: Quiz) => void
-  showActions?: boolean
+  quiz: Quiz;
+  onEdit?: (quiz: Quiz) => void;
+  showActions?: boolean;
 }
 
 // Use descriptive prop names
-<QuizCard
-  quiz={quiz}
-  onEdit={handleEdit}
-  showActions={canEditQuiz}
-/>
+<QuizCard quiz={quiz} onEdit={handleEdit} showActions={canEditQuiz} />;
 ```
 
 #### Component Structure
+
 ```tsx
 // Consistent component structure
 export function QuizCard({ quiz, onEdit, showActions = true }: QuizCardProps) {
   // Hooks at the top
-  const { formatDate } = useFormattedDate()
-  const { showToast } = useCustomToast()
+  const { formatDate } = useFormattedDate();
+  const { showToast } = useCustomToast();
 
   // Event handlers
   const handleEdit = useCallback(() => {
-    onEdit?.(quiz)
-  }, [quiz, onEdit])
+    onEdit?.(quiz);
+  }, [quiz, onEdit]);
 
   // Early returns for loading/error states
-  if (!quiz) return null
+  if (!quiz) return null;
 
   // Main render
-  return (
-    <Card.Root>
-      {/* Component JSX */}
-    </Card.Root>
-  )
+  return <Card.Root>{/* Component JSX */}</Card.Root>;
 }
 ```
 
 ### 3. **Hook Guidelines**
 
 #### Custom Hook Structure
+
 ```tsx
 // Consistent hook naming and structure
 function useQuizManagement(initialQuiz?: Quiz) {
   // State declarations
-  const [isEditing, setIsEditing] = useState(false)
+  const [isEditing, setIsEditing] = useState(false);
 
   // External hooks
-  const { showToast } = useCustomToast()
+  const { showToast } = useCustomToast();
 
   // Mutations
   const updateMutation = useApiMutation(updateQuiz, {
     successMessage: "Quiz updated!",
     onSuccess: () => setIsEditing(false),
-  })
+  });
 
   // Memoized values
-  const quizStatus = useMemo(() =>
-    calculateQuizStatus(quiz), [quiz]
-  )
+  const quizStatus = useMemo(() => calculateQuizStatus(quiz), [quiz]);
 
   // Callbacks
   const handleEdit = useCallback(() => {
-    setIsEditing(true)
-  }, [])
+    setIsEditing(true);
+  }, []);
 
   // Return object
   return {
@@ -442,7 +457,7 @@ function useQuizManagement(initialQuiz?: Quiz) {
     handleEdit,
     updateQuiz: updateMutation.mutate,
     isUpdating: updateMutation.isPending,
-  }
+  };
 }
 ```
 
@@ -457,21 +472,24 @@ function useQuizManagement(initialQuiz?: Quiz) {
 ### 2. **Future Enhancements**
 
 #### Planned Improvements
+
 - **React Server Components**: For better SSR performance
 - **Suspense**: For better loading state management
 - **Concurrent Features**: For better user experience
 - **PWA Features**: For offline functionality
 
 #### Scalability Considerations
+
 - **Micro-frontends**: For team independence
 - **Module Federation**: For shared components
 - **State Management**: Potential Zustand/Redux migration for complex state
 
 ## Conclusion
 
-The Rag@UiT frontend architecture provides a solid foundation for building maintainable, scalable, and performant React applications. The refactored codebase emphasizes developer experience, type safety, and reusability while maintaining excellent performance and user experience.
+The QuizCrafter frontend architecture provides a solid foundation for building maintainable, scalable, and performant React applications. The refactored codebase emphasizes developer experience, type safety, and reusability while maintaining excellent performance and user experience.
 
 Key architectural benefits:
+
 - **Type Safety**: 100% TypeScript coverage with strict mode
 - **Reusability**: Comprehensive custom hooks and component library
 - **Performance**: Optimized with memoization and code splitting

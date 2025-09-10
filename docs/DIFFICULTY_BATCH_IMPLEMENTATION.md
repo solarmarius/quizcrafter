@@ -7,26 +7,31 @@
 ## 1. Feature Overview
 
 ### Description
-This feature adds the ability to specify difficulty levels (EASY, MEDIUM, HARD) for individual question batches within the Rag@UiT quiz generation system. Previously, the system would generate questions with mixed difficulty levels determined by the AI. Now, teachers can explicitly set the difficulty for each batch of questions, providing more granular control over quiz complexity.
+
+This feature adds the ability to specify difficulty levels (EASY, MEDIUM, HARD) for individual question batches within the QuizCrafter quiz generation system. Previously, the system would generate questions with mixed difficulty levels determined by the AI. Now, teachers can explicitly set the difficulty for each batch of questions, providing more granular control over quiz complexity.
 
 ### Business Value
+
 - **Granular Control**: Teachers can tailor question difficulty to match course levels (introductory vs advanced)
 - **Consistency**: Ensures all questions in a batch meet the specified difficulty criteria
 - **Educational Alignment**: Better alignment with learning objectives and student capabilities
 - **Quality Assurance**: Reduces variability in question difficulty within batches
 
 ### User Benefits
+
 - Create differentiated assessments for different student groups
 - Maintain consistent difficulty across question types within modules
 - Better match assessment difficulty to course content complexity
 - Improved predictability of quiz difficulty
 
 ### Context
-Rag@UiT is a Canvas LMS integration that generates multiple-choice questions from course content using AI. The system processes content in "batches" - groups of questions of the same type (e.g., 10 multiple choice questions). This feature extends the batch system to include difficulty specification.
+
+QuizCrafter is a Canvas LMS integration that generates multiple-choice questions from course content using AI. The system processes content in "batches" - groups of questions of the same type (e.g., 10 multiple choice questions). This feature extends the batch system to include difficulty specification.
 
 ## 2. Technical Architecture
 
 ### High-Level Architecture
+
 ```
 ┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
 │   Frontend UI   │    │   Backend API    │    │   AI Templates  │
@@ -47,6 +52,7 @@ Rag@UiT is a Canvas LMS integration that generates multiple-choice questions fro
 ```
 
 ### Integration Points
+
 1. **Frontend**: Extends existing quiz creation flow with difficulty selection
 2. **Backend**: Modifies batch processing pipeline to include difficulty
 3. **Database**: Stores difficulty in existing JSONB `selected_modules` field
@@ -54,6 +60,7 @@ Rag@UiT is a Canvas LMS integration that generates multiple-choice questions fro
 5. **Batch Tracking**: Updates retry/success tracking with new key format
 
 ### Key Components Modified
+
 - **QuestionBatch Schema**: Core data structure for batch configuration
 - **ModuleBatchWorkflow**: AI generation pipeline that processes batches
 - **Quiz Model**: Validation and auto-migration logic
@@ -63,6 +70,7 @@ Rag@UiT is a Canvas LMS integration that generates multiple-choice questions fro
 ## 3. Dependencies & Prerequisites
 
 ### Backend Dependencies
+
 - **Python**: 3.11+
 - **SQLModel**: For data validation and database models
 - **Pydantic**: Field validation and defaults
@@ -70,12 +78,14 @@ Rag@UiT is a Canvas LMS integration that generates multiple-choice questions fro
 - **PostgreSQL**: Database with JSONB support
 
 ### Frontend Dependencies
+
 - **React**: 18+
 - **TypeScript**: 5+
 - **Chakra UI**: Component library
 - **TanStack Router**: File-based routing
 
 ### Environment Setup
+
 ```bash
 # Backend
 cd backend
@@ -88,7 +98,8 @@ npm install
 ```
 
 ### Existing System Requirements
-- Functional Rag@UiT installation
+
+- Functional QuizCrafter installation
 - Canvas LMS integration configured
 - AI/LLM provider setup (OpenAI, etc.)
 - PostgreSQL database with existing quiz schema
@@ -192,6 +203,7 @@ def validate_selected_modules(cls, v: Any) -> dict[str, dict[str, Any]]:
 ```
 
 **Purpose**:
+
 - Auto-migrates existing quizzes without difficulty to MEDIUM
 - Validates difficulty enum values
 - Prevents duplicate question_type + difficulty combinations within a module
@@ -230,6 +242,7 @@ for batch in module_info.get("question_batches", []):
 ```
 
 **Purpose**:
+
 - Changes batch key format from `id_type_count` to `id_type_count_difficulty`
 - Ensures all batch tracking includes difficulty information
 - Maintains backward compatibility with default "medium"
@@ -326,6 +339,7 @@ async def process_module(
 ```
 
 **Purpose**:
+
 - Adds difficulty to workflow state
 - Passes difficulty to GenerationParameters for template usage
 - Always uses batch-specified difficulty, ignoring LLM-provided difficulty
@@ -392,6 +406,7 @@ class ParallelModuleProcessor:
 **Files:** All 10 template files in `backend/src/question/templates/files/`
 
 **Pattern for English templates:**
+
 ```json
 {
   "system_prompt": "...\n4. {% if difficulty %}Generate {{ difficulty|upper }} difficulty questions.\n{% if difficulty == 'easy' %}Focus on basic recall, recognition, and simple comprehension. Use straightforward language and test fundamental concepts from the material.\n{% elif difficulty == 'medium' %}Include application, analysis, and moderate problem-solving. Test understanding and ability to apply concepts in familiar contexts.\n{% elif difficulty == 'hard' %}Emphasize synthesis, evaluation, complex problem-solving, and critical thinking. Test deep understanding and advanced application of concepts.\n{% endif %}{% else %}Vary the difficulty levels (easy, medium, hard){% endif %}\n...",
@@ -399,25 +414,27 @@ class ParallelModuleProcessor:
   "user_prompt": "...",
 
   "variables": {
-    "difficulty": "Question difficulty level (optional)",
+    "difficulty": "Question difficulty level (optional)"
     // ... other variables
   }
 }
 ```
 
 **Pattern for Norwegian templates:**
+
 ```json
 {
   "system_prompt": "...\n4. {% if difficulty %}Generer {{ difficulty|upper }} vanskelighetsgrad spørsmål.\n{% if difficulty == 'easy' %}Fokuser på grunnleggende gjenkalling, gjenkjennelse og enkel forståelse. Bruk enkelt språk og test grunnleggende konsepter fra materialet.\n{% elif difficulty == 'medium' %}Inkluder anvendelse, analyse og moderat problemløsning. Test forståelse og evne til å anvende konsepter i kjente sammenhenger.\n{% elif difficulty == 'hard' %}Vektlegg syntese, evaluering, kompleks problemløsning og kritisk tenkning. Test dyp forståelse og avansert anvendelse av konsepter.\n{% endif %}{% else %}Varier vanskelighetsgraden (lett, middels, vanskelig){% endif %}\n...",
 
   "variables": {
-    "difficulty": "Vanskelighetsgrad for spørsmål (valgfri)",
+    "difficulty": "Vanskelighetsgrad for spørsmål (valgfri)"
     // ... other variables
   }
 }
 ```
 
 **Purpose**:
+
 - Replace generic "vary difficulty" instructions with specific difficulty targeting
 - Provide clear cognitive level guidance for each difficulty
 - Maintain backward compatibility when difficulty is not specified
@@ -431,19 +448,19 @@ export const QUESTION_DIFFICULTIES = {
   EASY: "easy",
   MEDIUM: "medium",
   HARD: "hard",
-} as const
+} as const;
 
 export const QUESTION_DIFFICULTY_LABELS = {
   easy: "Easy",
   medium: "Medium",
   hard: "Hard",
-} as const
+} as const;
 
 export const QUESTION_DIFFICULTY_DESCRIPTIONS = {
   easy: "Basic recall and simple comprehension",
   medium: "Application and moderate problem-solving",
   hard: "Complex analysis and critical thinking",
-} as const
+} as const;
 ```
 
 **Purpose**: Provides consistent constants for difficulty handling across frontend components.
@@ -453,7 +470,10 @@ export const QUESTION_DIFFICULTY_DESCRIPTIONS = {
 **File:** `frontend/src/components/QuizCreation/ModuleQuestionSelectionStep.tsx`
 
 ```typescript
-import { QUESTION_DIFFICULTIES, QUESTION_DIFFICULTY_LABELS } from "@/lib/constants"
+import {
+  QUESTION_DIFFICULTIES,
+  QUESTION_DIFFICULTY_LABELS,
+} from "@/lib/constants";
 
 // Add difficulty collection for Chakra UI Select
 const difficultyCollection = createListCollection({
@@ -462,13 +482,13 @@ const difficultyCollection = createListCollection({
     { value: "medium", label: "Medium" },
     { value: "hard", label: "Hard" },
   ],
-})
+});
 
 // Update QuestionBatch interface usage
 interface QuestionBatch {
-  question_type: QuestionType
-  count: number
-  difficulty?: QuestionDifficulty  // NEW FIELD
+  question_type: QuestionType;
+  count: number;
+  difficulty?: QuestionDifficulty; // NEW FIELD
 }
 
 // Update addBatch function
@@ -476,29 +496,37 @@ const addBatch = (moduleId: string) => {
   const newBatch: QuestionBatch = {
     question_type: QUESTION_BATCH_DEFAULTS.DEFAULT_QUESTION_TYPE,
     count: QUESTION_BATCH_DEFAULTS.DEFAULT_QUESTION_COUNT,
-    difficulty: "medium",  // NEW DEFAULT
-  }
+    difficulty: "medium", // NEW DEFAULT
+  };
   // ... rest of function
-}
+};
 
 // Update validation to prevent duplicates
-const updateBatch = (moduleId: string, batchIndex: number, updates: Partial<QuestionBatch>) => {
+const updateBatch = (
+  moduleId: string,
+  batchIndex: number,
+  updates: Partial<QuestionBatch>
+) => {
   const updatedBatches = currentBatches.map((batch, index) =>
     index === batchIndex ? { ...batch, ...updates } : batch
-  )
+  );
 
   // Check for duplicate question_type + difficulty combinations
-  const combinations = updatedBatches.map(b => `${b.question_type}_${b.difficulty}`)
+  const combinations = updatedBatches.map(
+    (b) => `${b.question_type}_${b.difficulty}`
+  );
   if (combinations.length !== new Set(combinations).size) {
-    setValidationErrors(prev => ({
+    setValidationErrors((prev) => ({
       ...prev,
-      [moduleId]: ["Cannot have duplicate question type and difficulty combinations"],
-    }))
-    return
+      [moduleId]: [
+        "Cannot have duplicate question type and difficulty combinations",
+      ],
+    }));
+    return;
   }
 
   // ... rest of validation and update logic
-}
+};
 
 // Update batch display (3-column layout)
 <HStack gap={3} align="end">
@@ -578,10 +606,11 @@ const updateBatch = (moduleId: string, batchIndex: number, updates: Partial<Ques
   >
     <IoClose />
   </Button>
-</HStack>
+</HStack>;
 ```
 
 **Purpose**:
+
 - Adds difficulty selector as third column in batch configuration
 - Maintains consistent UI patterns with existing components
 - Implements validation for duplicate combinations
@@ -637,13 +666,13 @@ class Question(SQLModel, table=True):
 #### Frontend Type Definitions (Auto-generated)
 
 ```typescript
-export type QuestionDifficulty = "easy" | "medium" | "hard"
+export type QuestionDifficulty = "easy" | "medium" | "hard";
 
 export type QuestionBatch = {
-  question_type: QuestionType
-  count: number
-  difficulty?: QuestionDifficulty  // Optional for backward compatibility
-}
+  question_type: QuestionType;
+  count: number;
+  difficulty?: QuestionDifficulty; // Optional for backward compatibility
+};
 ```
 
 #### Validation Rules
@@ -681,16 +710,21 @@ AI Template: {difficulty: "hard"} → "Generate HARD difficulty questions..."
 ### 4.4 Configuration
 
 #### Environment Variables
+
 No new environment variables required. Uses existing:
+
 - `POSTGRES_*` - Database connection
 - `LLM_*` - AI provider settings
 
 #### Template Configuration
+
 Templates automatically receive difficulty through the generation pipeline:
+
 - `{{ difficulty }}` - Available in all templates
 - `{% if difficulty %}` - Conditional logic for difficulty-specific instructions
 
 #### Default Values
+
 ```python
 # Backend Defaults
 DEFAULT_DIFFICULTY = QuestionDifficulty.MEDIUM
@@ -708,6 +742,7 @@ DEFAULT_DIFFICULTY = "medium"  # NEW
 ### 5.1 Unit Tests
 
 #### Backend Model Tests
+
 ```python
 def test_question_batch_default_difficulty():
     """Test that QuestionBatch defaults to MEDIUM difficulty."""
@@ -747,6 +782,7 @@ def test_duplicate_combination_validation():
 ```
 
 #### Batch Key Generation Tests
+
 ```python
 def test_batch_key_format():
     """Test new batch key format includes difficulty."""
@@ -767,6 +803,7 @@ def test_backward_compatibility():
 ```
 
 #### Workflow Tests
+
 ```python
 def test_difficulty_flow_through_workflow():
     """Test difficulty flows from batch to generated questions."""
@@ -800,6 +837,7 @@ def test_difficulty_flow_through_workflow():
 ### 5.2 Integration Tests
 
 #### End-to-End Quiz Creation
+
 ```python
 async def test_quiz_creation_with_difficulty():
     """Test complete quiz creation flow with difficulty."""
@@ -830,6 +868,7 @@ async def test_quiz_creation_with_difficulty():
 ```
 
 #### Template Integration Tests
+
 ```python
 async def test_template_difficulty_rendering():
     """Test that templates receive and use difficulty correctly."""
@@ -854,7 +893,9 @@ async def test_template_difficulty_rendering():
 ### 5.3 Manual Testing Steps
 
 #### Backend Testing
+
 1. **Create Quiz with Mixed Difficulties**
+
    ```bash
    curl -X POST http://localhost:8000/api/v1/quiz/create \
      -H "Content-Type: application/json" \
@@ -875,6 +916,7 @@ async def test_template_difficulty_rendering():
    ```
 
 2. **Verify Batch Keys in Logs**
+
    - Check generation logs for keys like: `mod_1_multiple_choice_5_easy`
    - Verify retry tracking uses new key format
 
@@ -883,7 +925,9 @@ async def test_template_difficulty_rendering():
    - Verify they get auto-migrated to "medium"
 
 #### Frontend Testing
+
 1. **UI Functionality**
+
    - Navigate to quiz creation flow
    - Select modules and verify 3-column layout (Type, Count, Difficulty)
    - Test difficulty dropdown functionality
@@ -897,12 +941,14 @@ async def test_template_difficulty_rendering():
 ### 5.4 Performance Considerations
 
 #### Benchmarks
+
 - **Database Impact**: Minimal (difficulty stored in existing JSONB field)
 - **Memory Usage**: No significant increase (enum values are lightweight)
 - **API Response Time**: <5ms additional overhead for validation
 - **Template Rendering**: <1ms additional time for difficulty conditionals
 
 #### Load Testing Scenarios
+
 ```python
 # Test concurrent quiz creation with different difficulties
 async def test_concurrent_difficulty_processing():
@@ -919,6 +965,7 @@ async def test_concurrent_difficulty_processing():
 ## 6. Deployment Instructions
 
 ### 6.1 Pre-Deployment Checklist
+
 - [ ] All backend tests pass
 - [ ] Frontend tests pass
 - [ ] Linting passes (ruff, mypy, eslint)
@@ -928,6 +975,7 @@ async def test_concurrent_difficulty_processing():
 ### 6.2 Deployment Steps
 
 #### Backend Deployment
+
 ```bash
 # 1. Activate environment
 cd backend
@@ -947,6 +995,7 @@ bash scripts/lint.sh
 ```
 
 #### Frontend Deployment
+
 ```bash
 # 1. Install dependencies
 cd frontend
@@ -968,12 +1017,14 @@ npm run build
 ### 6.3 Environment-Specific Configurations
 
 #### Development
+
 ```bash
 # No special configuration needed
 # Use existing development environment setup
 ```
 
 #### Staging
+
 ```bash
 # Test with production-like data
 # Verify batch key migration works correctly
@@ -981,6 +1032,7 @@ npm run build
 ```
 
 #### Production
+
 ```bash
 # Monitor batch key generation
 # Watch for any validation errors in logs
@@ -990,6 +1042,7 @@ npm run build
 ### 6.4 Rollback Procedures
 
 #### Backend Rollback
+
 ```bash
 # 1. Revert to previous commit
 git revert <commit-hash>
@@ -1004,6 +1057,7 @@ git revert <commit-hash>
 ```
 
 #### Frontend Rollback
+
 ```bash
 # 1. Revert frontend changes
 git revert <commit-hash>
@@ -1021,17 +1075,20 @@ npm run build && deploy
 ### 7.1 Key Metrics
 
 #### Performance Metrics
+
 - **Quiz Creation Time**: Should remain within baseline ±5%
 - **Batch Processing Success Rate**: Monitor for any decrease
 - **Template Rendering Time**: Watch for increases in generation latency
 - **Database Query Performance**: Monitor JSONB field queries
 
 #### Business Metrics
+
 - **Difficulty Distribution**: Track usage of easy/medium/hard
 - **User Adoption**: Monitor how many quizzes use difficulty selection
 - **Error Rates**: Track validation errors for duplicate combinations
 
 #### Monitoring Queries
+
 ```sql
 -- Check difficulty distribution
 SELECT
@@ -1051,6 +1108,7 @@ LIMIT 10;
 ### 7.2 Log Entries to Monitor
 
 #### Success Indicators
+
 ```python
 # Batch processing with difficulty
 logger.info("processing_single_batch",
@@ -1069,6 +1127,7 @@ logger.info("module_batch_prompt_prepared",
 ```
 
 #### Warning Indicators
+
 ```python
 # Auto-migration occurring
 logger.info("quiz_validation_auto_migration",
@@ -1084,6 +1143,7 @@ logger.warning("invalid_difficulty_value",
 ```
 
 #### Error Indicators
+
 ```python
 # Validation failures
 logger.error("quiz_validation_failed",
@@ -1101,9 +1161,11 @@ logger.error("template_difficulty_rendering_failed",
 ### 7.3 Common Issues & Troubleshooting
 
 #### Issue: Duplicate Combination Errors
+
 **Symptoms**: Quiz creation fails with "duplicate question type and difficulty combinations"
 **Cause**: User trying to create multiple batches with same type+difficulty
 **Solution**:
+
 ```python
 # Frontend validation should prevent this, but if it occurs:
 # 1. Check frontend validation logic
@@ -1112,21 +1174,26 @@ logger.error("template_difficulty_rendering_failed",
 ```
 
 #### Issue: Batch Keys Not Found During Retry
+
 **Symptoms**: Failed batches being re-attempted instead of skipped
 **Cause**: Batch key format mismatch between old and new versions
 **Investigation**:
+
 ```python
 # Check generation_metadata format
 SELECT generation_metadata->'successful_batches' FROM quiz WHERE id = '<quiz_id>';
 
 # Look for old format keys: "mod_type_count" vs new: "mod_type_count_difficulty"
 ```
+
 **Solution**: Clear generation_metadata to force complete regeneration
 
 #### Issue: Template Not Using Difficulty
+
 **Symptoms**: Questions generated don't match specified difficulty
 **Cause**: Template not updated or difficulty not flowing through
 **Investigation**:
+
 ```python
 # Check template receives difficulty
 logger.debug("template_variables",
@@ -1138,9 +1205,11 @@ logger.debug("template_variables",
 ```
 
 #### Issue: Auto-Migration Not Working
+
 **Symptoms**: Validation errors for missing difficulty field
 **Cause**: Auto-migration logic not executing or failing
 **Investigation**:
+
 ```python
 # Check quiz validation logs
 # Verify batch structure in selected_modules
@@ -1150,18 +1219,21 @@ logger.debug("template_variables",
 ### 7.4 Maintenance Tasks
 
 #### Weekly Tasks
+
 - Review difficulty distribution metrics
 - Check for any validation error spikes
 - Monitor batch key format consistency
 - Verify template rendering performance
 
 #### Monthly Tasks
+
 - Analyze user adoption of difficulty selection
 - Review and optimize database queries involving difficulty
 - Check for any performance degradation trends
 - Update documentation based on user feedback
 
 #### Quarterly Tasks
+
 - Evaluate need for additional difficulty levels
 - Review template effectiveness for different difficulties
 - Assess system performance impact
@@ -1172,23 +1244,28 @@ logger.debug("template_variables",
 ### 8.1 Authentication & Authorization
 
 #### Existing Security Model
+
 The difficulty feature inherits all existing security measures:
+
 - **JWT Authentication**: Required for all quiz operations
 - **Canvas OAuth**: User must have Canvas course access
 - **Course Permissions**: Only users with course access can create quizzes
 - **Quiz Ownership**: Users can only modify their own quizzes
 
 #### No Additional Permissions Required
+
 Difficulty selection doesn't introduce new security boundaries - it's a configuration option within existing quiz creation permissions.
 
 ### 8.2 Data Privacy
 
 #### PII Considerations
+
 - **No PII in Difficulty Data**: Difficulty levels are non-sensitive metadata
 - **Audit Trail**: Difficulty choices logged for educational analytics only
 - **Data Retention**: Follows existing quiz data retention policies
 
 #### Data Storage
+
 ```python
 # Difficulty stored in existing JSONB field - no new tables
 # Inherits all existing encryption and backup procedures
@@ -1204,6 +1281,7 @@ selected_modules = {
 ### 8.3 Input Validation & Sanitization
 
 #### Backend Validation
+
 ```python
 # Enum validation prevents injection
 class QuestionDifficulty(str, Enum):
@@ -1221,6 +1299,7 @@ if batch["difficulty"] not in valid_difficulties:
 ```
 
 #### Frontend Validation
+
 ```typescript
 // Controlled select input - only allows predefined values
 const difficultyCollection = createListCollection({
@@ -1229,15 +1308,16 @@ const difficultyCollection = createListCollection({
     { value: "medium", label: "Medium" },
     { value: "hard", label: "Hard" },
   ],
-})
+});
 
 // TypeScript type safety
-difficulty: QuestionDifficulty  // "easy" | "medium" | "hard"
+difficulty: QuestionDifficulty; // "easy" | "medium" | "hard"
 ```
 
 ### 8.4 Template Security
 
 #### Template Injection Prevention
+
 ```python
 # Jinja2 templates with auto-escaping enabled
 # Difficulty values are enum-validated before reaching templates
@@ -1250,6 +1330,7 @@ difficulty: QuestionDifficulty  // "easy" | "medium" | "hard"
 ```
 
 #### LLM Prompt Security
+
 - **Controlled Input**: Only validated enum values reach LLM prompts
 - **No Code Injection**: Difficulty affects prompt content, not execution
 - **Output Sanitization**: LLM responses parsed and validated before storage
@@ -1257,9 +1338,11 @@ difficulty: QuestionDifficulty  // "easy" | "medium" | "hard"
 ### 8.5 API Security
 
 #### Rate Limiting
+
 Difficulty selection doesn't increase API call volume - uses existing quiz creation endpoints.
 
 #### Request Validation
+
 ```python
 # All existing request validation applies
 # Additional validation for difficulty field
@@ -1283,6 +1366,7 @@ async def create_quiz(quiz_data: QuizCreate):  # Pydantic validation
 ### 9.1 Known Limitations
 
 #### Current Constraints
+
 1. **Three Difficulty Levels**: Only easy/medium/hard supported
 2. **Per-Batch Granularity**: Cannot set difficulty per individual question
 3. **Static Difficulty Mapping**: Fixed cognitive level descriptions
@@ -1290,6 +1374,7 @@ async def create_quiz(quiz_data: QuizCreate):  # Pydantic validation
 5. **No Difficulty Validation**: System doesn't verify generated questions match requested difficulty
 
 #### Technical Debt
+
 - **Template Duplication**: Similar difficulty logic across 10 template files
 - **Enum String Mapping**: Conversion between enum and string in multiple places
 - **Validation Complexity**: Duplicate checking logic could be abstracted
@@ -1297,6 +1382,7 @@ async def create_quiz(quiz_data: QuizCreate):  # Pydantic validation
 ### 9.2 Potential Improvements
 
 #### Short-term Enhancements (Next 6 months)
+
 ```python
 # 1. Difficulty Validation Service
 class DifficultyValidator:
@@ -1323,6 +1409,7 @@ class DifficultyMetrics:
 ```
 
 #### Medium-term Features (6-12 months)
+
 1. **Adaptive Difficulty**: System learns optimal difficulty for different content types
 2. **Difficulty Presets**: Subject-specific difficulty templates (Math vs History)
 3. **Granular Control**: Per-question difficulty overrides
@@ -1330,6 +1417,7 @@ class DifficultyMetrics:
 5. **Advanced Templates**: AI-generated difficulty instructions based on content analysis
 
 #### Long-term Vision (1+ years)
+
 ```python
 # AI-Powered Difficulty Assessment
 class IntelligentDifficultyEngine:
@@ -1356,18 +1444,21 @@ class BloomsTaxonomyMapper:
 ### 9.3 Scalability Considerations
 
 #### Current Scalability
+
 - **Database Impact**: Minimal (JSONB field updates)
 - **Memory Usage**: Negligible enum overhead
 - **CPU Impact**: Minor validation overhead
 - **Network**: No additional API calls
 
 #### Scaling Challenges
+
 1. **Template Maintenance**: More difficulty levels = more template complexity
 2. **Validation Performance**: Complex duplicate checking with many batches
 3. **Analytics Storage**: Difficulty metrics could grow large over time
 4. **LLM Costs**: More specific prompts might increase token usage
 
 #### Scaling Solutions
+
 ```python
 # 1. Template Engine Optimization
 class OptimizedTemplateManager:
@@ -1391,6 +1482,7 @@ class DistributedDifficultyProcessor:
 ### 9.4 Integration Opportunities
 
 #### Canvas LMS Integration
+
 ```python
 # Sync difficulty with Canvas question banks
 class CanvasDifficultySync:
@@ -1404,6 +1496,7 @@ class CanvasDifficultySync:
 ```
 
 #### Learning Management Integration
+
 ```python
 # Integration with learning analytics platforms
 class LearningAnalyticsIntegration:
@@ -1417,6 +1510,7 @@ class LearningAnalyticsIntegration:
 ```
 
 #### AI/ML Platform Integration
+
 ```python
 # Enhanced difficulty with external AI services
 class ExternalAIIntegration:
@@ -1432,11 +1526,13 @@ class ExternalAIIntegration:
 ### 9.5 Research & Development Opportunities
 
 #### Educational Research
+
 1. **Difficulty Effectiveness Studies**: Measure learning outcomes vs difficulty settings
 2. **Cognitive Load Research**: Optimize difficulty progression for better learning
 3. **Adaptive Assessment**: Research optimal difficulty adjustment algorithms
 
 #### Technical Research
+
 1. **Automated Difficulty Assessment**: NLP models to verify question difficulty
 2. **Content Complexity Analysis**: AI systems to automatically determine optimal difficulty
 3. **Personalized Difficulty**: Machine learning for individual student difficulty optimization
@@ -1444,12 +1540,14 @@ class ExternalAIIntegration:
 ### 9.6 Deprecation & Migration Planning
 
 #### Future-Proofing Design Decisions
+
 1. **Enum Extensibility**: Easy to add new difficulty levels
 2. **Template Modularity**: Difficulty logic can be abstracted
 3. **Database Schema**: JSONB storage allows flexible difficulty evolution
 4. **API Versioning**: Current design supports backward-compatible changes
 
 #### Potential Migration Scenarios
+
 ```python
 # Scenario 1: More Difficulty Levels
 class ExtendedDifficulty(str, Enum):
@@ -1473,7 +1571,7 @@ class NumericDifficulty(BaseModel):
 
 ## Conclusion
 
-This implementation guide provides a comprehensive roadmap for adding difficulty selection to question batches in the Rag@UiT system. The feature has been designed to be:
+This implementation guide provides a comprehensive roadmap for adding difficulty selection to question batches in the QuizCrafter system. The feature has been designed to be:
 
 - **Backward Compatible**: Existing quizzes continue to work unchanged
 - **User-Friendly**: Intuitive 3-column interface following established UI patterns

@@ -2,7 +2,7 @@
 
 **Document Date**: July 22, 2025
 **Feature**: Matching Question Type Support
-**Target System**: Rag@UiT Canvas LMS Quiz Generator
+**Target System**: QuizCrafter Canvas LMS Quiz Generator
 
 ## 1. Feature Overview
 
@@ -33,7 +33,7 @@ The Matching question type allows instructors to create quiz questions where stu
 
 ### High-Level Architecture
 
-The Matching question type follows Rag@UiT's established polymorphic question architecture:
+The Matching question type follows QuizCrafter's established polymorphic question architecture:
 
 ```
 Question Generation Pipeline:

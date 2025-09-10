@@ -7,15 +7,18 @@
 ## 1. Feature Overview
 
 ### Description
+
 The Quiz Tone of Voice feature allows teachers to select different tones for AI-generated quiz questions, enabling customization based on the course context and teaching style. Teachers can choose from four predefined tones: Academic, Casual, Encouraging, and Professional.
 
 ### Business Value
+
 - **Personalization**: Teachers can match question tone to their teaching style and student needs
 - **Context Adaptation**: Different courses may require different communication styles (e.g., formal academic vs. professional training)
 - **Enhanced Learning Experience**: Appropriate tone can improve student engagement and reduce anxiety
 - **Flexibility**: One system serves diverse educational contexts without requiring separate implementations
 
 ### User Benefits
+
 - **Academic Tone**: Formal language with precise terminology for scholarly environments
 - **Casual Tone**: Conversational language that feels approachable and relaxed
 - **Encouraging Tone**: Supportive language that motivates learning and builds confidence
@@ -24,6 +27,7 @@ The Quiz Tone of Voice feature allows teachers to select different tones for AI-
 ## 2. Technical Architecture
 
 ### High-Level Architecture
+
 The tone feature is implemented as a parameter that flows through the entire question generation pipeline:
 
 ```
@@ -31,13 +35,16 @@ Quiz Creation UI → Quiz Model → Generation Service → Template System → L
 ```
 
 ### System Integration
+
 The feature integrates with existing components without breaking changes:
+
 - **Database**: New `tone` field added to Quiz model with default value for backward compatibility
 - **API**: QuizTone enum added to schemas, tone parameter included in creation endpoints
 - **Templates**: All 10 question generation templates updated with tone-specific instructions
 - **Frontend**: New UI component for tone selection added to quiz creation workflow
 
 ### Data Flow Diagram
+
 ```
 [User Selects Tone]
        ↓
@@ -59,6 +66,7 @@ The feature integrates with existing components without breaking changes:
 ## 3. Dependencies & Prerequisites
 
 ### Backend Dependencies
+
 - **Python 3.11+**: Required for backend services
 - **FastAPI**: Web framework (existing dependency)
 - **SQLModel**: Database ORM (existing dependency)
@@ -66,12 +74,14 @@ The feature integrates with existing components without breaking changes:
 - **Jinja2**: Template engine (existing dependency)
 
 ### Frontend Dependencies
+
 - **React 18+**: Frontend framework (existing dependency)
 - **TypeScript**: Type safety (existing dependency)
 - **Chakra UI**: Component library (existing dependency)
 - **TanStack Router**: Routing (existing dependency)
 
 ### Environment Setup
+
 No additional environment setup required. Uses existing infrastructure.
 
 ## 4. Implementation Details
@@ -79,7 +89,7 @@ No additional environment setup required. Uses existing infrastructure.
 ### 4.1 File Structure
 
 ```
-ragatuit/
+quizcrafter/
 ├── backend/
 │   ├── src/
 │   │   ├── quiz/
@@ -149,11 +159,13 @@ class QuizTone(str, Enum):
 **File:** `backend/src/quiz/models.py`
 
 Import the new enum:
+
 ```python
 from .schemas import FailureReason, QuizStatus, QuizTone
 ```
 
 Add the tone field after the language field:
+
 ```python
 tone: QuizTone = Field(
     default=QuizTone.ACADEMIC,
@@ -168,6 +180,7 @@ tone: QuizTone = Field(
 **File:** `backend/src/quiz/schemas.py`
 
 Add tone to QuizCreate schema:
+
 ```python
 class QuizCreate(SQLModel):
     # ... existing fields ...
@@ -175,6 +188,7 @@ class QuizCreate(SQLModel):
 ```
 
 Add tone to QuizPublic schema:
+
 ```python
 class QuizPublic(SQLModel):
     # ... existing fields ...
@@ -188,6 +202,7 @@ class QuizPublic(SQLModel):
 **File:** `backend/src/quiz/service.py`
 
 Add tone to quiz creation:
+
 ```python
 quiz = Quiz(
     # ... existing fields ...
@@ -203,6 +218,7 @@ quiz = Quiz(
 **File:** `backend/src/question/types/base.py`
 
 Add tone field to GenerationParameters class:
+
 ```python
 class GenerationParameters(BaseModel):
     # ... existing fields ...
@@ -244,6 +260,7 @@ class ParallelModuleProcessor:
 ```
 
 Update template variable injection:
+
 ```python
 extra_variables={
     "module_name": state.module_name,
@@ -253,6 +270,7 @@ extra_variables={
 ```
 
 Update workflow instantiation:
+
 ```python
 workflow = ModuleBatchWorkflow(
     llm_provider=self.llm_provider,
@@ -267,6 +285,7 @@ workflow = ModuleBatchWorkflow(
 **File:** `backend/src/question/services/generation_service.py`
 
 Extract tone from quiz and pass to processor:
+
 ```python
 processor = ParallelModuleProcessor(
     llm_provider=provider,
@@ -304,20 +323,21 @@ For Norwegian templates, use Norwegian translations of the tone descriptions.
 **File:** `frontend/src/lib/constants/index.ts`
 
 Add tone constants after language constants:
+
 ```typescript
 export const QUIZ_TONES = {
   ACADEMIC: "academic",
   CASUAL: "casual",
   ENCOURAGING: "encouraging",
   PROFESSIONAL: "professional",
-} as const
+} as const;
 
 export const QUIZ_TONE_LABELS = {
   academic: "Formal/Academic",
   casual: "Casual/Conversational",
   encouraging: "Friendly/Encouraging",
   professional: "Professional/Business",
-} as const
+} as const;
 ```
 
 #### Step 10: Update QuizSettingsStep Component
@@ -325,25 +345,28 @@ export const QUIZ_TONE_LABELS = {
 **File:** `frontend/src/components/QuizCreation/QuizSettingsStep.tsx`
 
 Update imports:
+
 ```typescript
-import type { QuizLanguage, QuizTone } from "@/client"
-import { QUIZ_LANGUAGES, QUIZ_TONES } from "@/lib/constants"
+import type { QuizLanguage, QuizTone } from "@/client";
+import { QUIZ_LANGUAGES, QUIZ_TONES } from "@/lib/constants";
 ```
 
 Update interface:
+
 ```typescript
 interface QuizSettings {
-  language: QuizLanguage
-  tone: QuizTone
+  language: QuizLanguage;
+  tone: QuizTone;
 }
 
 const DEFAULT_SETTINGS: QuizSettings = {
   language: QUIZ_LANGUAGES.ENGLISH,
   tone: QUIZ_TONES.ACADEMIC,
-}
+};
 ```
 
 Add tone selection UI after language selection:
+
 ```typescript
 <FormField label="Tone of Voice" isRequired>
   <Box>
@@ -394,27 +417,35 @@ Add tone selection UI after language selection:
 **File:** `frontend/src/routes/_layout/create-quiz.tsx`
 
 Update imports:
+
 ```typescript
-import { type QuestionBatch, type QuizLanguage, type QuizTone, QuizService } from "@/client"
-import { QUIZ_LANGUAGES, QUIZ_TONES } from "@/lib/constants"
+import {
+  type QuestionBatch,
+  type QuizLanguage,
+  type QuizTone,
+  QuizService,
+} from "@/client";
+import { QUIZ_LANGUAGES, QUIZ_TONES } from "@/lib/constants";
 ```
 
 Update form data interface:
+
 ```typescript
 interface QuizFormData {
   selectedCourse?: {
-    id: number
-    name: string
-  }
-  selectedModules?: { [id: number]: string }
-  moduleQuestions?: { [id: string]: QuestionBatch[] }
-  title?: string
-  language?: QuizLanguage
-  tone?: QuizTone
+    id: number;
+    name: string;
+  };
+  selectedModules?: { [id: number]: string };
+  moduleQuestions?: { [id: string]: QuestionBatch[] };
+  title?: string;
+  language?: QuizLanguage;
+  tone?: QuizTone;
 }
 ```
 
 Update settings handling:
+
 ```typescript
 <QuizSettingsStep
   settings={{
@@ -431,6 +462,7 @@ Update settings handling:
 ```
 
 Update quiz creation payload:
+
 ```typescript
 const quizData = {
   canvas_course_id: formData.selectedCourse.id,
@@ -439,7 +471,7 @@ const quizData = {
   title: formData.title,
   language: formData.language || QUIZ_LANGUAGES.ENGLISH,
   tone: formData.tone || QUIZ_TONES.ACADEMIC,
-}
+};
 ```
 
 #### Step 12: Update Quiz Information Display
@@ -447,25 +479,26 @@ const quizData = {
 **File:** `frontend/src/routes/_layout/quiz.$id.index.tsx`
 
 Update imports:
+
 ```typescript
-import { QUIZ_LANGUAGE_LABELS, QUIZ_TONE_LABELS } from "@/lib/constants"
+import { QUIZ_LANGUAGE_LABELS, QUIZ_TONE_LABELS } from "@/lib/constants";
 ```
 
 Add tone display after language:
+
 ```typescript
 <HStack justify="space-between">
   <Text fontWeight="medium" color="gray.700">
     Tone
   </Text>
-  <Badge variant="outline">
-    {QUIZ_TONE_LABELS[quiz.tone!]}
-  </Badge>
+  <Badge variant="outline">{QUIZ_TONE_LABELS[quiz.tone!]}</Badge>
 </HStack>
 ```
 
 ### 4.3 Data Models & Schemas
 
 #### QuizTone Enum
+
 ```python
 class QuizTone(str, Enum):
     ACADEMIC = "academic"          # Formal academic language
@@ -475,6 +508,7 @@ class QuizTone(str, Enum):
 ```
 
 #### Database Schema Change
+
 ```sql
 -- Auto-generated migration
 ALTER TABLE quiz ADD COLUMN tone VARCHAR DEFAULT 'academic';
@@ -483,6 +517,7 @@ ALTER TABLE quiz ADD COLUMN tone VARCHAR DEFAULT 'academic';
 #### API Request/Response Examples
 
 **Quiz Creation Request:**
+
 ```json
 {
   "canvas_course_id": 12345,
@@ -490,9 +525,7 @@ ALTER TABLE quiz ADD COLUMN tone VARCHAR DEFAULT 'academic';
   "selected_modules": {
     "67890": {
       "name": "Cognitive Psychology",
-      "question_batches": [
-        {"question_type": "multiple_choice", "count": 10}
-      ]
+      "question_batches": [{ "question_type": "multiple_choice", "count": 10 }]
     }
   },
   "title": "Psychology Quiz 1",
@@ -502,6 +535,7 @@ ALTER TABLE quiz ADD COLUMN tone VARCHAR DEFAULT 'academic';
 ```
 
 **Quiz Response:**
+
 ```json
 {
   "id": "123e4567-e89b-12d3-a456-426614174000",
@@ -517,7 +551,9 @@ ALTER TABLE quiz ADD COLUMN tone VARCHAR DEFAULT 'academic';
 ### 4.4 Configuration
 
 #### Template Configuration
+
 Each template includes tone variable documentation:
+
 ```json
 {
   "variables": {
@@ -527,6 +563,7 @@ Each template includes tone variable documentation:
 ```
 
 #### Default Values
+
 - **Database Default:** `academic` (most formal, widely applicable)
 - **Frontend Default:** `QUIZ_TONES.ACADEMIC`
 - **Fallback Logic:** If tone is null/missing, defaults to academic
@@ -536,6 +573,7 @@ Each template includes tone variable documentation:
 ### 5.1 Unit Tests
 
 #### Backend Tests
+
 ```python
 # Test tone enum validation
 def test_quiz_tone_enum_values():
@@ -570,35 +608,47 @@ def test_quiz_default_tone():
 ```
 
 #### Frontend Tests
+
 ```typescript
 // Test tone selection component
-describe('QuizSettingsStep Tone Selection', () => {
-  it('renders all tone options', () => {
-    render(<QuizSettingsStep settings={defaultSettings} onSettingsChange={jest.fn()} />)
+describe("QuizSettingsStep Tone Selection", () => {
+  it("renders all tone options", () => {
+    render(
+      <QuizSettingsStep
+        settings={defaultSettings}
+        onSettingsChange={jest.fn()}
+      />
+    );
 
-    expect(screen.getByText('Formal/Academic')).toBeInTheDocument()
-    expect(screen.getByText('Casual/Conversational')).toBeInTheDocument()
-    expect(screen.getByText('Friendly/Encouraging')).toBeInTheDocument()
-    expect(screen.getByText('Professional/Business')).toBeInTheDocument()
-  })
+    expect(screen.getByText("Formal/Academic")).toBeInTheDocument();
+    expect(screen.getByText("Casual/Conversational")).toBeInTheDocument();
+    expect(screen.getByText("Friendly/Encouraging")).toBeInTheDocument();
+    expect(screen.getByText("Professional/Business")).toBeInTheDocument();
+  });
 
-  it('calls onSettingsChange when tone is selected', () => {
-    const onSettingsChange = jest.fn()
-    render(<QuizSettingsStep settings={defaultSettings} onSettingsChange={onSettingsChange} />)
+  it("calls onSettingsChange when tone is selected", () => {
+    const onSettingsChange = jest.fn();
+    render(
+      <QuizSettingsStep
+        settings={defaultSettings}
+        onSettingsChange={onSettingsChange}
+      />
+    );
 
-    fireEvent.click(screen.getByTestId('tone-card-casual'))
+    fireEvent.click(screen.getByTestId("tone-card-casual"));
 
     expect(onSettingsChange).toHaveBeenCalledWith({
-      language: 'en',
-      tone: 'casual'
-    })
-  })
-})
+      language: "en",
+      tone: "casual",
+    });
+  });
+});
 ```
 
 ### 5.2 Integration Tests
 
 #### API Integration
+
 ```python
 def test_quiz_creation_api_with_tone():
     response = client.post("/api/v1/quiz", json={
@@ -614,6 +664,7 @@ def test_quiz_creation_api_with_tone():
 ```
 
 #### Template Integration
+
 ```python
 def test_tone_injection_in_templates():
     template_manager = get_template_manager()
@@ -633,6 +684,7 @@ def test_tone_injection_in_templates():
 ### 5.3 Manual Testing Steps
 
 1. **Quiz Creation Flow:**
+
    - Navigate to quiz creation
    - Select course and modules
    - Verify tone selection appears in settings step
@@ -640,6 +692,7 @@ def test_tone_injection_in_templates():
    - Create quiz and verify tone is saved
 
 2. **Question Generation:**
+
    - Create quizzes with different tones
    - Generate questions for each tone
    - Manually review generated questions for tone appropriateness
@@ -669,6 +722,7 @@ alembic upgrade head
 ```
 
 **Migration Details:**
+
 - Adds `tone` column to `quiz` table
 - Sets default value to 'academic'
 - Creates index for efficient querying
@@ -676,11 +730,13 @@ alembic upgrade head
 ### 6.2 Backend Deployment
 
 1. **Zero-Downtime Deployment:**
+
    - Feature is backward compatible
    - Existing quizzes get 'academic' tone by default
    - Old API clients continue to work
 
 2. **Verification Steps:**
+
    ```bash
    # Test API endpoint
    curl -X POST /api/v1/quiz \
@@ -693,6 +749,7 @@ alembic upgrade head
 ### 6.3 Frontend Deployment
 
 1. **Build and Deploy:**
+
    ```bash
    npm run build
    # Deploy build artifacts
@@ -701,22 +758,24 @@ alembic upgrade head
 2. **Feature Flag (Optional):**
    If gradual rollout is desired, wrap tone selection UI:
    ```typescript
-   {FEATURES.TONE_SELECTION_ENABLED && (
-     <FormField label="Tone of Voice">
-       {/* tone selection UI */}
-     </FormField>
-   )}
+   {
+     FEATURES.TONE_SELECTION_ENABLED && (
+       <FormField label="Tone of Voice">{/* tone selection UI */}</FormField>
+     );
+   }
    ```
 
 ### 6.4 Rollback Procedures
 
 #### Database Rollback
+
 ```sql
 -- If needed, remove tone column (data loss!)
 ALTER TABLE quiz DROP COLUMN tone;
 ```
 
 #### Application Rollback
+
 - Remove tone field from models and schemas
 - Templates will ignore missing tone variable (graceful degradation)
 - Frontend will not show tone selection
@@ -726,6 +785,7 @@ ALTER TABLE quiz DROP COLUMN tone;
 ### 7.1 Key Metrics
 
 #### Usage Metrics
+
 ```sql
 -- Monitor tone selection distribution
 SELECT tone, COUNT(*) as quiz_count
@@ -741,6 +801,7 @@ GROUP BY language, tone;
 ```
 
 #### Performance Metrics
+
 - Question generation latency by tone
 - Template processing time
 - API response times for quiz creation
@@ -764,9 +825,11 @@ logger.warning("invalid_tone_value", tone=invalid_tone, quiz_id=quiz_id)
 **Symptoms:** Generated questions appear generic regardless of tone selection
 
 **Diagnosis:**
+
 1. Check if tone is being passed to templates:
+
    ```bash
-   grep "tone.*null\|tone.*None" /var/log/ragatuit/generation.log
+   grep "tone.*null\|tone.*None" /var/log/quizcrafter/generation.log
    ```
 
 2. Verify template variable injection:
@@ -776,6 +839,7 @@ logger.warning("invalid_tone_value", tone=invalid_tone, quiz_id=quiz_id)
    ```
 
 **Resolution:**
+
 1. Ensure tone is extracted from quiz: `quiz.tone.value`
 2. Verify workflow passes tone to templates
 3. Check template syntax for tone conditionals
@@ -785,11 +849,13 @@ logger.warning("invalid_tone_value", tone=invalid_tone, quiz_id=quiz_id)
 **Symptoms:** Tone selection UI missing in quiz creation
 
 **Diagnosis:**
+
 1. Check if QuizTone type is available from API client
 2. Verify component imports are correct
 3. Check for JavaScript errors in browser console
 
 **Resolution:**
+
 1. Regenerate API client: `npm run generate-client`
 2. Verify imports in QuizSettingsStep component
 3. Check TypeScript compilation errors
@@ -799,6 +865,7 @@ logger.warning("invalid_tone_value", tone=invalid_tone, quiz_id=quiz_id)
 **Symptoms:** Deployment fails during database migration
 
 **Diagnosis:**
+
 ```bash
 # Check migration status
 alembic current
@@ -809,6 +876,7 @@ alembic show <revision_id>
 ```
 
 **Resolution:**
+
 1. Ensure database user has ALTER TABLE permissions
 2. Check for table locks during migration
 3. Run migration manually if needed:
@@ -821,6 +889,7 @@ alembic show <revision_id>
 ### 8.1 Input Validation
 
 #### Backend Validation
+
 ```python
 # Pydantic automatically validates enum values
 class QuizCreate(SQLModel):
@@ -831,6 +900,7 @@ class QuizCreate(SQLModel):
 ```
 
 #### Frontend Validation
+
 ```typescript
 // TypeScript prevents invalid values at compile time
 const tone: QuizTone = "invalid"; // TypeScript error
@@ -854,6 +924,7 @@ const isValidTone = Object.values(QUIZ_TONES).includes(selectedTone);
 ### 8.4 Template Security
 
 #### Prompt Injection Prevention
+
 ```python
 # Templates use controlled conditionals, not user input
 "{% if tone == 'academic' %}Use formal language{% endif %}"
@@ -863,6 +934,7 @@ const isValidTone = Object.values(QUIZ_TONES).includes(selectedTone);
 ```
 
 #### LLM Safety
+
 - Tone instructions are predefined and safe
 - No user-generated content in tone logic
 - All tone descriptions reviewed for appropriate language
@@ -879,6 +951,7 @@ const isValidTone = Object.values(QUIZ_TONES).includes(selectedTone);
 ### 9.2 Potential Improvements
 
 #### Custom Tone Descriptions
+
 ```python
 # Future enhancement: Allow custom tone instructions
 class CustomTone(BaseModel):
@@ -892,6 +965,7 @@ class Quiz(SQLModel, table=True):
 ```
 
 #### Per-Question Type Tones
+
 ```python
 class QuestionBatch(SQLModel):
     question_type: QuestionType
@@ -900,16 +974,18 @@ class QuestionBatch(SQLModel):
 ```
 
 #### Tone Analytics
+
 ```typescript
 // Future dashboard component
 interface ToneAnalytics {
-  mostPopularTone: QuizTone
-  toneEffectiveness: Record<QuizTone, number>
-  studentPreference: Record<QuizTone, number>
+  mostPopularTone: QuizTone;
+  toneEffectiveness: Record<QuizTone, number>;
+  studentPreference: Record<QuizTone, number>;
 }
 ```
 
 #### A/B Testing Framework
+
 ```python
 # Future: Test tone effectiveness
 class ToneExperiment(SQLModel, table=True):
@@ -922,11 +998,13 @@ class ToneExperiment(SQLModel, table=True):
 ### 9.3 Scalability Considerations
 
 #### Template Optimization
+
 - **Current:** 10 templates × 4 tones = 40 template variations loaded in memory
 - **Future:** Lazy loading of tone-specific template sections
 - **Caching:** Redis cache for compiled template variants
 
 #### Database Optimization
+
 ```sql
 -- Current index on tone for analytics queries
 CREATE INDEX idx_quiz_tone ON quiz(tone);
@@ -937,30 +1015,34 @@ CREATE INDEX idx_quiz_created_tone ON quiz(created_at, tone);
 ```
 
 #### Internationalization
+
 ```typescript
 // Future: Localized tone descriptions
 interface LocalizedToneLabels {
   [locale: string]: {
     [tone in QuizTone]: {
-      label: string
-      description: string
-      instructions: string
-    }
-  }
+      label: string;
+      description: string;
+      instructions: string;
+    };
+  };
 }
 ```
 
 ### 9.4 Integration Opportunities
 
 #### Canvas LMS Integration
+
 - Export tone information to Canvas quiz metadata
 - Allow Canvas course preferences to suggest default tones
 
 #### Learning Management System
+
 - Track which tones work best for different student populations
 - Integrate with student accessibility preferences
 
 #### AI/ML Enhancements
+
 - Analyze generated question quality by tone
 - Automatically suggest optimal tone based on course content
 - Train tone-specific question generation models
@@ -972,15 +1054,19 @@ interface LocalizedToneLabels {
 ### Template Tone Instructions Reference
 
 #### Academic Tone
+
 "Use formal academic language with precise terminology, structured explanations, and a scholarly approach. Maintain objectivity and use complete sentences with proper grammar."
 
 #### Casual Tone
+
 "Use everyday conversational language that feels approachable and relaxed. Keep explanations simple and use contractions where natural. Make the content feel like a friendly discussion."
 
 #### Encouraging Tone
+
 "Use warm, supportive language that motivates learning. Include positive reinforcement, acknowledge that mistakes are part of learning, and frame questions in ways that build confidence."
 
 #### Professional Tone
+
 "Use clear, direct business language suitable for workplace training. Focus on practical applications and real-world scenarios. Keep explanations concise and action-oriented."
 
 ### Norwegian Translations

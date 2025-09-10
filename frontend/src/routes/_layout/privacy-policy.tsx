@@ -1,9 +1,9 @@
-import { Box, Container, Heading, List, Text, VStack } from "@chakra-ui/react"
-import { Link, createFileRoute } from "@tanstack/react-router"
+import { Box, Container, Heading, List, Text, VStack } from "@chakra-ui/react";
+import { Link, createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/_layout/privacy-policy")({
   component: PrivacyPolicy,
-})
+});
 
 function PrivacyPolicy() {
   return (
@@ -22,12 +22,13 @@ function PrivacyPolicy() {
             1. Introduction
           </Heading>
           <Text mb={4}>
-            RAG@UiT is an application developed at UiT The Arctic University of
-            Norway to assist instructors and course coordinators in generating
-            quizzes based on course content from Canvas LMS. The application
-            streamlines the creation of question banks for quizzes and exams
-            while also serving as a research platform for a project thesis on
-            quality metrics for Norwegian AI-generated educational questions.
+            QuizCrafter is an application developed at UiT The Arctic University
+            of Norway to assist instructors and course coordinators in
+            generating quizzes based on course content from Canvas LMS. The
+            application streamlines the creation of question banks for quizzes
+            and exams while also serving as a research platform for a project
+            thesis on quality metrics for Norwegian AI-generated educational
+            questions.
           </Text>
           <Text mb={4}>
             As part of the research, anonymized quiz and question data is
@@ -281,5 +282,5 @@ function PrivacyPolicy() {
         </Box>
       </VStack>
     </Container>
-  )
+  );
 }

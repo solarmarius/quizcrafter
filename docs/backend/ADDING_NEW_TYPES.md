@@ -1,6 +1,6 @@
 # Adding New Question Types
 
-This guide explains how to add new question types to the Rag@UiT question module.
+This guide explains how to add new question types to the QuizCrafter question module.
 
 ## Overview
 
@@ -141,6 +141,7 @@ def _initialize_default_types(self) -> None:
 Create template files for your question type in `backend/src/question/templates/files/`:
 
 #### English Template
+
 Create `batch_{your_type}.json`:
 
 ```json
@@ -166,6 +167,7 @@ Create `batch_{your_type}.json`:
 ```
 
 #### Norwegian Template (if needed)
+
 Create `batch_{your_type}_no.json` with Norwegian prompts and set `"language": "no"`.
 
 ### Step 5: Test Your Implementation
@@ -215,20 +217,26 @@ def test_fib_canvas_format():
 ## Template Requirements
 
 ### System Prompt
+
 Your system prompt should:
+
 - Clearly explain the question type format
 - Specify the exact JSON structure expected
 - Include examples if helpful
 - Set expectations for difficulty, language, etc.
 
 ### User Prompt
+
 Your user prompt should include these variables:
+
 - `{{ module_name }}` - The name of the Canvas module
 - `{{ module_content }}` - The actual content to generate questions from
 - `{{ question_count }}` - Number of questions to generate
 
 ### JSON Response Format
+
 The LLM must return a JSON array of question objects. Each object must include:
+
 - `question_text` - The question text (required by BaseQuestionData)
 - `explanation` - Explanation of the answer (optional in BaseQuestionData)
 - Your type-specific fields (e.g., `correct_answers`, `case_sensitive`)
@@ -236,9 +244,11 @@ The LLM must return a JSON array of question objects. Each object must include:
 ## Canvas Integration
 
 Different question types require different Canvas API formats. Consult the Canvas API documentation for your question type:
+
 - [Canvas Quiz Question Types](https://canvas.instructure.com/doc/api/quiz_questions.html)
 
 Common Canvas question types:
+
 - `multiple_choice_question`
 - `fill_in_multiple_blanks_question`
 - `true_false_question`
@@ -263,16 +273,19 @@ Before considering your question type complete:
 ## Troubleshooting
 
 ### Template Not Found
+
 - Ensure template filename follows convention: `batch_{question_type}.json`
 - Check that template has correct `question_type` field
 - Verify template is in `backend/src/question/templates/files/`
 
 ### Registration Issues
+
 - Make sure import statement is added to registry
 - Check for typos in enum value and registration
 - Ensure the implementation class is instantiated when registering
 
 ### Generation Failures
+
 - Test your template prompts manually first
 - Ensure JSON structure matches your data model
 - Check that all required fields are included
@@ -281,6 +294,7 @@ Before considering your question type complete:
 ## Future Considerations
 
 When adding a new question type, consider:
+
 - How will it be displayed in the frontend?
 - Does it need special validation rules?
 - Can it be auto-graded or does it need manual review?
