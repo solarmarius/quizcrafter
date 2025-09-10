@@ -20,10 +20,11 @@ export const WelcomeStep = () => {
           py={3}
         >
           <Text color="orange.700" fontWeight="medium">
-            ⚠️ This application is currently in a student-driven development
-            phase and has not yet been officially released. Please be aware that
-            ongoing support and future development are not guaranteed. Features
-            may change or be discontinued at any time.
+            ⚠️ This application is currently in a development phase by IFI-UIT
+            and has not yet been officially released. Please be aware that
+            ongoing support and future development are not guaranteed. Quiz data
+            may be deleted at any time. Features may change or be discontinued
+            at any time.
           </Text>
         </Box>
       </Box>

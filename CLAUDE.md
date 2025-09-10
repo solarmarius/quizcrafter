@@ -216,6 +216,7 @@ The application integrates deeply with Canvas LMS:
 - Course and module content fetching
 - Direct quiz/exam creation in Canvas
 - Token refresh handling for long-term access
+- **Course Filtering**: Optional environment-configurable course prefix filtering
 
 ## Environment Setup
 
@@ -234,3 +235,20 @@ URLs:
 - Backend API: http://localhost:8000
 - API Docs: http://localhost:8000/docs
 - Database Admin: http://localhost:8080
+
+### Course Prefix Filtering
+
+The application supports optional course filtering by name prefixes through the `CANVAS_COURSE_PREFIX_FILTER` environment variable:
+
+```bash
+# Show all courses (default behavior)
+CANVAS_COURSE_PREFIX_FILTER=""
+
+# Filter specific prefixes (comma-separated)
+CANVAS_COURSE_PREFIX_FILTER="SB_ME_,TK-,INF-"
+```
+
+- **Empty/unset**: Shows all courses (default)
+- **Comma-separated**: Only courses starting with specified prefixes are shown
+- **Case-sensitive**: Exact prefix matching
+- **No matches**: Returns empty list if no courses match configured prefixes

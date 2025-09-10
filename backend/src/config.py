@@ -87,6 +87,9 @@ class Settings(BaseSettings):
     MAX_RETRY_DELAY: float = 30.0
     RETRY_BACKOFF_FACTOR: float = 2.0
 
+    # Course filtering
+    CANVAS_COURSE_PREFIX_FILTER: str = ""
+
     # LLM settings
     OPENAI_SECRET_KEY: str | None = None
     LLM_API_TIMEOUT: float = 500.0  # LLM request timeout in seconds (5 minutes)
@@ -140,6 +143,16 @@ class Settings(BaseSettings):
             else self.CANVAS_BASE_URL
         )
         return f"{base.rstrip('/')}/api/{self.CANVAS_API_VERSION}"
+
+    @computed_field  # type: ignore[prop-decorator]
+    @property
+    def canvas_course_prefixes(self) -> list[str]:
+        """Get parsed list of Canvas course prefixes for filtering."""
+        if not self.CANVAS_COURSE_PREFIX_FILTER.strip():
+            return []
+        return [
+            p.strip() for p in self.CANVAS_COURSE_PREFIX_FILTER.split(",") if p.strip()
+        ]
 
     def _check_default_secret(self, var_name: str, value: str | None) -> None:
         if value == "changethis":

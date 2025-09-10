@@ -56,6 +56,45 @@ SECONDARY_CANVAS_COURSE = {
     "workflow_state": "available",
 }
 
+# Canvas Courses with Various Prefixes for Filtering Tests
+CANVAS_COURSES_WITH_PREFIXES = [
+    {
+        "id": 1001,
+        "name": "SB_ME_INF-0005 Praktisk kunstig intelligens",
+        "course_code": "INF-0005",
+        "enrollment_term_id": 1,
+        "workflow_state": "available",
+    },
+    {
+        "id": 1002,
+        "name": "TK-8110 Advanced Machine Learning",
+        "course_code": "TK-8110",
+        "enrollment_term_id": 1,
+        "workflow_state": "available",
+    },
+    {
+        "id": 1003,
+        "name": "INF-2700 Database Systems",
+        "course_code": "INF-2700",
+        "enrollment_term_id": 1,
+        "workflow_state": "available",
+    },
+    {
+        "id": 1004,
+        "name": "MAT-1001 Mathematics Fundamentals",
+        "course_code": "MAT-1001",
+        "enrollment_term_id": 1,
+        "workflow_state": "available",
+    },
+    {
+        "id": 1005,
+        "name": "Regular Course Without Prefix",
+        "course_code": "REG-101",
+        "enrollment_term_id": 1,
+        "workflow_state": "available",
+    },
+]
+
 # Canvas Module Test Data
 DEFAULT_CANVAS_MODULES = [
     {
