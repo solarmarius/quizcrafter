@@ -8,24 +8,24 @@ import {
   RadioGroup,
   Text,
   VStack,
-} from "@chakra-ui/react"
-import { useQuery } from "@tanstack/react-query"
+} from "@chakra-ui/react";
+import { useQuery } from "@tanstack/react-query";
 
-import { CanvasService } from "@/client"
-import { LoadingSkeleton } from "@/components/Common"
-import { Field } from "@/components/ui/field"
-import { analyzeCanvasError } from "@/lib/utils"
+import { CanvasService } from "@/client";
+import { LoadingSkeleton } from "@/components/Common";
+import { Field } from "@/components/ui/field";
+import { analyzeCanvasError } from "@/lib/utils";
 
 interface Course {
-  id: number
-  name: string
+  id: number;
+  name: string;
 }
 
 interface CourseSelectionStepProps {
-  selectedCourse?: Course
-  onCourseSelect: (course: Course) => void
-  title?: string
-  onTitleChange: (title: string) => void
+  selectedCourse?: Course;
+  onCourseSelect: (course: Course) => void;
+  title?: string;
+  onTitleChange: (title: string) => void;
 }
 
 export function CourseSelectionStep({
@@ -46,7 +46,7 @@ export function CourseSelectionStep({
     retry: 1, // Only retry once instead of default 3 times
     retryDelay: 1000, // Wait 1 second between retries
     staleTime: 30000, // Consider data stale after 30 seconds
-  })
+  });
 
   if (isLoading || isFetching) {
     return (
@@ -56,11 +56,11 @@ export function CourseSelectionStep({
         </Text>
         <LoadingSkeleton height="60px" lines={3} />
       </VStack>
-    )
+    );
   }
 
   if (error) {
-    const errorInfo = analyzeCanvasError(error)
+    const errorInfo = analyzeCanvasError(error);
 
     return (
       <Alert.Root status="error">
@@ -84,7 +84,7 @@ export function CourseSelectionStep({
           </VStack>
         </Alert.Description>
       </Alert.Root>
-    )
+    );
   }
 
   if (!courses || courses.length === 0) {
@@ -97,7 +97,7 @@ export function CourseSelectionStep({
           check your Canvas account or contact your administrator.
         </Alert.Description>
       </Alert.Root>
-    )
+    );
   }
 
   return (
@@ -113,6 +113,20 @@ export function CourseSelectionStep({
           Choose the course where you want to generate quiz questions from the
           module materials.
         </Text>
+        <Box
+          bg="orange.50"
+          border="1px"
+          borderColor="orange.200"
+          borderRadius="md"
+          px={4}
+          py={3}
+          mt={4}
+        >
+          <Text color="orange.700">
+            During development, only courses with the prefix "INF" are shown.
+            Contact us if you would like to test with other courses.
+          </Text>
+        </Box>
       </Box>
 
       <RadioGroup.Root value={selectedCourse?.id?.toString() || ""}>
@@ -128,7 +142,7 @@ export function CourseSelectionStep({
               }
               bg={selectedCourse?.id === course.id ? "blue.50" : "white"}
               onClick={() => {
-                onCourseSelect(course)
+                onCourseSelect(course);
               }}
               data-testid={`course-card-${course.id}`}
             >
@@ -178,5 +192,5 @@ export function CourseSelectionStep({
         </VStack>
       )}
     </VStack>
-  )
+  );
 }
