@@ -90,8 +90,10 @@ class Settings(BaseSettings):
     # Course filtering
     CANVAS_COURSE_PREFIX_FILTER: str = ""
 
-    # LLM settings
-    OPENAI_SECRET_KEY: str | None = None
+    # Azure OpenAI settings
+    AZURE_OPENAI_API_KEY: str | None = None
+    AZURE_OPENAI_ENDPOINT: str | None = None
+    AZURE_OPENAI_API_VERSION: str | None = None
     LLM_API_TIMEOUT: float = 500.0  # LLM request timeout in seconds (5 minutes)
 
     # Module-based question generation settings

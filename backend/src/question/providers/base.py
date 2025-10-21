@@ -13,8 +13,8 @@ from src.config import get_logger
 logger = get_logger("llm_provider")
 
 
-# Default LLM Configuration Constants
-DEFAULT_OPENAI_MODEL = "gpt-5-mini-2025-08-07"
+# Default LLM Configuration Constants (Azure deployment name)
+DEFAULT_OPENAI_MODEL = "gpt-5-mini"
 DEFAULT_TEMPERATURE = 1.0
 
 
