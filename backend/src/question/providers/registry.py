@@ -263,7 +263,7 @@ class LLMProviderRegistry:
             from .mock_provider import MockProvider
             from .openai_provider import OpenAIProvider
 
-            if settings.OPENAI_SECRET_KEY:
+            if settings.AZURE_OPENAI_API_KEY:
                 openai_config = LLMConfiguration(
                     provider=LLMProvider.OPENAI,
                     model=DEFAULT_OPENAI_MODEL,
@@ -273,7 +273,11 @@ class LLMProviderRegistry:
                     initial_retry_delay=settings.INITIAL_RETRY_DELAY,
                     max_retry_delay=settings.MAX_RETRY_DELAY,
                     retry_backoff_factor=settings.RETRY_BACKOFF_FACTOR,
-                    provider_settings={"api_key": settings.OPENAI_SECRET_KEY},
+                    provider_settings={
+                        "api_key": settings.AZURE_OPENAI_API_KEY,
+                        "azure_endpoint": settings.AZURE_OPENAI_ENDPOINT,
+                        "api_version": settings.AZURE_OPENAI_API_VERSION,
+                    },
                 )
 
                 self.register_provider(

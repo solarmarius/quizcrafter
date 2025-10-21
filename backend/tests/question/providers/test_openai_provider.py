@@ -51,19 +51,19 @@ async def test_get_available_models(provider):
     model_ids = [model.model_id for model in models]
     assert DEFAULT_OPENAI_MODEL in model_ids
 
-    # Verify model properties for default model (o4-mini)
+    # Verify model properties for default model (gpt-5-mini)
     default_model = next(
         model for model in models if model.model_id == DEFAULT_OPENAI_MODEL
     )
     assert default_model.provider == LLMProvider.OPENAI
-    assert default_model.display_name == "OpenAI GPT-5 Mini"
+    assert default_model.display_name == "Azure OpenAI GPT-5 Mini"
     assert default_model.max_tokens == 400000
     assert default_model.supports_streaming is False
     assert default_model.cost_per_1k_tokens == 0.025
 
-    # Verify both models are available
+    # Verify Azure deployment is available
     model_ids = [model.model_id for model in models]
-    assert "gpt-5-mini-2025-08-07" in model_ids
+    assert "gpt-5-mini" in model_ids
 
 
 def test_validate_model_valid(provider):
@@ -115,11 +115,11 @@ async def test_generate_response_success(provider):
 
     with patch.object(provider, "_client", None):  # Start with no client
         with patch(
-            "src.question.providers.openai_provider.ChatOpenAI"
-        ) as mock_chat_openai:
+            "src.question.providers.openai_provider.AzureChatOpenAI"
+        ) as mock_azure_openai:
             mock_client = AsyncMock()
             mock_client.ainvoke.return_value = mock_response
-            mock_chat_openai.return_value = mock_client
+            mock_azure_openai.return_value = mock_client
 
             response = await provider.generate(messages)
 
@@ -148,12 +148,12 @@ async def test_generate_response_authentication_error(provider):
 
     with patch.object(provider, "_client", None):  # Start with no client
         with patch(
-            "src.question.providers.openai_provider.ChatOpenAI"
-        ) as mock_chat_openai:
+            "src.question.providers.openai_provider.AzureChatOpenAI"
+        ) as mock_azure_openai:
             mock_client = AsyncMock()
             # Use centralized mock for auth error
             mock_client.ainvoke.side_effect = Exception("authentication failed")
-            mock_chat_openai.return_value = mock_client
+            mock_azure_openai.return_value = mock_client
 
             with pytest.raises(AuthenticationError) as exc_info:
                 await provider.generate(messages)
@@ -172,12 +172,12 @@ async def test_generate_response_rate_limit_error(provider):
 
     with patch.object(provider, "_client", None):  # Start with no client
         with patch(
-            "src.question.providers.openai_provider.ChatOpenAI"
-        ) as mock_chat_openai:
+            "src.question.providers.openai_provider.AzureChatOpenAI"
+        ) as mock_azure_openai:
             mock_client = AsyncMock()
             # Use centralized mock for rate limit error
             mock_client.ainvoke.side_effect = Exception("Rate limit exceeded")
-            mock_chat_openai.return_value = mock_client
+            mock_azure_openai.return_value = mock_client
 
             with pytest.raises(RateLimitError) as exc_info:
                 await provider.generate(messages)
@@ -193,10 +193,10 @@ async def test_generate_response_with_custom_config():
     from src.question.providers.base import LLMConfiguration, LLMMessage, LLMProvider
     from src.question.providers.openai_provider import OpenAIProvider
 
-    # Use different model and temperature
+    # Use different deployment and temperature
     custom_config = LLMConfiguration(
         provider=LLMProvider.OPENAI,
-        model="gpt-5-mini-2025-08-07",
+        model="gpt-5-mini",
         temperature=1.0,
         max_tokens=1000,
         timeout=60.0,
@@ -211,18 +211,18 @@ async def test_generate_response_with_custom_config():
 
     with patch.object(provider, "_client", None):  # Start with no client
         with patch(
-            "src.question.providers.openai_provider.ChatOpenAI"
-        ) as mock_chat_openai:
+            "src.question.providers.openai_provider.AzureChatOpenAI"
+        ) as mock_azure_openai:
             mock_client = AsyncMock()
             mock_client.ainvoke.return_value = mock_response
-            mock_chat_openai.return_value = mock_client
+            mock_azure_openai.return_value = mock_client
 
             response = await provider.generate(messages)
 
     assert response.model == DEFAULT_OPENAI_MODEL
 
     # Verify client was configured with custom settings
-    mock_chat_openai.assert_called_once()
+    mock_azure_openai.assert_called_once()
 
 
 @pytest.mark.asyncio
@@ -232,23 +232,27 @@ async def test_client_lazy_initialization(provider):
 
     assert provider._client is None
 
-    with patch("src.question.providers.openai_provider.ChatOpenAI") as mock_chat_openai:
+    with patch(
+        "src.question.providers.openai_provider.AzureChatOpenAI"
+    ) as mock_azure_openai:
         mock_client = AsyncMock()
-        mock_chat_openai.return_value = mock_client
+        mock_azure_openai.return_value = mock_client
 
         await provider.initialize()
 
         assert provider._client == mock_client
 
         # Verify configuration was passed correctly
-        mock_chat_openai.assert_called_once()
-        call_kwargs = mock_chat_openai.call_args[1]
-        assert call_kwargs["model"] == DEFAULT_OPENAI_MODEL
+        mock_azure_openai.assert_called_once()
+        call_kwargs = mock_azure_openai.call_args[1]
+        assert call_kwargs["azure_deployment"] == DEFAULT_OPENAI_MODEL
         assert call_kwargs["temperature"] == DEFAULT_TEMPERATURE
         assert call_kwargs["timeout"] == 30.0
 
         # Verify api_key is passed correctly
         assert "api_key" in call_kwargs
+        assert "azure_endpoint" in call_kwargs
+        assert "api_version" in call_kwargs
 
 
 @pytest.mark.asyncio
@@ -256,9 +260,11 @@ async def test_client_reuses_instance(provider):
     """Test that client instance is reused."""
     from unittest.mock import AsyncMock
 
-    with patch("src.question.providers.openai_provider.ChatOpenAI") as mock_chat_openai:
+    with patch(
+        "src.question.providers.openai_provider.AzureChatOpenAI"
+    ) as mock_azure_openai:
         mock_client = AsyncMock()
-        mock_chat_openai.return_value = mock_client
+        mock_azure_openai.return_value = mock_client
 
         await provider.initialize()
         client1 = provider._client
@@ -268,7 +274,7 @@ async def test_client_reuses_instance(provider):
         assert client1 == client2
         assert client1 == mock_client
         # Should only be called once due to caching
-        mock_chat_openai.assert_called_once()
+        mock_azure_openai.assert_called_once()
 
 
 @pytest.mark.asyncio
@@ -285,7 +291,9 @@ async def test_generate_response_measures_time(provider):
 
     with (
         patch.object(provider, "_client", None),
-        patch("src.question.providers.openai_provider.ChatOpenAI") as mock_chat_openai,
+        patch(
+            "src.question.providers.openai_provider.AzureChatOpenAI"
+        ) as mock_azure_openai,
         patch("src.question.providers.openai_provider.time") as mock_time_module,
     ):
         # Mock time.time to return specific values
@@ -293,7 +301,7 @@ async def test_generate_response_measures_time(provider):
 
         mock_client = AsyncMock()
         mock_client.ainvoke.return_value = mock_response
-        mock_chat_openai.return_value = mock_client
+        mock_azure_openai.return_value = mock_client
 
         response = await provider.generate(messages)
 
@@ -322,11 +330,11 @@ async def test_generate_response_counts_tokens(provider):
 
     with patch.object(provider, "_client", None):
         with patch(
-            "src.question.providers.openai_provider.ChatOpenAI"
-        ) as mock_chat_openai:
+            "src.question.providers.openai_provider.AzureChatOpenAI"
+        ) as mock_azure_openai:
             mock_client = AsyncMock()
             mock_client.ainvoke.return_value = mock_response
-            mock_chat_openai.return_value = mock_client
+            mock_azure_openai.return_value = mock_client
 
             response = await provider.generate(messages)
 
@@ -357,9 +365,8 @@ def test_provider_configuration_immutable(provider, config):
 @pytest.mark.parametrize(
     "model,expected_valid",
     [
-        (DEFAULT_OPENAI_MODEL, True),
-        ("o3-2025-04-16", True),  # Keep o3 as valid option
-        ("gpt-4", False),
+        (DEFAULT_OPENAI_MODEL, True),  # gpt-5-mini deployment
+        ("gpt-4", False),  # Not configured in Azure
         ("gpt-4-turbo", False),
         ("gpt-3.5-turbo", False),
         ("claude-3", False),
@@ -368,7 +375,7 @@ def test_provider_configuration_immutable(provider, config):
     ],
 )
 def test_validate_model_various_inputs(config, model, expected_valid):
-    """Test model validation with various inputs."""
+    """Test deployment validation with various inputs."""
     from src.question.providers.base import LLMConfiguration, LLMProvider
     from src.question.providers.openai_provider import OpenAIProvider
 
@@ -403,8 +410,8 @@ async def test_generate_response_error_handling(provider):
 
     with patch.object(provider, "_client", None):
         with patch(
-            "src.question.providers.openai_provider.ChatOpenAI"
-        ) as mock_chat_openai:
+            "src.question.providers.openai_provider.AzureChatOpenAI"
+        ) as mock_azure_openai:
             mock_client = AsyncMock()
 
             # Test various exception types - all should be wrapped in LLMError
@@ -416,7 +423,7 @@ async def test_generate_response_error_handling(provider):
 
             for original_error in test_cases:
                 mock_client.ainvoke.side_effect = original_error
-                mock_chat_openai.return_value = mock_client
+                mock_azure_openai.return_value = mock_client
 
                 with pytest.raises(LLMError):
                     await provider.generate(messages)
@@ -425,7 +432,7 @@ async def test_generate_response_error_handling(provider):
 def test_provider_string_representation(provider):
     """Test string representation of provider."""
     str_repr = str(provider)
-    assert "OpenAI" in str_repr
+    assert "Azure OpenAI" in str_repr
     assert DEFAULT_OPENAI_MODEL in str_repr
 
 

@@ -1,12 +1,12 @@
-"""OpenAI LLM provider implementation."""
+"""Azure OpenAI LLM provider implementation."""
 
 import time
 from typing import Any
 
-from langchain_openai import ChatOpenAI
+from langchain_openai import AzureChatOpenAI
 from pydantic import SecretStr
 
-from src.config import get_logger
+from src.config import get_logger, settings
 
 from .base import (
     AuthenticationError,
@@ -24,31 +24,22 @@ logger = get_logger("openai_provider")
 
 
 class OpenAIProvider(BaseLLMProvider):
-    """OpenAI LLM provider implementation using LangChain."""
+    """Azure OpenAI LLM provider implementation using LangChain."""
 
     def __init__(self, configuration: LLMConfiguration):
         super().__init__(configuration)
-        self._client: ChatOpenAI | None = None
+        self._client: AzureChatOpenAI | None = None
 
-        # OpenAI model definitions
+        # Azure OpenAI model definitions (using deployment names)
         self._models = [
             LLMModel(
                 provider=LLMProvider.OPENAI,
-                model_id="gpt-5-mini-2025-08-07",
-                display_name="OpenAI GPT-5 Mini",
+                model_id="gpt-5-mini",
+                display_name="Azure OpenAI GPT-5 Mini",
                 max_tokens=400000,
                 supports_streaming=False,
                 cost_per_1k_tokens=0.025,
-                description="Cost-efficient OpenAI GPT-5 Mini model for development",
-            ),
-            LLMModel(
-                provider=LLMProvider.OPENAI,
-                model_id="o3-2025-04-16",
-                display_name="OpenAI o3",
-                max_tokens=200000,
-                supports_streaming=True,
-                cost_per_1k_tokens=0.015,
-                description="Latest OpenAI o3 reasoning model",
+                description="Cost-efficient Azure OpenAI GPT-5 Mini model for development",
             ),
         ]
 
@@ -58,44 +49,62 @@ class OpenAIProvider(BaseLLMProvider):
         return LLMProvider.OPENAI
 
     async def initialize(self) -> None:
-        """Initialize the OpenAI client."""
+        """Initialize the Azure OpenAI client."""
         if self._client is not None:
             return
 
         api_key = self.configuration.provider_settings.get("api_key")
+        azure_endpoint = self.configuration.provider_settings.get(
+            "azure_endpoint", settings.AZURE_OPENAI_ENDPOINT
+        )
+        azure_api_version = self.configuration.provider_settings.get(
+            "api_version", settings.AZURE_OPENAI_API_VERSION
+        )
+
         if not api_key:
             raise AuthenticationError(
-                "OpenAI API key is required", provider=self.provider_name
+                "Azure OpenAI API key is required", provider=self.provider_name
+            )
+
+        if not azure_endpoint:
+            raise AuthenticationError(
+                "Azure OpenAI endpoint is required", provider=self.provider_name
             )
 
         try:
-            self._client = ChatOpenAI(
-                model=self.configuration.model,
-                temperature=self.configuration.temperature,
+            self._client = AzureChatOpenAI(
+                azure_deployment=self.configuration.model,
+                api_version=azure_api_version,
+                azure_endpoint=azure_endpoint,
                 api_key=SecretStr(api_key),
+                temperature=self.configuration.temperature,
                 timeout=self.configuration.timeout,
                 max_retries=0,  # We handle retries ourselves
             )
 
             logger.info(
-                "openai_provider_initialized",
-                model=self.configuration.model,
+                "azure_openai_provider_initialized",
+                deployment=self.configuration.model,
                 temperature=self.configuration.temperature,
                 timeout=self.configuration.timeout,
+                endpoint=azure_endpoint,
+                api_version=azure_api_version,
             )
 
         except Exception as e:
             logger.error(
-                "openai_provider_initialization_failed", error=str(e), exc_info=True
+                "azure_openai_provider_initialization_failed",
+                error=str(e),
+                exc_info=True,
             )
             raise AuthenticationError(
-                f"Failed to initialize OpenAI client: {str(e)}",
+                f"Failed to initialize Azure OpenAI client: {str(e)}",
                 provider=self.provider_name,
             )
 
     async def generate(self, messages: list[LLMMessage], **kwargs: Any) -> LLMResponse:
         """
-        Generate a response using OpenAI.
+        Generate a response using Azure OpenAI.
 
         Args:
             messages: List of messages for the conversation
@@ -120,7 +129,7 @@ class OpenAIProvider(BaseLLMProvider):
 
             # Call the LangChain client
             if self._client is None:
-                raise RuntimeError("OpenAI client not initialized")
+                raise RuntimeError("Azure OpenAI client not initialized")
             result = await self._client.ainvoke(langchain_messages)
 
             response_time = time.time() - start_time
@@ -137,8 +146,8 @@ class OpenAIProvider(BaseLLMProvider):
                 content = str(result)
 
             logger.info(
-                "openai_generation_completed",
-                model=self.configuration.model,
+                "azure_openai_generation_completed",
+                deployment=self.configuration.model,
                 response_time=response_time,
                 prompt_tokens=prompt_tokens,
                 completion_tokens=completion_tokens,
@@ -161,8 +170,8 @@ class OpenAIProvider(BaseLLMProvider):
             error_type = type(e).__name__.lower()
 
             logger.error(
-                "openai_generation_failed",
-                model=self.configuration.model,
+                "azure_openai_generation_failed",
+                deployment=self.configuration.model,
                 error=str(e),
                 error_type=error_type,
                 response_time=time.time() - start_time,
@@ -182,7 +191,7 @@ class OpenAIProvider(BaseLLMProvider):
                 ]
             ):
                 raise AuthenticationError(
-                    f"OpenAI authentication error: {str(e)}",
+                    f"Azure OpenAI authentication error: {str(e)}",
                     provider=self.provider_name,
                 )
 
@@ -203,17 +212,22 @@ class OpenAIProvider(BaseLLMProvider):
                         pass
 
                 raise RateLimitError(
-                    f"OpenAI rate limit exceeded: {str(e)}",
+                    f"Azure OpenAI rate limit exceeded: {str(e)}",
                     provider=self.provider_name,
                     retry_after=retry_after,
                 )
 
             elif any(
                 pattern in error_str
-                for pattern in ["model_not_found", "invalid_model", "unsupported_model"]
+                for pattern in [
+                    "model_not_found",
+                    "invalid_model",
+                    "unsupported_model",
+                    "deployment_not_found",
+                ]
             ):
                 raise ModelNotFoundError(
-                    f"OpenAI model not found: {str(e)}",
+                    f"Azure OpenAI deployment not found: {str(e)}",
                     provider=self.provider_name,
                     model=self.configuration.model,
                 )
@@ -225,7 +239,7 @@ class OpenAIProvider(BaseLLMProvider):
                 from .base import LLMError
 
                 raise LLMError(
-                    f"OpenAI temporary error: {str(e)}",
+                    f"Azure OpenAI temporary error: {str(e)}",
                     provider=self.provider_name,
                     error_code="temporary_error",
                     retryable=True,
@@ -236,7 +250,7 @@ class OpenAIProvider(BaseLLMProvider):
                 from .base import LLMError
 
                 raise LLMError(
-                    f"OpenAI error: {str(e)}",
+                    f"Azure OpenAI error: {str(e)}",
                     provider=self.provider_name,
                     error_code="unknown_error",
                     retryable=False,
@@ -244,7 +258,7 @@ class OpenAIProvider(BaseLLMProvider):
 
     async def get_available_models(self) -> list[LLMModel]:
         """
-        Get list of available OpenAI models.
+        Get list of available Azure OpenAI deployments.
 
         Returns:
             List of available models
@@ -253,7 +267,7 @@ class OpenAIProvider(BaseLLMProvider):
 
     def validate_configuration(self) -> None:
         """
-        Validate the OpenAI provider configuration.
+        Validate the Azure OpenAI provider configuration.
 
         Raises:
             ValueError: If configuration is invalid
@@ -263,17 +277,26 @@ class OpenAIProvider(BaseLLMProvider):
 
         api_key = self.configuration.provider_settings.get("api_key")
         if not api_key:
-            raise ValueError("OpenAI API key is required in provider_settings.api_key")
+            raise ValueError(
+                "Azure OpenAI API key is required in provider_settings.api_key"
+            )
 
         if not isinstance(api_key, str) or len(api_key.strip()) == 0:
-            raise ValueError("OpenAI API key must be a non-empty string")
+            raise ValueError("Azure OpenAI API key must be a non-empty string")
+
+        # Validate Azure endpoint
+        azure_endpoint = self.configuration.provider_settings.get(
+            "azure_endpoint", settings.AZURE_OPENAI_ENDPOINT
+        )
+        if not azure_endpoint or not isinstance(azure_endpoint, str):
+            raise ValueError("Azure OpenAI endpoint is required")
 
         # Validate model is supported
         available_model_ids = [model.model_id for model in self._models]
         if self.configuration.model not in available_model_ids:
             raise ValueError(
-                f"Model {self.configuration.model} is not supported. "
-                f"Available models: {', '.join(available_model_ids)}"
+                f"Deployment {self.configuration.model} is not supported. "
+                f"Available deployments: {', '.join(available_model_ids)}"
             )
 
         # Validate temperature range
@@ -301,4 +324,4 @@ class OpenAIProvider(BaseLLMProvider):
 
     def __str__(self) -> str:
         """String representation of the provider."""
-        return f"OpenAI Provider (model: {self.configuration.model})"
+        return f"Azure OpenAI Provider (deployment: {self.configuration.model})"
