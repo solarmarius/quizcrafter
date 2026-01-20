@@ -15,7 +15,12 @@
     "view": "View",
     "approve": "Approve",
     "reject": "Reject",
-    "addBatch": "Add Batch"
+    "addBatch": "Add Batch",
+    "addQuestion": "Add Question"
+  },
+  "toast": {
+    "successTitle": "Success!",
+    "errorTitle": "Something went wrong!"
   },
   "status": {
     "loading": "Loading...",
@@ -95,7 +100,7 @@
       "placeholder": "Enter your name"
     },
     "updateSuccess": "User updated successfully.",
-    "privacyNotice": "Review our Privacy Policy to understand how we handle your data.",
+    "privacyNotice": "Review our <privacyLink>Privacy Policy</privacyLink> to understand how we handle your data.",
     "language": {
       "title": "Interface Language",
       "description": "Select your preferred language for the application interface. This is independent from the quiz content language.",

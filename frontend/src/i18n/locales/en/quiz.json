@@ -87,7 +87,11 @@
       "status": "Status",
       "created": "Created",
       "actions": "Actions"
-    }
+    },
+    "modulesSelected": "{{count}} module selected",
+    "modulesSelected_other": "{{count}} modules selected",
+    "totalQuestions": "{{count}} total questions",
+    "noQuestionsConfigured": "No questions configured"
   },
   "emptyStates": {
     "noQuizzes": "No quizzes found",
@@ -201,6 +205,7 @@
     "moduleFallback": "Module {{id}}"
   },
   "questions": {
+    "createType": "Create {{type}} Question",
     "title": "Question {{number}}",
     "approved": "Approved",
     "approvedOn": "Approved on {{date}}",

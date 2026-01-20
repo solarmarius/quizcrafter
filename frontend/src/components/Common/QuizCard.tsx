@@ -8,7 +8,7 @@ import { QuizProgressIndicator } from "@/components/dashboard/QuizProgressIndica
 import { Button } from "@/components/ui/button"
 import { StatusLight } from "@/components/ui/status-light"
 import { UI_COLORS } from "@/lib/constants"
-import { getQuizProgressPercentage, getQuizStatusText } from "@/lib/utils"
+import { getQuizProgressPercentage, getQuizStatusKey } from "@/lib/utils"
 
 interface QuizCardProps {
   quiz: Quiz
@@ -62,11 +62,11 @@ export const QuizCard = memo(function QuizCard({
   showProgress,
   variant = "auto",
 }: QuizCardProps) {
-  const { t } = useTranslation("common")
+  const { t } = useTranslation(["common", "quiz"])
 
   // Default action button with translated text
   const effectiveActionButton = actionButton ?? {
-    text: t("actions.view"),
+    text: t("common:actions.view"),
     to: `/quiz/${quiz.id}`,
   }
 
@@ -80,8 +80,10 @@ export const QuizCard = memo(function QuizCard({
   // Auto-determine progress display
   const shouldShowProgress = showProgress ?? effectiveVariant === "processing"
 
-  // Get status-specific data
-  const statusText = getQuizStatusText(quiz)
+  // Get status-specific data - translate status key
+  const statusKey = getQuizStatusKey(quiz)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const statusText: string = (t as any)(`quiz:status.${statusKey}`)
   const progressPercentage = getQuizProgressPercentage(quiz)
 
   // Styling based on variant
@@ -135,7 +137,7 @@ export const QuizCard = memo(function QuizCard({
         <HStack justify="space-between" align="center" gap={2} flexWrap="wrap">
           <HStack gap={2} flex="1" minW="0">
             <Badge variant="solid" colorScheme="blue" size="sm" flexShrink={0}>
-              {quiz.question_count || 0} {t("labels.questions")}
+              {quiz.question_count || 0} {t("common:labels.questions")}
             </Badge>
           </HStack>
 

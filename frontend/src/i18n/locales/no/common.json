@@ -15,7 +15,12 @@
     "view": "Vis",
     "approve": "Godkjenn",
     "reject": "Avvis",
-    "addBatch": "Legg til gruppe"
+    "addBatch": "Legg til gruppe",
+    "addQuestion": "Legg til spørsmål"
+  },
+  "toast": {
+    "successTitle": "Vellykket!",
+    "errorTitle": "Noe gikk galt!"
   },
   "status": {
     "loading": "Laster...",
@@ -95,7 +100,7 @@
       "placeholder": "Skriv inn navnet ditt"
     },
     "updateSuccess": "Bruker oppdatert.",
-    "privacyNotice": "Les vår personvernerklæring for å forstå hvordan vi håndterer dataene dine.",
+    "privacyNotice": "Les vår <privacyLink>personvernerklæring</privacyLink> for å forstå hvordan vi håndterer dataene dine.",
     "language": {
       "title": "Språk for grensesnitt",
       "description": "Velg ditt foretrukne språk for applikasjonsgrensesnittet. Dette er uavhengig av quiz-innholdsspråket.",

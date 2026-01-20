@@ -21,7 +21,6 @@ import type { QuestionBatch, QuestionDifficulty, QuestionType } from "@/client"
 import {
   QUESTION_BATCH_DEFAULTS,
   QUESTION_DIFFICULTIES,
-  QUESTION_DIFFICULTY_LABELS,
   VALIDATION_MESSAGES,
   VALIDATION_RULES,
 } from "@/lib/constants"
@@ -37,54 +36,61 @@ interface ModuleQuestionSelectionStepProps {
   onModuleQuestionChange: (moduleId: string, batches: QuestionBatch[]) => void
 }
 
-// Question type options collection for Chakra UI Select
-const questionTypeCollection = createListCollection({
-  items: [
-    {
-      value: "multiple_choice" as QuestionType,
-      label: "Multiple Choice",
-    },
-    {
-      value: "fill_in_blank" as QuestionType,
-      label: "Fill in the Blank",
-    },
-    {
-      value: "matching" as QuestionType,
-      label: "Matching",
-    },
-    {
-      value: "categorization" as QuestionType,
-      label: "Categorization",
-    },
-    {
-      value: "true_false" as QuestionType,
-      label: "True/False",
-    },
-  ],
-})
-
-// Difficulty options collection for Chakra UI Select
-const difficultyCollection = createListCollection({
-  items: [
-    {
-      value: QUESTION_DIFFICULTIES.EASY,
-      label: QUESTION_DIFFICULTY_LABELS.easy,
-    },
-    {
-      value: QUESTION_DIFFICULTIES.MEDIUM,
-      label: QUESTION_DIFFICULTY_LABELS.medium,
-    },
-    {
-      value: QUESTION_DIFFICULTIES.HARD,
-      label: QUESTION_DIFFICULTY_LABELS.hard,
-    },
-  ],
-})
-
 export const ModuleQuestionSelectionStep: React.FC<
   ModuleQuestionSelectionStepProps
 > = ({ selectedModules, moduleQuestions, onModuleQuestionChange }) => {
   const { t } = useTranslation(["creation", "quiz"])
+
+  // Create translated collections inside component
+  const questionTypeCollection = useMemo(
+    () =>
+      createListCollection({
+        items: [
+          {
+            value: "multiple_choice" as QuestionType,
+            label: t("quiz:questionTypes.multiple_choice"),
+          },
+          {
+            value: "fill_in_blank" as QuestionType,
+            label: t("quiz:questionTypes.fill_in_blank"),
+          },
+          {
+            value: "matching" as QuestionType,
+            label: t("quiz:questionTypes.matching"),
+          },
+          {
+            value: "categorization" as QuestionType,
+            label: t("quiz:questionTypes.categorization"),
+          },
+          {
+            value: "true_false" as QuestionType,
+            label: t("quiz:questionTypes.true_false"),
+          },
+        ],
+      }),
+    [t],
+  )
+
+  const difficultyCollection = useMemo(
+    () =>
+      createListCollection({
+        items: [
+          {
+            value: QUESTION_DIFFICULTIES.EASY,
+            label: t("quiz:difficulty.easy"),
+          },
+          {
+            value: QUESTION_DIFFICULTIES.MEDIUM,
+            label: t("quiz:difficulty.medium"),
+          },
+          {
+            value: QUESTION_DIFFICULTIES.HARD,
+            label: t("quiz:difficulty.hard"),
+          },
+        ],
+      }),
+    [t],
+  )
   const [validationErrors, setValidationErrors] = useState<
     Record<string, string[]>
   >({})

@@ -30,7 +30,7 @@ export const MCQEditor = memo(function MCQEditor({
   onCancel,
   isLoading,
 }: MCQEditorProps) {
-  const { t } = useTranslation("quiz")
+  const { t } = useTranslation(["quiz", "validation"])
 
   try {
     const mcqData = extractQuestionData(question, "multiple_choice")
@@ -200,7 +200,7 @@ export const MCQEditor = memo(function MCQEditor({
   } catch (error) {
     return (
       <ErrorEditor
-        error="Error loading MCQ question data"
+        error={t("validation:editors.mcqLoadError")}
         onCancel={onCancel}
       />
     )

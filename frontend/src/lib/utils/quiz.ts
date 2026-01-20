@@ -2,7 +2,6 @@ import type { QuestionBatch, Quiz } from "@/client/types.gen"
 import {
   QUESTION_TYPE_LABELS,
   QUIZ_STATUS,
-  UI_TEXT,
   VALIDATION_MESSAGES,
   VALIDATION_RULES,
 } from "@/lib/constants"
@@ -70,28 +69,19 @@ export function getPublishedQuizzes(quizzes: Quiz[]): Quiz[] {
 // =============================================================================
 
 /**
- * Get human-readable status text for a quiz
+ * Get the status translation key for a quiz.
+ * Returns a key that can be used with i18n: t(`quiz:status.${key}`)
  */
-export function getQuizStatusText(quiz: Quiz): string {
-  if (!quiz.status) return UI_TEXT.STATUS.CREATED // Default to "Ready to Start"
+export function getQuizStatusKey(quiz: Quiz): string {
+  if (!quiz.status) return QUIZ_STATUS.CREATED
 
-  // Map lowercase status values to uppercase UI_TEXT keys
-  const statusMapping = {
-    [QUIZ_STATUS.CREATED]: UI_TEXT.STATUS.CREATED,
-    [QUIZ_STATUS.EXTRACTING_CONTENT]: UI_TEXT.STATUS.EXTRACTING_CONTENT,
-    [QUIZ_STATUS.GENERATING_QUESTIONS]: UI_TEXT.STATUS.GENERATING_QUESTIONS,
-    [QUIZ_STATUS.READY_FOR_REVIEW]: UI_TEXT.STATUS.READY_FOR_REVIEW,
-    [QUIZ_STATUS.READY_FOR_REVIEW_PARTIAL]:
-      UI_TEXT.STATUS.READY_FOR_REVIEW_PARTIAL,
-    [QUIZ_STATUS.EXPORTING_TO_CANVAS]: UI_TEXT.STATUS.EXPORTING_TO_CANVAS,
-    [QUIZ_STATUS.PUBLISHED]: UI_TEXT.STATUS.PUBLISHED,
-    [QUIZ_STATUS.FAILED]: UI_TEXT.STATUS.FAILED,
+  // Verify it's a valid status, otherwise return default
+  const validStatuses = Object.values(QUIZ_STATUS)
+  if (validStatuses.includes(quiz.status as (typeof validStatuses)[number])) {
+    return quiz.status
   }
 
-  return (
-    statusMapping[quiz.status as keyof typeof statusMapping] ||
-    UI_TEXT.STATUS.CREATED
-  )
+  return QUIZ_STATUS.CREATED
 }
 
 /**
@@ -414,19 +404,4 @@ export function formatQuestionTypeDisplay(questionType: string): string {
     QUESTION_TYPE_LABELS[questionType as keyof typeof QUESTION_TYPE_LABELS] ||
     questionType
   )
-}
-
-/**
- * Format multiple question types for compact display
- */
-export function formatQuestionTypesDisplay(types: string[]): string {
-  if (types.length === 0) return "No questions"
-  if (types.length === 1) return formatQuestionTypeDisplay(types[0])
-
-  const formatted = types.map(formatQuestionTypeDisplay)
-  if (formatted.length <= 2) {
-    return formatted.join(" & ")
-  }
-
-  return `${formatted.slice(0, 2).join(", ")} & ${formatted.length - 2} more`
 }

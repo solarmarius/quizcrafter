@@ -1,6 +1,7 @@
 "use client"
 
 import { toaster } from "@/components/ui/toaster"
+import { useTranslation } from "react-i18next"
 
 /**
  * Custom hook for displaying toast notifications with consistent styling and behavior.
@@ -22,6 +23,8 @@ import { toaster } from "@/components/ui/toaster"
  * ```
  */
 const useCustomToast = () => {
+  const { t } = useTranslation("common")
+
   /**
    * Display a success toast notification with a predefined success title.
    *
@@ -34,7 +37,7 @@ const useCustomToast = () => {
    */
   const showSuccessToast = (description: string) => {
     toaster.create({
-      title: "Success!",
+      title: t("toast.successTitle"),
       description,
       type: "success",
     })
@@ -52,7 +55,7 @@ const useCustomToast = () => {
    */
   const showErrorToast = (description: string) => {
     toaster.create({
-      title: "Something went wrong!",
+      title: t("toast.errorTitle"),
       description,
       type: "error",
     })

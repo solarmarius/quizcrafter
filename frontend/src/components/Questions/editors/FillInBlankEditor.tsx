@@ -39,7 +39,7 @@ export const FillInBlankEditor = memo(function FillInBlankEditor({
   onCancel,
   isLoading,
 }: FillInBlankEditorProps) {
-  const { t } = useTranslation("quiz")
+  const { t } = useTranslation(["quiz", "validation"])
 
   try {
     const fibData = extractQuestionData(question, "fill_in_blank")
@@ -354,7 +354,7 @@ export const FillInBlankEditor = memo(function FillInBlankEditor({
   } catch (error) {
     return (
       <ErrorEditor
-        error="Error loading Fill in Blank question data"
+        error={t("validation:editors.fillInBlankLoadError")}
         onCancel={onCancel}
       />
     )
