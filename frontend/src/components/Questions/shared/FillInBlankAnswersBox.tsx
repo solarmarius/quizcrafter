@@ -33,14 +33,17 @@ export const FillInBlankAnswersBox = memo(function FillInBlankAnswersBox({
         {blanks.map((blank, index) => (
           <Box key={index}>
             <Text fontSize="sm" color="green.600">
-              <strong>{t("questions.blankPosition", { position: blank.position })}</strong>{" "}
+              <strong>
+                {t("questions.blankPosition", { position: blank.position })}
+              </strong>{" "}
               <Text as="span" fontFamily="mono">
                 {blank.correct_answer}
               </Text>
             </Text>
             {blank.answer_variations && blank.answer_variations.length > 0 && (
               <Text fontSize="xs" color="green.500" ml={4}>
-                {t("questions.variationsLabel")} {blank.answer_variations.join(", ")}
+                {t("questions.variationsLabel")}{" "}
+                {blank.answer_variations.join(", ")}
               </Text>
             )}
             {blank.case_sensitive && (

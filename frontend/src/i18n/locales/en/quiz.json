@@ -139,6 +139,11 @@
     "matching": "Match questions to their correct answers",
     "categorization": "Group items into appropriate categories"
   },
+  "questionSelector": {
+    "title": "Select Question Type",
+    "description": "Choose the type of question you want to create.",
+    "selectAriaLabel": "Select {{type}} question type"
+  },
   "difficulty": {
     "easy": "Easy",
     "easyDescription": "Basic recall and simple comprehension",

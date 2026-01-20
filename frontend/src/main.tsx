@@ -18,7 +18,7 @@ import { clearAuthToken, configureApiClient } from "./lib/api/client"
 configureApiClient()
 
 // Initialize i18n
-import "./i18n"
+import i18n from "./i18n"
 
 const handleApiError = (error: Error) => {
   if (error instanceof ApiError && error.status === 401) {
@@ -29,8 +29,10 @@ const handleApiError = (error: Error) => {
     if (!isCanvasApiCall) {
       // Show user-friendly notification before redirect
       toaster.create({
-        title: "Session Expired",
-        description: "Please log in again to continue.",
+        title: i18n.t("errors.sessionExpired", { ns: "common" }),
+        description: i18n.t("errors.sessionExpiredDescription", {
+          ns: "common",
+        }),
         type: "warning",
       })
 

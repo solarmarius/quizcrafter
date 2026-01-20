@@ -139,6 +139,11 @@
     "matching": "Koble spørsmål til riktige svar",
     "categorization": "Grupper elementer i passende kategorier"
   },
+  "questionSelector": {
+    "title": "Velg spørsmålstype",
+    "description": "Velg hvilken type spørsmål du vil opprette.",
+    "selectAriaLabel": "Velg {{type}} spørsmålstype"
+  },
   "difficulty": {
     "easy": "Lett",
     "easyDescription": "Grunnleggende gjenkjenning og enkel forståelse",

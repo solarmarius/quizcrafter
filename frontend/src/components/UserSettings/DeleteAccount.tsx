@@ -1,19 +1,16 @@
 import { Heading, Text, VStack } from "@chakra-ui/react"
+import { useTranslation } from "react-i18next"
 
 import DeleteConfirmation from "./DeleteConfirmation"
 
 const DeleteAccount = () => {
+  const { t } = useTranslation("common")
+
   return (
     <VStack align="stretch" gap={4} w="75%">
-      <Heading size="xl">Delete Account</Heading>
-      <Text>
-        This will delete all your user data. Quizzes and questions you created
-        will not be deleted, but they will no longer be connected to your
-        account. The user ID of your quizzes will be set to "NULL".
-      </Text>
-      <Text>
-        Make sure that any ongoing quizzes are completed before proceeding.
-      </Text>
+      <Heading size="xl">{t("deleteAccount.title")}</Heading>
+      <Text>{t("deleteAccount.description")}</Text>
+      <Text>{t("deleteAccount.warningOngoing")}</Text>
       <DeleteConfirmation />
     </VStack>
   )

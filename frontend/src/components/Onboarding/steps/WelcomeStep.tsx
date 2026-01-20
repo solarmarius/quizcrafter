@@ -1,15 +1,17 @@
 import { Box, Stack, Text } from "@chakra-ui/react"
+import { useTranslation } from "react-i18next"
 
 export const WelcomeStep = () => {
+  const { t } = useTranslation("common")
+
   return (
     <Stack gap={6} align="center" py={8} minH="300px" justify="center">
       <Box textAlign="center">
         <Text fontSize="2xl" fontWeight="bold" color="ui.main" mb={4}>
-          Welcome to QuizCrafter
+          {t("onboarding.welcome.title")}
         </Text>
         <Text fontSize="lg" color="gray.600" lineHeight="tall" mb={6}>
-          Thanks for trying us out. Let us show you around and help you get
-          started with everything our application has to offer.
+          {t("onboarding.welcome.description")}
         </Text>
         <Box
           bg="orange.50"
@@ -20,11 +22,7 @@ export const WelcomeStep = () => {
           py={3}
         >
           <Text color="orange.700" fontWeight="medium">
-            ⚠️ This application is currently in a development phase by IFI-UIT
-            and has not yet been officially released. Please be aware that
-            ongoing support and future development are not guaranteed. Quiz data
-            may be deleted at any time. Features may change or be discontinued
-            at any time.
+            ⚠️ {t("onboarding.welcome.developmentWarning")}
           </Text>
         </Box>
       </Box>
