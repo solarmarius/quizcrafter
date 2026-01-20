@@ -14,6 +14,7 @@ import {
 } from "@chakra-ui/react"
 import type React from "react"
 import { useMemo, useState } from "react"
+import { useTranslation } from "react-i18next"
 import { IoAdd, IoClose } from "react-icons/io5"
 
 import type { QuestionBatch, QuestionDifficulty, QuestionType } from "@/client"
@@ -83,6 +84,7 @@ const difficultyCollection = createListCollection({
 export const ModuleQuestionSelectionStep: React.FC<
   ModuleQuestionSelectionStepProps
 > = ({ selectedModules, moduleQuestions, onModuleQuestionChange }) => {
+  const { t } = useTranslation(["creation", "quiz"])
   const [validationErrors, setValidationErrors] = useState<
     Record<string, string[]>
   >({})
@@ -183,13 +185,9 @@ export const ModuleQuestionSelectionStep: React.FC<
       <VStack gap={6} align="stretch">
         <Box>
           <Heading size="md" mb={2}>
-            Configure Question Types per Module
+            {t("questionConfig.title")}
           </Heading>
-          <Text color="gray.600">
-            Add question batches for each module. Each batch can have a
-            different question type, count (1-20 questions), and difficulty
-            level (max 4 batches per module).
-          </Text>
+          <Text color="gray.600">{t("questionConfig.description")}</Text>
         </Box>
 
         {/* Summary Card */}
@@ -202,13 +200,13 @@ export const ModuleQuestionSelectionStep: React.FC<
           <Card.Body>
             <Box textAlign="center">
               <Text fontSize="sm" color="gray.600" mb={1}>
-                Total Questions
+                {t("questionConfig.totalQuestions")}
               </Text>
               <Text fontSize="3xl" fontWeight="bold" color="blue.600">
                 {totalQuestions}
               </Text>
               <Text fontSize="sm" color="gray.500">
-                Across {moduleIds.length} modules
+                {t("questionConfig.acrossModules", { count: moduleIds.length })}
               </Text>
             </Box>
           </Card.Body>
@@ -218,9 +216,9 @@ export const ModuleQuestionSelectionStep: React.FC<
         {totalQuestions > 500 && (
           <Alert.Root status="warning">
             <Alert.Indicator />
-            <Alert.Title>Large Question Count</Alert.Title>
+            <Alert.Title>{t("questionConfig.largeCountWarning")}</Alert.Title>
             <Alert.Description>
-              Large number of questions may take longer to generate.
+              {t("questionConfig.largeCountMessage")}
             </Alert.Description>
           </Alert.Root>
         )}
@@ -248,8 +246,13 @@ export const ModuleQuestionSelectionStep: React.FC<
                           {selectedModules[moduleId]}
                         </Text>
                         <Text fontSize="sm" color="gray.600">
-                          {moduleTotal} questions total • {moduleBatches.length}{" "}
-                          batches
+                          {t("questionConfig.questionsTotal", {
+                            count: moduleTotal,
+                          })}{" "}
+                          •{" "}
+                          {t("questionConfig.batchCount", {
+                            count: moduleBatches.length,
+                          })}
                         </Text>
                       </Box>
                       <Button
@@ -262,7 +265,7 @@ export const ModuleQuestionSelectionStep: React.FC<
                         }
                       >
                         <IoAdd />
-                        Add Batch
+                        {t("questionConfig.addBatch")}
                       </Button>
                     </HStack>
 
@@ -294,7 +297,7 @@ export const ModuleQuestionSelectionStep: React.FC<
                           >
                             <HStack gap={3} align="end">
                               <Box flex={1}>
-                                <Field label="Question Type">
+                                <Field label={t("questionConfig.questionType")}>
                                   <Select.Root
                                     collection={questionTypeCollection}
                                     value={[batch.question_type]}
@@ -308,7 +311,11 @@ export const ModuleQuestionSelectionStep: React.FC<
                                   >
                                     <Select.Control>
                                       <Select.Trigger>
-                                        <Select.ValueText placeholder="Select question type" />
+                                        <Select.ValueText
+                                          placeholder={t(
+                                            "questionConfig.selectQuestionType",
+                                          )}
+                                        />
                                       </Select.Trigger>
                                       <Select.IndicatorGroup>
                                         <Select.Indicator />
@@ -334,7 +341,7 @@ export const ModuleQuestionSelectionStep: React.FC<
                               </Box>
 
                               <Box width="100px">
-                                <Field label="Questions">
+                                <Field label={t("questionConfig.questions")}>
                                   <Input
                                     type="number"
                                     min={1}
@@ -354,7 +361,7 @@ export const ModuleQuestionSelectionStep: React.FC<
                               </Box>
 
                               <Box width="120px">
-                                <Field label="Difficulty">
+                                <Field label={t("questionConfig.difficulty")}>
                                   <Select.Root
                                     collection={difficultyCollection}
                                     value={[
@@ -371,7 +378,11 @@ export const ModuleQuestionSelectionStep: React.FC<
                                   >
                                     <Select.Control>
                                       <Select.Trigger>
-                                        <Select.ValueText placeholder="Select difficulty" />
+                                        <Select.ValueText
+                                          placeholder={t(
+                                            "questionConfig.selectDifficulty",
+                                          )}
+                                        />
                                       </Select.Trigger>
                                       <Select.IndicatorGroup>
                                         <Select.Indicator />
@@ -412,9 +423,9 @@ export const ModuleQuestionSelectionStep: React.FC<
                       </VStack>
                     ) : (
                       <Box textAlign="center" py={6} color="gray.500">
-                        <Text>No question batches configured</Text>
+                        <Text>{t("questionConfig.noBatches")}</Text>
                         <Text fontSize="sm">
-                          Click "Add Batch" to get started
+                          {t("questionConfig.noBatchesHint")}
                         </Text>
                       </Box>
                     )}
@@ -429,7 +440,7 @@ export const ModuleQuestionSelectionStep: React.FC<
           <Card.Root variant="outline">
             <Card.Body textAlign="center" py={8}>
               <Text color="gray.500">
-                No modules selected. Go back to select modules first.
+                {t("questionConfig.noModulesSelected")}
               </Text>
             </Card.Body>
           </Card.Root>
@@ -437,9 +448,7 @@ export const ModuleQuestionSelectionStep: React.FC<
 
         <Box mt={4}>
           <Text fontSize="sm" color="gray.600">
-            <strong>Tip:</strong> Mix different question types and difficulty
-            levels to create comprehensive assessments. Each module can have up
-            to 4 different question batches with 1-20 questions each.
+            {t("questionConfig.tip")}
           </Text>
         </Box>
       </VStack>

@@ -1,7 +1,8 @@
 import { Button, HStack, Input, Text, VStack } from "@chakra-ui/react"
 import { memo, useCallback, useState } from "react"
+import { useTranslation } from "react-i18next"
 
-import { ApiError, QuizService } from "@/client"
+import { QuizService } from "@/client"
 import {
   DialogBody,
   DialogCloseTrigger,
@@ -60,6 +61,8 @@ export const ManualModuleDialog = memo(function ManualModuleDialog({
   onOpenChange,
   onModuleCreated,
 }: ManualModuleDialogProps) {
+  const { t } = useTranslation("creation")
+
   // State management
   const [currentStep, setCurrentStep] = useState<DialogStep>("input-method")
   const [inputMethod, setInputMethod] = useState<InputMethod | null>(null)
@@ -126,17 +129,17 @@ export const ManualModuleDialog = memo(function ManualModuleDialog({
   // Process content and move to preview
   const handleProcessContent = useCallback(async () => {
     if (!moduleName.trim()) {
-      setError("Module name is required")
+      setError(t("errors.moduleNameRequired"))
       return
     }
 
     if (inputMethod === "file" && selectedFiles.length === 0) {
-      setError("Please select at least one PDF file")
+      setError(t("errors.selectPdfFile"))
       return
     }
 
     if (inputMethod === "text" && !textContent.trim()) {
-      setError("Please enter some text content")
+      setError(t("errors.enterTextContent"))
       return
     }
 
@@ -168,27 +171,17 @@ export const ManualModuleDialog = memo(function ManualModuleDialog({
       })
 
       setCurrentStep("preview")
-      toast.showSuccessToast("Content processed successfully!")
+      toast.showSuccessToast(t("success.contentProcessed"))
     } catch (err) {
-      let errorMessage = "Failed to process content"
-
-      // Handle API errors with detailed error messages
-      if (err instanceof ApiError) {
-        if (err.body && typeof err.body === "object" && "detail" in err.body) {
-          errorMessage = (err.body as { detail: string }).detail
-        } else {
-          errorMessage = err.message
-        }
-      } else if (err instanceof Error) {
-        errorMessage = err.message
-      }
+      // Use translated fallback error message
+      const errorMessage = t("errors.processContentFailed")
 
       setError(errorMessage)
       toast.showErrorToast(errorMessage)
     } finally {
       setIsProcessing(false)
     }
-  }, [moduleName, inputMethod, selectedFiles, textContent, toast])
+  }, [moduleName, inputMethod, selectedFiles, textContent, toast, t])
 
   // Handle module creation confirmation
   const handleConfirmCreation = useCallback(() => {
@@ -229,15 +222,15 @@ export const ManualModuleDialog = memo(function ManualModuleDialog({
   const getDialogTitle = () => {
     switch (currentStep) {
       case "input-method":
-        return "Add Manual Module"
+        return t("manualModule.title")
       case "file-upload":
-        return "Upload PDF File"
+        return t("manualModule.stepUpload")
       case "text-input":
-        return "Enter Text Content"
+        return t("manualModule.stepText")
       case "preview":
-        return "Review Content"
+        return t("manualModule.stepReview")
       default:
-        return "Add Manual Module"
+        return t("manualModule.title")
     }
   }
 
@@ -279,7 +272,7 @@ export const ManualModuleDialog = memo(function ManualModuleDialog({
             {currentStep !== "input-method" && (
               <VStack gap={2} align="stretch">
                 <Text fontSize="sm" fontWeight="medium">
-                  Module Name{" "}
+                  {t("manualModule.moduleName.label")}{" "}
                   <Text as="span" color="red.500">
                     *
                   </Text>
@@ -287,7 +280,7 @@ export const ManualModuleDialog = memo(function ManualModuleDialog({
                 <Input
                   value={moduleName}
                   onChange={(e) => setModuleName(e.target.value)}
-                  placeholder="Enter a name for this module"
+                  placeholder={t("manualModule.moduleName.placeholder")}
                   disabled={isProcessing}
                   required
                 />
@@ -298,7 +291,7 @@ export const ManualModuleDialog = memo(function ManualModuleDialog({
             {currentStep === "input-method" && (
               <VStack gap={4} align="stretch">
                 <Text fontSize="md" color="gray.600" textAlign="center">
-                  How would you like to add content for this module?
+                  {t("manualModule.contentMethod")}
                 </Text>
 
                 <VStack gap={3}>
@@ -315,10 +308,11 @@ export const ManualModuleDialog = memo(function ManualModuleDialog({
                     <HStack gap={4} align="center" w="full">
                       <Text fontSize="2xl">📄</Text>
                       <VStack align="start" gap={1} flex={1}>
-                        <Text fontWeight="semibold">Upload PDF File</Text>
+                        <Text fontWeight="semibold">
+                          {t("manualModule.uploadPdf")}
+                        </Text>
                         <Text fontSize="sm" color="gray.600">
-                          Upload PDF documents (lecture notes, transcripts,
-                          etc.)
+                          {t("manualModule.uploadPdfDescription")}
                         </Text>
                       </VStack>
                     </HStack>
@@ -337,9 +331,11 @@ export const ManualModuleDialog = memo(function ManualModuleDialog({
                     <HStack gap={4} align="center" w="full">
                       <Text fontSize="2xl">📝</Text>
                       <VStack align="start" gap={1} flex={1}>
-                        <Text fontWeight="semibold">Enter Text Content</Text>
+                        <Text fontWeight="semibold">
+                          {t("manualModule.enterText")}
+                        </Text>
                         <Text fontSize="sm" color="gray.600">
-                          Paste or type content directly
+                          {t("manualModule.enterTextDescription")}
                         </Text>
                       </VStack>
                     </HStack>
@@ -386,7 +382,7 @@ export const ManualModuleDialog = memo(function ManualModuleDialog({
                   onClick={handleBack}
                   disabled={isProcessing}
                 >
-                  Back
+                  {t("manualModule.back")}
                 </Button>
               )}
             </HStack>
@@ -397,7 +393,7 @@ export const ManualModuleDialog = memo(function ManualModuleDialog({
                 onClick={() => handleOpenChange(false)}
                 disabled={isProcessing}
               >
-                Cancel
+                {t("manualModule.cancel")}
               </Button>
 
               {currentStep === "preview" ? (
@@ -406,7 +402,7 @@ export const ManualModuleDialog = memo(function ManualModuleDialog({
                   onClick={handleConfirmCreation}
                   disabled={!previewData}
                 >
-                  Add Module
+                  {t("manualModule.addModule")}
                 </Button>
               ) : (
                 currentStep !== "input-method" && (
@@ -415,9 +411,9 @@ export const ManualModuleDialog = memo(function ManualModuleDialog({
                     onClick={handleProcessContent}
                     disabled={!canProceed() || isProcessing}
                     loading={isProcessing}
-                    loadingText="Processing..."
+                    loadingText={t("manualModule.processing")}
                   >
-                    Process Content
+                    {t("manualModule.processContent")}
                   </Button>
                 )
               )}

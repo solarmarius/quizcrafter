@@ -1,6 +1,7 @@
 import { Badge, Box, Card, HStack, Text, VStack } from "@chakra-ui/react"
 import { useQuery } from "@tanstack/react-query"
 import { createFileRoute } from "@tanstack/react-router"
+import { useTranslation } from "react-i18next"
 
 import { QuizService } from "@/client"
 import { QuestionTypeBreakdown } from "@/components/Common"
@@ -14,15 +15,19 @@ export const Route = createFileRoute("/_layout/quiz/$id/")({
   component: QuizInformation,
 })
 
-function DateDisplay({ date }: { date: string | null | undefined }) {
+function DateDisplay({
+  date,
+  notAvailableText,
+}: { date: string | null | undefined; notAvailableText: string }) {
   const formattedDate = useFormattedDate(date, "default")
 
-  if (!formattedDate) return <Text color="gray.500">Not available</Text>
+  if (!formattedDate) return <Text color="gray.500">{notAvailableText}</Text>
 
   return <Text color="gray.600">{formattedDate}</Text>
 }
 
 function QuizInformation() {
+  const { t } = useTranslation("quiz")
   const { id } = Route.useParams()
 
   const { data: quiz } = useQuery({
@@ -69,7 +74,7 @@ function QuizInformation() {
   if (!quiz) {
     return (
       <VStack gap={6} align="stretch">
-        <Text>Loading quiz information...</Text>
+        <Text>{t("detail.loadingInfo")}</Text>
       </VStack>
     )
   }
@@ -80,24 +85,24 @@ function QuizInformation() {
       <Card.Root>
         <Card.Header>
           <Text fontSize="xl" fontWeight="semibold">
-            Course Information
+            {t("detail.courseInfo")}
           </Text>
         </Card.Header>
         <Card.Body>
           <VStack gap={4} align="stretch">
             <Box>
               <Text fontWeight="medium" color="gray.700">
-                Canvas Course
+                {t("detail.canvasCourse")}
               </Text>
               <Text fontSize="lg">{quiz.canvas_course_name}</Text>
               <Text fontSize="sm" color="gray.500">
-                Course ID: {quiz.canvas_course_id}
+                {t("detail.courseId", { id: quiz.canvas_course_id })}
               </Text>
             </Box>
 
             <Box>
               <Text fontWeight="medium" color="gray.700" mb={2}>
-                Selected Modules
+                {t("detail.selectedModules")}
               </Text>
               {moduleNames.length > 0 ? (
                 <HStack wrap="wrap" gap={2}>
@@ -108,7 +113,7 @@ function QuizInformation() {
                   ))}
                 </HStack>
               ) : (
-                <Text color="gray.500">No modules selected</Text>
+                <Text color="gray.500">{t("detail.noModules")}</Text>
               )}
             </Box>
           </VStack>
@@ -119,14 +124,14 @@ function QuizInformation() {
       <Card.Root>
         <Card.Header>
           <Text fontSize="xl" fontWeight="semibold">
-            Settings
+            {t("detail.settings")}
           </Text>
         </Card.Header>
         <Card.Body>
           <VStack gap={4} align="stretch">
             <HStack justify="space-between">
               <Text fontWeight="medium" color="gray.700">
-                Question Count
+                {t("detail.questionCount")}
               </Text>
               <Badge variant="outline">{quiz.question_count}</Badge>
             </HStack>
@@ -137,7 +142,7 @@ function QuizInformation() {
             </VStack>
             <HStack justify="space-between">
               <Text fontWeight="medium" color="gray.700">
-                Language
+                {t("detail.language")}
               </Text>
               <Badge variant="outline">
                 {QUIZ_LANGUAGE_LABELS[quiz.language!]}
@@ -145,7 +150,7 @@ function QuizInformation() {
             </HStack>
             <HStack justify="space-between">
               <Text fontWeight="medium" color="gray.700">
-                Tone
+                {t("detail.tone")}
               </Text>
               <Badge variant="outline">{QUIZ_TONE_LABELS[quiz.tone!]}</Badge>
             </HStack>
@@ -157,14 +162,14 @@ function QuizInformation() {
       <Card.Root>
         <Card.Header>
           <Text fontSize="xl" fontWeight="semibold">
-            Metadata
+            {t("detail.metadata")}
           </Text>
         </Card.Header>
         <Card.Body>
           <VStack gap={4} align="stretch">
             <HStack justify="space-between">
               <Text fontWeight="medium" color="gray.700">
-                Quiz ID
+                {t("detail.quizId")}
               </Text>
               <Text fontSize="sm" fontFamily="mono" color="gray.600">
                 {quiz.id}
@@ -174,18 +179,24 @@ function QuizInformation() {
             {quiz.created_at && (
               <HStack justify="space-between">
                 <Text fontWeight="medium" color="gray.700">
-                  Created
+                  {t("detail.created")}
                 </Text>
-                <DateDisplay date={quiz.created_at} />
+                <DateDisplay
+                  date={quiz.created_at}
+                  notAvailableText={t("detail.notAvailable")}
+                />
               </HStack>
             )}
 
             {quiz.updated_at && (
               <HStack justify="space-between">
                 <Text fontWeight="medium" color="gray.700">
-                  Last Updated
+                  {t("detail.lastUpdated")}
                 </Text>
-                <DateDisplay date={quiz.updated_at} />
+                <DateDisplay
+                  date={quiz.updated_at}
+                  notAvailableText={t("detail.notAvailable")}
+                />
               </HStack>
             )}
           </VStack>
@@ -196,7 +207,7 @@ function QuizInformation() {
       <Card.Root>
         <Card.Header>
           <Text fontSize="xl" fontWeight="semibold">
-            Generation Progress
+            {t("detail.generationProgress")}
           </Text>
         </Card.Header>
         <Card.Body>

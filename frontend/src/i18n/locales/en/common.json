@@ -1,0 +1,81 @@
+{
+  "appName": "QuizCrafter",
+  "actions": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "close": "Close",
+    "confirm": "Confirm",
+    "tryAgain": "Try Again",
+    "next": "Next",
+    "previous": "Previous",
+    "getStarted": "Get Started",
+    "logOut": "Log out",
+    "view": "View",
+    "approve": "Approve",
+    "reject": "Reject",
+    "addBatch": "Add Batch"
+  },
+  "status": {
+    "loading": "Loading...",
+    "retrying": "Retrying...",
+    "processing": "Processing...",
+    "completed": "Completed",
+    "failed": "Failed",
+    "waiting": "Waiting",
+    "unknown": "Unknown"
+  },
+  "errors": {
+    "generic": "An error occurred",
+    "networkError": "Network error. Please check your connection.",
+    "sessionExpired": "Session Expired",
+    "sessionExpiredDescription": "Please log in again to continue."
+  },
+  "labels": {
+    "name": "Name",
+    "required": "Required",
+    "optional": "Optional",
+    "selected": "Selected",
+    "total": "Total",
+    "questions": "questions",
+    "modules": "modules",
+    "words": "words",
+    "batches": "batches"
+  },
+  "time": {
+    "justNow": "just now",
+    "minutesAgo": "{{count}} minute ago",
+    "minutesAgo_other": "{{count}} minutes ago",
+    "hoursAgo": "{{count}} hour ago",
+    "hoursAgo_other": "{{count}} hours ago",
+    "daysAgo": "{{count}} day ago",
+    "daysAgo_other": "{{count}} days ago"
+  },
+  "userSettings": {
+    "title": "User Settings",
+    "description": "Manage your account settings and preferences",
+    "tabs": {
+      "myProfile": "My profile",
+      "dangerZone": "Danger zone"
+    },
+    "name": {
+      "label": "Name",
+      "placeholder": "Enter your name"
+    },
+    "updateSuccess": "User updated successfully.",
+    "privacyNotice": "Review our Privacy Policy to understand how we handle your data.",
+    "language": {
+      "title": "Interface Language",
+      "description": "Select your preferred language for the application interface. This is independent from the quiz content language.",
+      "englishDescription": "Use English for the user interface",
+      "norwegianDescription": "Bruk norsk for brukergrensesnittet"
+    }
+  },
+  "deleteAccount": {
+    "title": "Delete Account",
+    "warning": "Are you sure you want to delete your account? This action cannot be undone.",
+    "confirmButton": "Delete My Account",
+    "success": "Account deleted successfully"
+  }
+}

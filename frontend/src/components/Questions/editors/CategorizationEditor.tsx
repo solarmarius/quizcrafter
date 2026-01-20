@@ -27,6 +27,7 @@ import {
   useFieldArray,
   useForm,
 } from "react-hook-form"
+import { useTranslation } from "react-i18next"
 import { MdAdd, MdDelete } from "react-icons/md"
 import { ErrorEditor } from "./ErrorEditor"
 
@@ -53,6 +54,8 @@ function CategorizationEditorComponent({
   onCancel,
   isLoading = false,
 }: CategorizationEditorProps) {
+  const { t } = useTranslation("quiz")
+
   try {
     const categorizationData = extractQuestionData(question, "categorization")
 
@@ -204,7 +207,7 @@ function CategorizationEditorComponent({
           )}
           {/* Question Text */}
           <FormField
-            label="Question Text"
+            label={t("questions.editor.questionText")}
             isRequired
             error={errors.questionText?.message}
           >
@@ -225,7 +228,10 @@ function CategorizationEditorComponent({
           <FormGroup>
             <HStack justify="space-between" mb={4}>
               <Text fontSize="md" fontWeight="semibold">
-                Categories ({categoryFields.length}/8)
+                {t("questions.editor.categoriesCount", {
+                  count: categoryFields.length,
+                  max: 8,
+                })}
               </Text>
               <Button
                 size="sm"
@@ -235,7 +241,7 @@ function CategorizationEditorComponent({
                 variant="outline"
               >
                 <MdAdd />
-                Add Category
+                {t("questions.editor.addCategory")}
               </Button>
             </HStack>
 
@@ -272,7 +278,10 @@ function CategorizationEditorComponent({
           <FormGroup>
             <HStack justify="space-between" mb={4}>
               <Text fontSize="md" fontWeight="semibold">
-                Distractors ({distractorFields.length}/5)
+                {t("questions.editor.distractors", {
+                  count: distractorFields.length,
+                  max: 5,
+                })}
               </Text>
               <Button
                 size="sm"
@@ -282,7 +291,7 @@ function CategorizationEditorComponent({
                 variant="outline"
               >
                 <MdAdd />
-                Add Distractor
+                {t("questions.editor.addDistractor")}
               </Button>
             </HStack>
 
@@ -304,7 +313,9 @@ function CategorizationEditorComponent({
                     <HStack>
                       <Box flex={1}>
                         <FormField
-                          label={`Distractor ${index + 1}`}
+                          label={t("questions.editor.distractor", {
+                            number: index + 1,
+                          })}
                           error={errors.distractors?.[index]?.text?.message}
                         >
                           <Controller
@@ -344,7 +355,7 @@ function CategorizationEditorComponent({
 
           {/* Explanation */}
           <FormField
-            label="Explanation (Optional)"
+            label={t("questions.editor.explanationOptional")}
             error={errors.explanation?.message}
           >
             <Controller
@@ -363,7 +374,7 @@ function CategorizationEditorComponent({
           {/* Action Buttons */}
           <HStack gap={3} justify="end" pt={4}>
             <Button variant="outline" onClick={onCancel} disabled={isLoading}>
-              Cancel
+              {t("questions.editor.cancel")}
             </Button>
             <Button
               type="submit"
@@ -371,7 +382,7 @@ function CategorizationEditorComponent({
               loading={isLoading}
               disabled={!isDirty}
             >
-              Save Changes
+              {t("questions.editor.saveChanges")}
             </Button>
           </HStack>
         </VStack>
@@ -406,6 +417,7 @@ function CategoryEditor({
   onRemoveCategory,
   canRemoveCategory,
 }: CategoryEditorProps) {
+  const { t } = useTranslation("quiz")
   const {
     fields: itemFields,
     append: appendItem,
@@ -427,7 +439,7 @@ function CategoryEditor({
       <Card.Header>
         <HStack justify="space-between">
           <Text fontSize="sm" fontWeight="medium">
-            Category {categoryIndex + 1}
+            {t("questions.editor.category", { number: categoryIndex + 1 })}
           </Text>
           <IconButton
             aria-label={`Remove category ${categoryIndex + 1}`}
@@ -445,7 +457,7 @@ function CategoryEditor({
         <VStack gap={3} align="stretch">
           {/* Category Name */}
           <FormField
-            label="Category Name"
+            label={t("questions.editor.categoryName")}
             isRequired
             error={errors.categories?.[categoryIndex]?.name?.message}
           >
@@ -466,7 +478,7 @@ function CategoryEditor({
           <Box>
             <HStack justify="space-between" mb={2}>
               <Text fontSize="sm" fontWeight="medium">
-                Items ({itemFields.length})
+                {t("questions.editor.itemsCount", { count: itemFields.length })}
               </Text>
               <Button
                 size="xs"
@@ -475,7 +487,7 @@ function CategoryEditor({
                 variant="outline"
               >
                 <MdAdd />
-                Add Item
+                {t("questions.editor.addItem")}
               </Button>
             </HStack>
 

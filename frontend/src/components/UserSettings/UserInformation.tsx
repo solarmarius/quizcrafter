@@ -12,6 +12,7 @@ import {
 import { FormField, FormGroup } from "@/components/forms"
 import { useAuth } from "@/hooks/auth"
 import { useCustomToast, useErrorHandler } from "@/hooks/common"
+import LanguagePreference from "./LanguagePreference"
 
 const UserInformation = () => {
   const queryClient = useQueryClient()
@@ -112,6 +113,10 @@ const UserInformation = () => {
             )}
           </Flex>
         </FormGroup>
+      </Box>
+
+      <Box mt={6}>
+        <LanguagePreference />
       </Box>
 
       <Alert.Root status="info" variant="subtle" mt={6} colorPalette="orange">

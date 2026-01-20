@@ -1,4 +1,5 @@
 import { Box, HStack, Text, VStack } from "@chakra-ui/react"
+import { useTranslation } from "react-i18next"
 import {
   MdCheckCircle,
   MdError,
@@ -8,7 +9,7 @@ import {
 
 import type { FailureReason, QuizStatus } from "@/client/types.gen"
 import { QUIZ_STATUS } from "@/lib/constants"
-import { formatTimeAgo } from "@/lib/utils"
+import { getRelativeTimeData } from "@/lib/utils"
 
 /**
  * Props for the QuizPhaseProgress component.
@@ -171,63 +172,25 @@ function getPhaseColor(status: PhaseStatus) {
 }
 
 /**
- * Gets phase-specific descriptions
+ * Helper to format relative time with translation
  */
-function getPhaseDescription(phase: string, status: PhaseStatus): string {
-  if (status === "failed") {
-    switch (phase) {
-      case "extraction":
-        return "Content extraction failed. Please check your module selection and try again."
-      case "generation":
-        return "Question generation failed. This may be due to insufficient content or AI service issues."
-      case "export":
-        return "Canvas export failed. Please check your Canvas permissions and try again."
-      default:
-        return "Process failed."
-    }
-  }
+function useRelativeTime(timestamp: string | null | undefined) {
+  const { t } = useTranslation("common")
 
-  switch (phase) {
-    case "extraction":
-      switch (status) {
-        case "pending":
-          return "Waiting to extract content from selected Canvas modules"
-        case "processing":
-          return "Extracting and processing content from Canvas modules..."
-        case "completed":
-          return "Content successfully extracted from Canvas modules"
-        default:
-          return "Content extraction"
-      }
+  if (!timestamp) return null
 
-    case "generation":
-      switch (status) {
-        case "pending":
-          return "Waiting for content extraction to complete"
-        case "processing":
-          return "AI is generating multiple-choice questions from extracted content..."
-        case "completed":
-          return "Questions generated successfully and ready for review"
-        case "partial":
-          return "Some questions generated successfully - retry available for remaining questions"
-        default:
-          return "Question generation"
-      }
+  const data = getRelativeTimeData(timestamp)
+  if (!data) return null
 
-    case "export":
-      switch (status) {
-        case "pending":
-          return "Waiting for questions to be reviewed and approved"
-        case "processing":
-          return "Exporting approved questions to Canvas as a new quiz..."
-        case "completed":
-          return "Quiz successfully published to Canvas"
-        default:
-          return "Canvas export"
-      }
-
-    default:
-      return ""
+  switch (data.key) {
+    case "justNow":
+      return t("time.justNow")
+    case "minutesAgo":
+      return t("time.minutesAgo", { count: data.count })
+    case "hoursAgo":
+      return t("time.hoursAgo", { count: data.count })
+    case "daysAgo":
+      return t("time.daysAgo", { count: data.count })
   }
 }
 
@@ -240,6 +203,7 @@ function PhaseItem({
 }: { phase: Phase; isLast?: boolean }) {
   const color = getPhaseColor(phase.status)
   const icon = getPhaseIcon(phase.status)
+  const relativeTime = useRelativeTime(phase.timestamp)
 
   return (
     <Box position="relative">
@@ -257,9 +221,9 @@ function PhaseItem({
           <Text fontSize="sm" color="gray.600" lineHeight="1.4">
             {phase.description}
           </Text>
-          {phase.timestamp && (
+          {relativeTime && (
             <Text fontSize="xs" color="gray.500">
-              {formatTimeAgo(phase.timestamp)}
+              {relativeTime}
             </Text>
           )}
           {phase.failureMessage && (
@@ -296,21 +260,70 @@ export function QuizPhaseProgress({
   lastStatusUpdate,
   showTimestamps = true,
 }: QuizPhaseProgressProps) {
+  const { t } = useTranslation("quiz")
   const phaseStatuses = getPhaseStatuses(status, failureReason)
+
+  // Helper to get description based on phase and status
+  const getExtractionDescription = () => {
+    switch (phaseStatuses.extraction) {
+      case "pending":
+        return t("phases.extraction.pending")
+      case "processing":
+        return t("phases.extraction.processing")
+      case "completed":
+        return t("phases.extraction.completed")
+      case "failed":
+        return t("phases.extraction.failed")
+      default:
+        return t("phases.extraction.title")
+    }
+  }
+
+  const getGenerationDescription = () => {
+    switch (phaseStatuses.generation) {
+      case "pending":
+        return t("phases.generation.pending")
+      case "processing":
+        return t("phases.generation.processing")
+      case "completed":
+        return t("phases.generation.completed")
+      case "partial":
+        return t("phases.generation.partial")
+      case "failed":
+        return t("phases.generation.failed")
+      default:
+        return t("phases.generation.title")
+    }
+  }
+
+  const getExportDescription = () => {
+    switch (phaseStatuses.export) {
+      case "pending":
+        return t("phases.export.pending")
+      case "processing":
+        return t("phases.export.processing")
+      case "completed":
+        return t("phases.export.completed")
+      case "failed":
+        return t("phases.export.failed")
+      default:
+        return t("phases.export.title")
+    }
+  }
 
   const phases: Phase[] = [
     {
       id: "extraction",
-      title: "Content Extraction",
+      title: t("phases.extraction.title"),
       status: phaseStatuses.extraction,
-      description: getPhaseDescription("extraction", phaseStatuses.extraction),
+      description: getExtractionDescription(),
       timestamp: showTimestamps ? contentExtractedAt : null,
     },
     {
       id: "generation",
-      title: "Question Generation",
+      title: t("phases.generation.title"),
       status: phaseStatuses.generation,
-      description: getPhaseDescription("generation", phaseStatuses.generation),
+      description: getGenerationDescription(),
       timestamp:
         showTimestamps &&
         (phaseStatuses.generation === "completed" ||
@@ -320,9 +333,9 @@ export function QuizPhaseProgress({
     },
     {
       id: "export",
-      title: "Canvas Export",
+      title: t("phases.export.title"),
       status: phaseStatuses.export,
-      description: getPhaseDescription("export", phaseStatuses.export),
+      description: getExportDescription(),
       timestamp: showTimestamps ? exportedAt : null,
     },
   ]

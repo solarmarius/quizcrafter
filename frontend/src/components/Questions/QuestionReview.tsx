@@ -1,6 +1,7 @@
 import { Box, Button, Card, HStack, VStack } from "@chakra-ui/react"
 import { useQuery } from "@tanstack/react-query"
 import { useCallback, useMemo, useState } from "react"
+import { useTranslation } from "react-i18next"
 
 import {
   type QuestionResponse,
@@ -47,6 +48,7 @@ interface QuestionReviewProps {
 }
 
 export function QuestionReview({ quizId, quizStatus }: QuestionReviewProps) {
+  const { t } = useTranslation("quiz")
   const [filterView, setFilterView] = useState<"pending" | "all">("pending")
   const { editingId, startEditing, cancelEditing, isEditing } =
     useEditingState<QuestionResponse>((question) => question.id)
@@ -93,7 +95,7 @@ export function QuestionReview({ quizId, quizStatus }: QuestionReviewProps) {
       })
     },
     {
-      successMessage: "Question approved",
+      successMessage: t("questions.questionApproved"),
       invalidateQueries: [
         queryKeys.quizQuestions(quizId),
         queryKeys.quizQuestionStats(quizId),
@@ -117,7 +119,7 @@ export function QuestionReview({ quizId, quizStatus }: QuestionReviewProps) {
       })
     },
     {
-      successMessage: "Question updated",
+      successMessage: t("questions.questionUpdated"),
       invalidateQueries: [queryKeys.quizQuestions(quizId)],
       onSuccess: () => {
         cancelEditing()
@@ -134,7 +136,7 @@ export function QuestionReview({ quizId, quizStatus }: QuestionReviewProps) {
       })
     },
     {
-      successMessage: "Question rejected",
+      successMessage: t("questions.questionRejected"),
       invalidateQueries: [
         queryKeys.quizQuestions(quizId),
         queryKeys.quizQuestionStats(quizId),
@@ -163,8 +165,8 @@ export function QuestionReview({ quizId, quizStatus }: QuestionReviewProps) {
       <Card.Root>
         <Card.Body>
           <ErrorState
-            title="Failed to Load Questions"
-            message="There was an error loading the questions for this quiz."
+            title={t("questions.loadFailed")}
+            message={t("questions.loadFailedDescription")}
             showRetry={false}
           />
         </Card.Body>
@@ -177,8 +179,8 @@ export function QuestionReview({ quizId, quizStatus }: QuestionReviewProps) {
       <Card.Root>
         <Card.Body>
           <EmptyState
-            title="No Questions Generated Yet"
-            description="Questions will appear here once the generation process is complete."
+            title={t("questions.noQuestions")}
+            description={t("questions.noQuestionsDescription")}
           />
         </Card.Body>
       </Card.Root>
@@ -195,7 +197,7 @@ export function QuestionReview({ quizId, quizStatus }: QuestionReviewProps) {
           size="sm"
           onClick={() => setFilterView("pending")}
         >
-          Pending Approval ({pendingCount})
+          {t("questions.pendingApproval", { count: pendingCount })}
         </Button>
         <Button
           variant={filterView === "all" ? "solid" : "outline"}
@@ -203,7 +205,7 @@ export function QuestionReview({ quizId, quizStatus }: QuestionReviewProps) {
           size="sm"
           onClick={() => setFilterView("all")}
         >
-          All Questions ({totalCount})
+          {t("questions.allQuestions", { count: totalCount })}
         </Button>
       </HStack>
 
@@ -214,13 +216,13 @@ export function QuestionReview({ quizId, quizStatus }: QuestionReviewProps) {
             <EmptyState
               title={
                 filterView === "pending"
-                  ? "No Pending Questions"
-                  : "No Questions Found"
+                  ? t("questions.noPending")
+                  : t("questions.noQuestionsFound")
               }
               description={
                 filterView === "pending"
-                  ? 'All questions have been approved! Switch to "All Questions" to see them.'
-                  : "No questions match the current filter."
+                  ? t("questions.allApprovedSwitch")
+                  : t("questions.noMatchFilter")
               }
             />
           </Card.Body>

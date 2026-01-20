@@ -2,6 +2,7 @@ import { Button, ButtonGroup, Text } from "@chakra-ui/react"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
+import { useTranslation } from "react-i18next"
 
 import type { ApiError } from "@/client"
 import {
@@ -36,16 +37,20 @@ const ConfirmationDialog = ({
   triggerButtonProps = {},
   title,
   message,
-  confirmButtonText = "Confirm",
-  successMessage = "Action completed successfully",
+  confirmButtonText,
+  successMessage,
   mutationFn,
   onSuccess,
   invalidateQueries = [],
 }: ConfirmationDialogProps) => {
+  const { t } = useTranslation("common")
   const [isOpen, setIsOpen] = useState(false)
   const queryClient = useQueryClient()
   const { showSuccessToast } = useCustomToast()
   const { handleError } = useErrorHandler()
+
+  const finalConfirmButtonText = confirmButtonText || t("actions.confirm")
+  const finalSuccessMessage = successMessage || t("status.completed")
   const {
     handleSubmit,
     formState: { isSubmitting },
@@ -54,7 +59,7 @@ const ConfirmationDialog = ({
   const mutation = useMutation({
     mutationFn,
     onSuccess: () => {
-      showSuccessToast(successMessage)
+      showSuccessToast(finalSuccessMessage)
       setIsOpen(false)
 
       // Invalidate specified queries
@@ -111,7 +116,7 @@ const ConfirmationDialog = ({
                   colorPalette="gray"
                   disabled={isSubmitting}
                 >
-                  Cancel
+                  {t("actions.cancel")}
                 </Button>
               </DialogActionTrigger>
               <Button
@@ -120,7 +125,7 @@ const ConfirmationDialog = ({
                 type="submit"
                 loading={isSubmitting}
               >
-                {confirmButtonText}
+                {finalConfirmButtonText}
               </Button>
             </ButtonGroup>
           </DialogFooter>

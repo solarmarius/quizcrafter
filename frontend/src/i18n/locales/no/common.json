@@ -1,0 +1,81 @@
+{
+  "appName": "QuizCrafter",
+  "actions": {
+    "save": "Lagre",
+    "cancel": "Avbryt",
+    "delete": "Slett",
+    "edit": "Rediger",
+    "close": "Lukk",
+    "confirm": "Bekreft",
+    "tryAgain": "Prøv igjen",
+    "next": "Neste",
+    "previous": "Forrige",
+    "getStarted": "Kom i gang",
+    "logOut": "Logg ut",
+    "view": "Vis",
+    "approve": "Godkjenn",
+    "reject": "Avvis",
+    "addBatch": "Legg til gruppe"
+  },
+  "status": {
+    "loading": "Laster...",
+    "retrying": "Prøver på nytt...",
+    "processing": "Behandler...",
+    "completed": "Fullført",
+    "failed": "Feilet",
+    "waiting": "Venter",
+    "unknown": "Ukjent"
+  },
+  "errors": {
+    "generic": "Det oppstod en feil",
+    "networkError": "Nettverksfeil. Vennligst sjekk tilkoblingen din.",
+    "sessionExpired": "Økten er utløpt",
+    "sessionExpiredDescription": "Vennligst logg inn på nytt for å fortsette."
+  },
+  "labels": {
+    "name": "Navn",
+    "required": "Påkrevd",
+    "optional": "Valgfritt",
+    "selected": "Valgt",
+    "total": "Totalt",
+    "questions": "spørsmål",
+    "modules": "moduler",
+    "words": "ord",
+    "batches": "grupper"
+  },
+  "time": {
+    "justNow": "akkurat nå",
+    "minutesAgo": "{{count}} minutt siden",
+    "minutesAgo_other": "{{count}} minutter siden",
+    "hoursAgo": "{{count}} time siden",
+    "hoursAgo_other": "{{count}} timer siden",
+    "daysAgo": "{{count}} dag siden",
+    "daysAgo_other": "{{count}} dager siden"
+  },
+  "userSettings": {
+    "title": "Brukerinnstillinger",
+    "description": "Administrer kontoinnstillinger og preferanser",
+    "tabs": {
+      "myProfile": "Min profil",
+      "dangerZone": "Faresone"
+    },
+    "name": {
+      "label": "Navn",
+      "placeholder": "Skriv inn navnet ditt"
+    },
+    "updateSuccess": "Bruker oppdatert.",
+    "privacyNotice": "Les vår personvernerklæring for å forstå hvordan vi håndterer dataene dine.",
+    "language": {
+      "title": "Språk for grensesnitt",
+      "description": "Velg ditt foretrukne språk for applikasjonsgrensesnittet. Dette er uavhengig av quiz-innholdsspråket.",
+      "englishDescription": "Use English for the user interface",
+      "norwegianDescription": "Bruk norsk for brukergrensesnittet"
+    }
+  },
+  "deleteAccount": {
+    "title": "Slett konto",
+    "warning": "Er du sikker på at du vil slette kontoen din? Denne handlingen kan ikke angres.",
+    "confirmButton": "Slett min konto",
+    "success": "Konto slettet"
+  }
+}

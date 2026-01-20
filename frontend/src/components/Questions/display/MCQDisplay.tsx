@@ -3,6 +3,7 @@ import { ErrorState } from "@/components/Common"
 import { extractQuestionData } from "@/types/questionTypes"
 import { Badge, Box, HStack, Text, VStack } from "@chakra-ui/react"
 import { memo } from "react"
+import { useTranslation } from "react-i18next"
 import { ExplanationBox } from "../shared/ExplanationBox"
 
 interface MCQDisplayProps {
@@ -14,6 +15,8 @@ export const MCQDisplay = memo(function MCQDisplay({
   question,
   showCorrectAnswer,
 }: MCQDisplayProps) {
+  const { t } = useTranslation("quiz")
+
   try {
     const mcqData = extractQuestionData(question, "multiple_choice")
 
@@ -66,7 +69,7 @@ export const MCQDisplay = memo(function MCQDisplay({
               <Text flex={1}>{option.text}</Text>
               {showCorrectAnswer && option.key === mcqData.correct_answer && (
                 <Badge colorScheme="green" variant="subtle" size="sm">
-                  Correct
+                  {t("questions.correct")}
                 </Badge>
               )}
             </HStack>
@@ -81,8 +84,8 @@ export const MCQDisplay = memo(function MCQDisplay({
   } catch (error) {
     return (
       <ErrorState
-        title="Display Error"
-        message="Error loading MCQ question data"
+        title={t("questions.displayError")}
+        message={t("questions.loadingError")}
         variant="inline"
         showRetry={false}
       />

@@ -3,6 +3,7 @@ import { ErrorState } from "@/components/Common"
 import { extractQuestionData } from "@/types/questionTypes"
 import { Badge, Box, Card, SimpleGrid, Text, VStack } from "@chakra-ui/react"
 import { memo } from "react"
+import { useTranslation } from "react-i18next"
 import { ExplanationBox } from "../shared/ExplanationBox"
 
 interface CategorizationDisplayProps {
@@ -18,6 +19,7 @@ function CategorizationDisplayComponent({
   question,
   showCorrectAnswer: _showCorrectAnswer = false, // Always show answers in teacher-facing view
 }: CategorizationDisplayProps) {
+  const { t } = useTranslation("quiz")
   // Note: showCorrectAnswer is kept for API consistency but we always show answers for teachers
   try {
     const categorizationData = extractQuestionData(question, "categorization")
@@ -91,7 +93,7 @@ function CategorizationDisplayComponent({
                       size="sm"
                       colorScheme="red"
                     >
-                      Distractor
+                      {t("questions.distractorLabel")}
                     </Badge>
                   </Box>
                 ))}
@@ -109,8 +111,8 @@ function CategorizationDisplayComponent({
     console.error("Error rendering categorization question:", error)
     return (
       <ErrorState
-        title="Display Error"
-        message="Error loading categorization question data"
+        title={t("questions.displayError")}
+        message={t("questions.loadingError")}
         variant="inline"
         showRetry={false}
       />

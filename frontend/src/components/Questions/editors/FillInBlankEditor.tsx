@@ -22,6 +22,7 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod"
 import { memo, useMemo } from "react"
 import { Controller, useFieldArray, useForm, useWatch } from "react-hook-form"
+import { useTranslation } from "react-i18next"
 import { ErrorEditor } from "./ErrorEditor"
 import { FillInBlankValidationErrors } from "./FillInBlankValidationErrors"
 
@@ -38,6 +39,8 @@ export const FillInBlankEditor = memo(function FillInBlankEditor({
   onCancel,
   isLoading,
 }: FillInBlankEditorProps) {
+  const { t } = useTranslation("quiz")
+
   try {
     const fibData = extractQuestionData(question, "fill_in_blank")
 
@@ -185,10 +188,10 @@ export const FillInBlankEditor = memo(function FillInBlankEditor({
           control={control}
           render={({ field }) => (
             <FormField
-              label="Question Text"
+              label={t("questions.editor.questionText")}
               isRequired
               error={errors.questionText?.message}
-              helperText="Use [blank_1], [blank_2], etc. to mark blanks in your question"
+              helperText={t("questions.editor.blankHelperText")}
             >
               <Textarea
                 {...field}
@@ -200,7 +203,7 @@ export const FillInBlankEditor = memo(function FillInBlankEditor({
         />
 
         <Fieldset.Root>
-          <Fieldset.Legend>Blanks</Fieldset.Legend>
+          <Fieldset.Legend>{t("questions.editor.blanks")}</Fieldset.Legend>
           <VStack gap={4} align="stretch">
             {fields.map((field, index) => (
               <Box
@@ -213,7 +216,7 @@ export const FillInBlankEditor = memo(function FillInBlankEditor({
                 <FormGroup gap={3}>
                   <HStack>
                     <Text fontWeight="medium" fontSize="sm">
-                      Blank {index + 1}
+                      {t("questions.editor.blankNumber", { number: index + 1 })}
                     </Text>
                     <Button
                       size="sm"
@@ -221,7 +224,7 @@ export const FillInBlankEditor = memo(function FillInBlankEditor({
                       colorScheme="red"
                       onClick={() => remove(index)}
                     >
-                      Remove
+                      {t("questions.editor.remove")}
                     </Button>
                   </HStack>
 
@@ -230,7 +233,7 @@ export const FillInBlankEditor = memo(function FillInBlankEditor({
                     control={control}
                     render={({ field }) => (
                       <FormField
-                        label="Correct Answer"
+                        label={t("questions.editor.correctAnswer")}
                         isRequired
                         error={errors.blanks?.[index]?.correctAnswer?.message}
                       >
@@ -247,11 +250,13 @@ export const FillInBlankEditor = memo(function FillInBlankEditor({
                     control={control}
                     render={({ field }) => (
                       <FormField
-                        label="Answer Variations"
+                        label={t("questions.editor.answerVariations")}
                         error={
                           errors.blanks?.[index]?.answerVariations?.message
                         }
-                        helperText="Separate multiple variations with commas"
+                        helperText={t(
+                          "questions.editor.answerVariationsHelper",
+                        )}
                       >
                         <Input
                           {...field}
@@ -272,7 +277,7 @@ export const FillInBlankEditor = memo(function FillInBlankEditor({
                           checked={value}
                           onCheckedChange={(e) => onChange(!!e.checked)}
                         >
-                          Case sensitive
+                          {t("questions.editor.caseSensitiveCheckbox")}
                         </Checkbox>
                       </FormField>
                     )}
@@ -287,16 +292,18 @@ export const FillInBlankEditor = memo(function FillInBlankEditor({
                 onClick={addBlank}
                 disabled={!watchedQuestionText}
               >
-                Add Blank
+                {t("questions.editor.addBlank")}
               </Button>
               {!watchedQuestionText && (
                 <Text fontSize="xs" color="gray.500" mt={1}>
-                  Add question text first to enable smart blank creation
+                  {t("questions.editor.addBlankDisabledText")}
                 </Text>
               )}
               {watchedQuestionText && (
                 <Text fontSize="xs" color="gray.600" mt={1}>
-                  Next position: {getNextBlankPosition(watchedQuestionText)}
+                  {t("questions.editor.nextPosition", {
+                    position: getNextBlankPosition(watchedQuestionText),
+                  })}
                 </Text>
               )}
             </Box>
@@ -307,7 +314,10 @@ export const FillInBlankEditor = memo(function FillInBlankEditor({
           name="explanation"
           control={control}
           render={({ field }) => (
-            <FormField label="Explanation" error={errors.explanation?.message}>
+            <FormField
+              label={t("questions.editor.explanation")}
+              error={errors.explanation?.message}
+            >
               <Textarea
                 {...field}
                 placeholder="Enter explanation for the answers..."
@@ -319,7 +329,7 @@ export const FillInBlankEditor = memo(function FillInBlankEditor({
 
         <HStack gap={3} justify="end">
           <Button variant="outline" onClick={onCancel} disabled={isLoading}>
-            Cancel
+            {t("questions.editor.cancel")}
           </Button>
           <Button
             colorScheme="blue"
@@ -327,15 +337,15 @@ export const FillInBlankEditor = memo(function FillInBlankEditor({
             loading={isLoading}
             disabled={!canSave}
           >
-            Save Changes
+            {t("questions.editor.saveChanges")}
           </Button>
           {!canSave && isDirty && (
             <Text fontSize="xs" color="gray.500">
               {validationErrors.length > 0
-                ? "Fix validation errors to save"
+                ? t("questions.editor.fixValidationErrors")
                 : !isValid
-                  ? "Complete required fields to save"
-                  : "No changes to save"}
+                  ? t("questions.editor.completeRequiredFields")
+                  : t("questions.editor.noChangesToSave")}
             </Text>
           )}
         </HStack>

@@ -8,24 +8,25 @@ import {
   RadioGroup,
   Text,
   VStack,
-} from "@chakra-ui/react";
-import { useQuery } from "@tanstack/react-query";
+} from "@chakra-ui/react"
+import { useQuery } from "@tanstack/react-query"
+import { useTranslation } from "react-i18next"
 
-import { CanvasService } from "@/client";
-import { LoadingSkeleton } from "@/components/Common";
-import { Field } from "@/components/ui/field";
-import { analyzeCanvasError } from "@/lib/utils";
+import { CanvasService } from "@/client"
+import { LoadingSkeleton } from "@/components/Common"
+import { Field } from "@/components/ui/field"
+import { analyzeCanvasError } from "@/lib/utils"
 
 interface Course {
-  id: number;
-  name: string;
+  id: number
+  name: string
 }
 
 interface CourseSelectionStepProps {
-  selectedCourse?: Course;
-  onCourseSelect: (course: Course) => void;
-  title?: string;
-  onTitleChange: (title: string) => void;
+  selectedCourse?: Course
+  onCourseSelect: (course: Course) => void
+  title?: string
+  onTitleChange: (title: string) => void
 }
 
 export function CourseSelectionStep({
@@ -34,6 +35,7 @@ export function CourseSelectionStep({
   title,
   onTitleChange,
 }: CourseSelectionStepProps) {
+  const { t } = useTranslation("creation")
   const {
     data: courses,
     isLoading,
@@ -46,26 +48,28 @@ export function CourseSelectionStep({
     retry: 1, // Only retry once instead of default 3 times
     retryDelay: 1000, // Wait 1 second between retries
     staleTime: 30000, // Consider data stale after 30 seconds
-  });
+  })
 
   if (isLoading || isFetching) {
     return (
       <VStack gap={4} align="stretch">
         <Text fontSize="lg" fontWeight="semibold">
-          {isLoading ? "Loading your courses..." : "Retrying..."}
+          {isLoading
+            ? t("courseSelection.loadingCourses")
+            : t("common.retrying")}
         </Text>
         <LoadingSkeleton height="60px" lines={3} />
       </VStack>
-    );
+    )
   }
 
   if (error) {
-    const errorInfo = analyzeCanvasError(error);
+    const errorInfo = analyzeCanvasError(error)
 
     return (
       <Alert.Root status="error">
         <Alert.Indicator />
-        <Alert.Title>Failed to load courses</Alert.Title>
+        <Alert.Title>{t("courseSelection.failedToLoad")}</Alert.Title>
         <Alert.Description>
           <VStack gap={3} align="stretch">
             <Text>{errorInfo.userFriendlyMessage}</Text>
@@ -79,39 +83,37 @@ export function CourseSelectionStep({
               disabled={isFetching}
               loading={isFetching}
             >
-              Try Again
+              {t("common.tryAgain")}
             </Button>
           </VStack>
         </Alert.Description>
       </Alert.Root>
-    );
+    )
   }
 
   if (!courses || courses.length === 0) {
     return (
       <Alert.Root status="info">
         <Alert.Indicator />
-        <Alert.Title>No teacher courses found</Alert.Title>
+        <Alert.Title>{t("courseSelection.noCourses")}</Alert.Title>
         <Alert.Description>
-          You don't have any courses where you are enrolled as a teacher. Please
-          check your Canvas account or contact your administrator.
+          {t("courseSelection.noCoursesDescription")}
         </Alert.Description>
       </Alert.Root>
-    );
+    )
   }
 
   return (
     <VStack gap={4} align="stretch">
       <Box>
         <Text fontSize="lg" fontWeight="semibold" mb={2}>
-          Select a course to create a quiz for
+          {t("courseSelection.title")}
         </Text>
         <Text color="gray.600" fontSize="sm">
-          Here is the courses we found where you have a teacher role.
+          {t("courseSelection.description")}
         </Text>
         <Text color="gray.600" fontSize="sm">
-          Choose the course where you want to generate quiz questions from the
-          module materials.
+          {t("courseSelection.chooseDescription")}
         </Text>
         <Box
           bg="orange.50"
@@ -122,10 +124,7 @@ export function CourseSelectionStep({
           py={3}
           mt={4}
         >
-          <Text color="orange.700">
-            During development, only courses with the prefix "INF" are shown.
-            Contact us if you would like to test with other courses.
-          </Text>
+          <Text color="orange.700">{t("courseSelection.devWarning")}</Text>
         </Box>
       </Box>
 
@@ -142,7 +141,7 @@ export function CourseSelectionStep({
               }
               bg={selectedCourse?.id === course.id ? "blue.50" : "white"}
               onClick={() => {
-                onCourseSelect(course);
+                onCourseSelect(course)
               }}
               data-testid={`course-card-${course.id}`}
             >
@@ -153,10 +152,10 @@ export function CourseSelectionStep({
                   </RadioGroup.Item>
                   <Box flex={1}>
                     <Text fontWeight="medium" fontSize="md" lineClamp={2}>
-                      {course.name || "Unnamed Course"}
+                      {course.name || t("courseSelection.unnamedCourse")}
                     </Text>
                     <Text fontSize="sm" color="gray.600">
-                      Course ID: {course.id || "Unknown"}
+                      {t("courseSelection.courseId", { id: course.id || "?" })}
                     </Text>
                   </Box>
                 </HStack>
@@ -171,26 +170,27 @@ export function CourseSelectionStep({
           <Alert.Root status="success">
             <Alert.Indicator />
             <Alert.Description>
-              Selected: <strong>{selectedCourse.name}</strong>
+              {t("courseSelection.selected", {
+                courseName: selectedCourse.name,
+              })}
             </Alert.Description>
           </Alert.Root>
 
           <Box>
-            <Field label="Quiz Title" required>
+            <Field label={t("quizTitle.label")} required>
               <Input
                 value={title || ""}
                 onChange={(e) => onTitleChange(e.target.value)}
-                placeholder="Enter quiz title"
+                placeholder={t("quizTitle.placeholder")}
                 data-testid="quiz-title-input"
               />
             </Field>
             <Text fontSize="sm" color="gray.600" mt={1}>
-              This is the quiz title shown in Canvas and when browsing quizzes.
-              You can modify it before continuing.
+              {t("quizTitle.description")}
             </Text>
           </Box>
         </VStack>
       )}
     </VStack>
-  );
+  )
 }

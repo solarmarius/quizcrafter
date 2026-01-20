@@ -1,5 +1,6 @@
 import { Box, Button, Card, HStack, Text, VStack } from "@chakra-ui/react"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { useTranslation } from "react-i18next"
 import { MdAutoAwesome, MdRefresh } from "react-icons/md"
 
 import { type Quiz, QuizService } from "@/client"
@@ -29,6 +30,7 @@ interface QuestionGenerationTriggerProps {
 export function QuestionGenerationTrigger({
   quiz,
 }: QuestionGenerationTriggerProps) {
+  const { t } = useTranslation("quiz")
   const { showSuccessToast } = useCustomToast()
   const { handleError } = useErrorHandler()
   const queryClient = useQueryClient()
@@ -54,8 +56,8 @@ export function QuestionGenerationTrigger({
       const successMessage =
         response.message ||
         (isPartialRetry
-          ? "Failed batch retry started"
-          : "Question generation started")
+          ? t("generationTrigger.retryStarted")
+          : t("generationTrigger.generationStarted"))
       showSuccessToast(successMessage)
       queryClient.invalidateQueries({ queryKey: ["quiz", quiz.id] })
     },
@@ -106,15 +108,17 @@ export function QuestionGenerationTrigger({
           <Box textAlign="center">
             <Text fontSize="xl" fontWeight="bold" mb={2}>
               {isPartialRetry
-                ? "Partial Success - Retry Available"
-                : "Question Generation Failed"}
+                ? t("generationTrigger.partialTitle")
+                : t("generationTrigger.failedTitle")}
             </Text>
             <Text color="gray.600" mb={4}>
               {isPartialRetry
-                ? `Some questions were generated successfully. Click below to retry generating the remaining ${
-                    progressInfo?.remainingQuestions || 0
-                  } questions.`
-                : `The previous question generation attempt failed. Click below to retry generating ${quiz.question_count} multiple-choice questions.`}
+                ? t("generationTrigger.partialMessage", {
+                    count: progressInfo?.remainingQuestions || 0,
+                  })
+                : t("generationTrigger.failedMessage", {
+                    count: quiz.question_count,
+                  })}
             </Text>
           </Box>
 
@@ -130,9 +134,17 @@ export function QuestionGenerationTrigger({
               <VStack gap={3}>
                 <HStack gap={4} fontSize="sm" color="purple.600">
                   <Text>
-                    ✓ {progressInfo.successfulBatches} batches succeeded
+                    ✓{" "}
+                    {t("generationTrigger.batchesSucceeded", {
+                      count: progressInfo.successfulBatches,
+                    })}
                   </Text>
-                  <Text>✗ {progressInfo.failedBatches} batches failed</Text>
+                  <Text>
+                    ✗{" "}
+                    {t("generationTrigger.batchesFailed", {
+                      count: progressInfo.failedBatches,
+                    })}
+                  </Text>
                 </HStack>
               </VStack>
             </Box>
@@ -149,10 +161,14 @@ export function QuestionGenerationTrigger({
             >
               <VStack gap={2}>
                 <Text fontSize="sm" fontWeight="medium" color="blue.700">
-                  Generation Settings
+                  {t("generationTrigger.generationSettings")}
                 </Text>
                 <HStack gap={4} fontSize="sm" color="blue.600">
-                  <Text>Questions: {quiz.question_count}</Text>
+                  <Text>
+                    {t("generationTrigger.questionsCount", {
+                      count: quiz.question_count,
+                    })}
+                  </Text>
                 </HStack>
               </VStack>
             </Box>
@@ -167,8 +183,8 @@ export function QuestionGenerationTrigger({
           >
             {isPartialRetry ? <MdRefresh /> : <MdAutoAwesome />}
             {isPartialRetry
-              ? "Retry Failed Batches"
-              : "Retry Question Generation"}
+              ? t("generationTrigger.retryFailedBatches")
+              : t("generationTrigger.retryGeneration")}
           </Button>
         </VStack>
       </Card.Body>

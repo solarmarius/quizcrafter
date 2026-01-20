@@ -1,6 +1,7 @@
 import type { QuizStatus } from "@/client/types.gen"
-import { QUIZ_STATUS, UI_SIZES, UI_TEXT } from "@/lib/constants"
+import { QUIZ_STATUS, UI_SIZES } from "@/lib/constants"
 import { Box } from "@chakra-ui/react"
+import { useTranslation } from "react-i18next"
 
 /**
  * Props for the StatusLight component.
@@ -38,6 +39,8 @@ interface StatusLightProps {
 }
 
 export function StatusLight({ status }: StatusLightProps) {
+  const { t } = useTranslation("quiz")
+
   const getStatusColor = () => {
     switch (status) {
       case QUIZ_STATUS.FAILED:
@@ -55,26 +58,8 @@ export function StatusLight({ status }: StatusLightProps) {
   }
 
   const getStatusTitle = () => {
-    switch (status) {
-      case QUIZ_STATUS.CREATED:
-        return UI_TEXT.STATUS.CREATED
-      case QUIZ_STATUS.EXTRACTING_CONTENT:
-        return UI_TEXT.STATUS.EXTRACTING_CONTENT
-      case QUIZ_STATUS.GENERATING_QUESTIONS:
-        return UI_TEXT.STATUS.GENERATING_QUESTIONS
-      case QUIZ_STATUS.READY_FOR_REVIEW:
-        return UI_TEXT.STATUS.READY_FOR_REVIEW
-      case QUIZ_STATUS.READY_FOR_REVIEW_PARTIAL:
-        return UI_TEXT.STATUS.READY_FOR_REVIEW_PARTIAL
-      case QUIZ_STATUS.EXPORTING_TO_CANVAS:
-        return UI_TEXT.STATUS.EXPORTING_TO_CANVAS
-      case QUIZ_STATUS.PUBLISHED:
-        return UI_TEXT.STATUS.PUBLISHED
-      case QUIZ_STATUS.FAILED:
-        return UI_TEXT.STATUS.FAILED
-      default:
-        return "Unknown status"
-    }
+    // Use status as translation key directly (keys match enum values)
+    return t(`status.${status}`)
   }
 
   return (

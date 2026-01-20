@@ -1,5 +1,6 @@
 import { Box, Text } from "@chakra-ui/react"
 import { memo } from "react"
+import { useTranslation } from "react-i18next"
 
 interface CorrectAnswerBoxProps {
   correctAnswer: string
@@ -12,6 +13,8 @@ export const CorrectAnswerBox = memo(function CorrectAnswerBox({
   answerVariations,
   caseSensitive,
 }: CorrectAnswerBoxProps) {
+  const { t } = useTranslation("quiz")
+
   return (
     <Box
       p={3}
@@ -21,7 +24,7 @@ export const CorrectAnswerBox = memo(function CorrectAnswerBox({
       borderColor="green.200"
     >
       <Text fontSize="sm" fontWeight="medium" color="green.700" mb={1}>
-        Correct Answer:
+        {t("questions.editor.correctAnswer")}:
       </Text>
       <Text fontSize="sm" color="green.600" fontFamily="mono">
         {correctAnswer}
@@ -35,7 +38,7 @@ export const CorrectAnswerBox = memo(function CorrectAnswerBox({
             mt={2}
             mb={1}
           >
-            Accepted Variations:
+            {t("questions.editor.acceptedVariations")}:
           </Text>
           <Text fontSize="sm" color="green.600" fontFamily="mono">
             {answerVariations.join(", ")}
@@ -44,7 +47,7 @@ export const CorrectAnswerBox = memo(function CorrectAnswerBox({
       )}
       {caseSensitive && (
         <Text fontSize="xs" color="orange.600" mt={1}>
-          (Case sensitive)
+          {t("questions.editor.caseSensitive")}
         </Text>
       )}
     </Box>

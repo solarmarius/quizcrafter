@@ -1,0 +1,61 @@
+{
+  "greeting": "Hei, {{name}}",
+  "welcome": "Velkommen tilbake! Her er en oversikt over quizene dine og nyttige ressurser.",
+  "developmentWarning": "Denne applikasjonen er for tiden i utviklingsfase av IFI-UiT og er ennå ikke offisielt lansert. Vær oppmerksom på at løpende support og fremtidig utvikling ikke er garantert. Quiz-data kan slettes når som helst. Funksjoner kan endres eller avvikles når som helst.",
+  "panels": {
+    "generation": {
+      "title": "Quizer under generering",
+      "description": "Quizer som behandles nå",
+      "empty": "Ingen quizer under generering",
+      "emptyDescription": "Start med å opprette en quiz for å se fremdrift her",
+      "moreInProgress": "+{{count}} flere quizer pågår"
+    },
+    "review": {
+      "title": "Quizer som trenger gjennomgang",
+      "description": "Fullførte quizer klare for godkjenning av spørsmål",
+      "empty": "Ingen quizer klare for gjennomgang",
+      "emptyDescription": "Genererte quizer vil vises her når de er klare for godkjenning",
+      "moreNeedReview": "+{{count}} flere quizer trenger gjennomgang"
+    },
+    "help": {
+      "title": "Hjelp og ressurser",
+      "description": "Lær hvordan du bruker QuizCrafter effektivt",
+      "about": {
+        "title": "Om QuizCrafter",
+        "content": "QuizCrafter bruker LLM-er for å generere flervalgsoppgaver fra Canvas-emnemateriell. Systemet analyserer modulene fra et emne og oppretter relevante spørsmål som du kan gjennomgå, godkjenne og eksportere direkte til Canvas."
+      },
+      "howItWorks": {
+        "title": "Slik fungerer det",
+        "step1": "Velg emne og moduler fra Canvas",
+        "step2": "Appen henter PDF-er og sider fra moduler",
+        "step3": "LLM genererer spørsmål per modul",
+        "step4": "Gjennomgå og godkjenn spørsmål",
+        "step5": "Eksporter til Canvas som en quiz"
+      },
+      "helpfulLinks": {
+        "title": "Nyttige lenker",
+        "canvasUit": "Canvas UiT",
+        "contactDeveloper": "Kontakt utvikler",
+        "githubRepo": "GitHub-repository"
+      },
+      "tips": {
+        "title": "Tips for beste resultater",
+        "tip1": "Juster antall spørsmål basert på modulinnholdets lengde",
+        "tip2": "Gjennomgå alle genererte spørsmål før godkjenning",
+        "tip3": "Sørg for at diagrammer og bilder i emnet er forklart med tekst"
+      }
+    }
+  },
+  "errors": {
+    "loadFailed": "Kunne ikke laste quizer",
+    "title": "Feil ved lasting av oversikt",
+    "message": "Det oppstod en feil ved lasting av oversikten. Vennligst prøv å oppdatere siden."
+  },
+  "quizList": {
+    "title": "Mine quizer",
+    "description": "Administrer og se alle quizene dine",
+    "emptyDescription": "Du har ikke opprettet noen quizer ennå. Kom i gang ved å opprette din første quiz.",
+    "loadFailed": "Kunne ikke laste quizer",
+    "loadFailedMessage": "Det oppstod en feil ved lasting av quizene dine. Vennligst prøv igjen."
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "questionBatch": {
+    "maxBatches": "Maksimalt 4 spørsmålsgrupper per modul",
+    "duplicateTypes": "Kan ikke ha dupliserte spørsmålstyper i samme modul",
+    "duplicateCombinations": "Kan ikke ha dupliserte kombinasjoner av spørsmålstype og vanskelighetsgrad",
+    "invalidCount": "Antall spørsmål må være mellom 1 og 20",
+    "noBatches": "Hver modul må ha minst én spørsmålsgruppe"
+  },
+  "quiz": {
+    "minTitleLength": "Tittel er påkrevd",
+    "maxTitleLength": "Tittel må være kortere enn 255 tegn"
+  }
+}

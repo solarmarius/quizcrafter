@@ -17,6 +17,9 @@ import { clearAuthToken, configureApiClient } from "./lib/api/client"
 // Configure API client
 configureApiClient()
 
+// Initialize i18n
+import "./i18n"
+
 const handleApiError = (error: Error) => {
   if (error instanceof ApiError && error.status === 401) {
     // Only redirect to login for non-Canvas API 401 errors

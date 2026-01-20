@@ -1,6 +1,7 @@
 import { Badge, Card, HStack, IconButton, Text, VStack } from "@chakra-ui/react"
 import { useVirtualizer } from "@tanstack/react-virtual"
 import { Suspense, lazy, memo, useCallback, useEffect, useRef } from "react"
+import { useTranslation } from "react-i18next"
 import { MdCheck, MdClose, MdEdit } from "react-icons/md"
 
 import type {
@@ -71,6 +72,7 @@ const QUESTION_HEIGHT_ESTIMATES = {
  * Memoized component for rendering approval timestamp
  */
 const ApprovalTimestamp = memo(({ approvedAt }: { approvedAt: string }) => {
+  const { t } = useTranslation("quiz")
   const date = new Date(approvedAt)
   const formattedDate = date.toLocaleDateString("en-US", {
     year: "numeric",
@@ -80,7 +82,7 @@ const ApprovalTimestamp = memo(({ approvedAt }: { approvedAt: string }) => {
 
   return (
     <Text fontSize="sm" color="gray.600">
-      Approved on {formattedDate}
+      {t("questions.approvedOn", { date: formattedDate })}
     </Text>
   )
 })
@@ -105,6 +107,7 @@ export const VirtualQuestionList = memo(
     isDeleteLoading,
     quizStatus,
   }: VirtualQuestionListProps) => {
+    const { t } = useTranslation("quiz")
     const parentRef = useRef<HTMLDivElement>(null)
     const scrollElementRef = useRef<HTMLElement | null>(null)
 
@@ -209,11 +212,11 @@ export const VirtualQuestionList = memo(
                     <HStack justify="space-between" align="center">
                       <HStack gap={3}>
                         <Text fontSize="lg" fontWeight="semibold">
-                          Question {questionIndex + 1}
+                          {t("questions.title", { number: questionIndex + 1 })}
                         </Text>
                         {question.is_approved && (
                           <Badge colorScheme="green" variant="subtle">
-                            Approved
+                            {t("questions.approved")}
                           </Badge>
                         )}
                       </HStack>

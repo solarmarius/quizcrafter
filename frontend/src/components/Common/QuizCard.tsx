@@ -1,42 +1,43 @@
-import { Badge, Box, HStack, Text, VStack } from "@chakra-ui/react";
-import { Link as RouterLink } from "@tanstack/react-router";
-import { memo } from "react";
+import { Badge, Box, HStack, Text, VStack } from "@chakra-ui/react"
+import { Link as RouterLink } from "@tanstack/react-router"
+import { memo } from "react"
+import { useTranslation } from "react-i18next"
 
-import type { Quiz } from "@/client/types.gen";
-import { QuizProgressIndicator } from "@/components/dashboard/QuizProgressIndicator";
-import { Button } from "@/components/ui/button";
-import { StatusLight } from "@/components/ui/status-light";
-import { UI_COLORS } from "@/lib/constants";
-import { getQuizProgressPercentage, getQuizStatusText } from "@/lib/utils";
+import type { Quiz } from "@/client/types.gen"
+import { QuizProgressIndicator } from "@/components/dashboard/QuizProgressIndicator"
+import { Button } from "@/components/ui/button"
+import { StatusLight } from "@/components/ui/status-light"
+import { UI_COLORS } from "@/lib/constants"
+import { getQuizProgressPercentage, getQuizStatusText } from "@/lib/utils"
 
 interface QuizCardProps {
-  quiz: Quiz;
+  quiz: Quiz
   /**
    * Custom action button configuration
    * If not provided, defaults to "View" button linking to quiz details
    */
   actionButton?: {
-    text: string;
-    to: string;
-    params?: Record<string, any>;
-    search?: Record<string, any>;
-  };
+    text: string
+    to: string
+    params?: Record<string, any>
+    search?: Record<string, any>
+  }
   /**
    * Whether to show course information
    * @default true
    */
-  showCourseInfo?: boolean;
+  showCourseInfo?: boolean
   /**
    * Whether to use compact mode with reduced padding and spacing
    * @default false
    */
-  compact?: boolean;
+  compact?: boolean
   /**
    * Whether to show progress indicator for quizzes in progress
    * Automatically enabled for processing states if not explicitly set
    * @default auto (based on quiz status)
    */
-  showProgress?: boolean;
+  showProgress?: boolean
   /**
    * Visual variant for the card styling
    * - "default": Gray background for general quiz lists
@@ -44,36 +45,44 @@ interface QuizCardProps {
    * - "auto": Automatically choose based on quiz status
    * @default "auto"
    */
-  variant?: "default" | "processing" | "auto";
+  variant?: "default" | "processing" | "auto"
 }
 
 const PROCESSING_STATUSES = [
   "extracting_content",
   "generating_questions",
   "exporting_to_canvas",
-];
+]
 
 export const QuizCard = memo(function QuizCard({
   quiz,
-  actionButton = { text: "View", to: `/quiz/${quiz.id}` },
+  actionButton,
   showCourseInfo = true,
   compact = false,
   showProgress,
   variant = "auto",
 }: QuizCardProps) {
+  const { t } = useTranslation("common")
+
+  // Default action button with translated text
+  const effectiveActionButton = actionButton ?? {
+    text: t("actions.view"),
+    to: `/quiz/${quiz.id}`,
+  }
+
   // Determine if quiz is in processing state
-  const isProcessing = PROCESSING_STATUSES.includes(quiz.status || "");
+  const isProcessing = PROCESSING_STATUSES.includes(quiz.status || "")
 
   // Auto-determine variant based on status if set to auto
   const effectiveVariant =
-    variant === "auto" ? (isProcessing ? "processing" : "default") : variant;
+    variant === "auto" ? (isProcessing ? "processing" : "default") : variant
 
   // Auto-determine progress display
-  const shouldShowProgress = showProgress ?? effectiveVariant === "processing";
+  const shouldShowProgress = showProgress ?? effectiveVariant === "processing"
 
   // Get status-specific data
-  const statusText = getQuizStatusText(quiz);
-  const progressPercentage = getQuizProgressPercentage(quiz);
+  const statusText = getQuizStatusText(quiz)
+  const progressPercentage = getQuizProgressPercentage(quiz)
 
   // Styling based on variant
   const cardStyles =
@@ -87,7 +96,7 @@ export const QuizCard = memo(function QuizCard({
           borderColor: "gray.200",
           bg: "gray.50",
           _hover: { bg: "gray.100" },
-        };
+        }
 
   return (
     <Box
@@ -126,21 +135,21 @@ export const QuizCard = memo(function QuizCard({
         <HStack justify="space-between" align="center" gap={2} flexWrap="wrap">
           <HStack gap={2} flex="1" minW="0">
             <Badge variant="solid" colorScheme="blue" size="sm" flexShrink={0}>
-              {quiz.question_count || 0} questions
+              {quiz.question_count || 0} {t("labels.questions")}
             </Badge>
           </HStack>
 
           <Button size="sm" variant="outline" asChild flexShrink={0}>
             <RouterLink
-              to={actionButton.to as any}
-              params={actionButton.params as any}
-              search={actionButton.search as any}
+              to={effectiveActionButton.to as any}
+              params={effectiveActionButton.params as any}
+              search={effectiveActionButton.search as any}
             >
-              {actionButton.text}
+              {effectiveActionButton.text}
             </RouterLink>
           </Button>
         </HStack>
       </VStack>
     </Box>
-  );
-});
+  )
+})

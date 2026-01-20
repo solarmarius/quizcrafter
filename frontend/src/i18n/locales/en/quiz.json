@@ -1,0 +1,297 @@
+{
+  "status": {
+    "created": "Ready to Start",
+    "extracting_content": "Extracting Content",
+    "generating_questions": "Generating Questions",
+    "ready_for_review": "Ready for Review",
+    "ready_for_review_partial": "Partial Success - Ready for Review",
+    "exporting_to_canvas": "Exporting to Canvas",
+    "published": "Published to Canvas",
+    "failed": "Failed"
+  },
+  "statusDetailed": {
+    "created": "Quiz created and ready to start content extraction",
+    "extracting_content": "Extracting and cleaning content from Canvas pages. This may take a few minutes depending on the amount of content.",
+    "generating_questions": "Generating questions using the language model. This process typically takes 2-5 minutes.",
+    "ready_for_review": "Questions generated successfully",
+    "ready_for_review_timestamp": "Questions generated successfully ({{timeAgo}})",
+    "exporting_to_canvas": "Exporting quiz to Canvas. This includes creating the quiz and adding all approved questions.",
+    "published": "Quiz exported to Canvas successfully",
+    "published_timestamp": "Quiz exported to Canvas successfully ({{timeAgo}})",
+    "failed": "Process failed",
+    "unknown": "Status unknown"
+  },
+  "failureMessages": {
+    "canvas_export_error": {
+      "title": "Export to Canvas Failed",
+      "message": "There was an error exporting your quiz to Canvas. Review any questions that may be failing and try exporting again."
+    },
+    "content_extraction_error": {
+      "title": "Content Extraction Failed",
+      "message": "Unable to extract content from the selected Canvas modules. Please check your module selection and try again."
+    },
+    "no_content_found": {
+      "title": "No Content Found",
+      "message": "No content was found in the selected Canvas modules. Please select different modules or check if the modules contain content."
+    },
+    "llm_generation_error": {
+      "title": "Question Generation Failed",
+      "message": "Unable to generate questions from the extracted content. Please try again or adjust your quiz settings."
+    },
+    "no_questions_generated": {
+      "title": "No Questions Generated",
+      "message": "No questions could be generated from the available content. Please try with different content or adjust your quiz settings."
+    },
+    "network_error": {
+      "title": "Network Error",
+      "message": "A network error occurred while processing your quiz. Please check your connection and try again."
+    },
+    "validation_error": {
+      "title": "Validation Error",
+      "message": "There was a validation error while processing your quiz. Please check your quiz settings and try again."
+    },
+    "generic": {
+      "title": "Quiz Processing Failed",
+      "message": "An error occurred while processing your quiz. Please try again or contact support if the problem persists."
+    }
+  },
+  "phases": {
+    "extraction": {
+      "title": "Content Extraction",
+      "pending": "Waiting to extract content from selected Canvas modules",
+      "processing": "Extracting and processing content from Canvas modules...",
+      "completed": "Content successfully extracted from Canvas modules",
+      "failed": "Content extraction failed. Please check your module selection and try again."
+    },
+    "generation": {
+      "title": "Question Generation",
+      "pending": "Waiting for content extraction to complete",
+      "processing": "AI is generating multiple-choice questions from extracted content...",
+      "completed": "Questions generated successfully and ready for review",
+      "partial": "Some questions generated successfully - retry available for remaining questions",
+      "failed": "Question generation failed. This may be due to insufficient content or AI service issues."
+    },
+    "export": {
+      "title": "Canvas Export",
+      "pending": "Waiting for questions to be reviewed and approved",
+      "processing": "Exporting approved questions to Canvas as a new quiz...",
+      "completed": "Quiz successfully published to Canvas",
+      "failed": "Canvas export failed. Please check your Canvas permissions and try again."
+    }
+  },
+  "table": {
+    "headers": {
+      "title": "Quiz Title",
+      "course": "Course",
+      "questions": "Questions",
+      "status": "Status",
+      "created": "Created",
+      "actions": "Actions"
+    }
+  },
+  "emptyStates": {
+    "noQuizzes": "No quizzes found",
+    "noQuizzesGenerating": "No quizzes being generated",
+    "noQuizzesReview": "No quizzes ready for review"
+  },
+  "actions": {
+    "createQuiz": "Create New Quiz",
+    "createFirstQuiz": "Create Your First Quiz",
+    "viewDetails": "View Details",
+    "viewAll": "View All Quizzes",
+    "review": "Review",
+    "postToCanvas": "Post to Canvas",
+    "deleteQuiz": "Delete Quiz"
+  },
+  "settings": {
+    "language": {
+      "label": "Quiz Language",
+      "description": "Select the language for question generation",
+      "en": "English",
+      "enDescription": "Generate questions in English",
+      "no": "Norwegian",
+      "noDescription": "Generate questions in Norwegian (Norsk)"
+    },
+    "tone": {
+      "label": "Tone of Voice",
+      "description": "Select the tone for question generation",
+      "academic": "Formal/Academic",
+      "academicDescription": "Use formal academic language with precise terminology",
+      "casual": "Casual/Conversational",
+      "casualDescription": "Use everyday conversational language that feels approachable",
+      "encouraging": "Friendly/Encouraging",
+      "encouragingDescription": "Use warm, supportive language with helpful hints embedded in questions",
+      "professional": "Professional/Business",
+      "professionalDescription": "Use clear, direct business language for workplace training"
+    }
+  },
+  "questionTypes": {
+    "multiple_choice": "Multiple Choice",
+    "fill_in_blank": "Fill in the Blank",
+    "matching": "Matching",
+    "categorization": "Categorization",
+    "true_false": "True/False"
+  },
+  "questionTypeDescriptions": {
+    "multiple_choice": "Choose the correct answer from 4 options (A, B, C, D)",
+    "true_false": "Simple true or false statements",
+    "fill_in_blank": "Complete sentences with missing words",
+    "matching": "Match questions to their correct answers",
+    "categorization": "Group items into appropriate categories"
+  },
+  "difficulty": {
+    "easy": "Easy",
+    "easyDescription": "Basic recall and simple comprehension",
+    "medium": "Medium",
+    "mediumDescription": "Application and moderate problem-solving",
+    "hard": "Hard",
+    "hardDescription": "Complex analysis and critical thinking"
+  },
+  "deleteConfirmation": {
+    "title": "Delete Quiz",
+    "message": "Are you sure you want to delete the quiz \"{{quizTitle}}\"? This action cannot be undone.",
+    "success": "Quiz deleted successfully"
+  },
+  "detail": {
+    "notFound": "Quiz Not Found",
+    "notFoundMessage": "The quiz you're looking for doesn't exist or you don't have permission to view it.",
+    "loadingInfo": "Loading quiz information...",
+    "notAvailable": "Not available",
+    "courseInfo": "Course Information",
+    "settings": "Settings",
+    "metadata": "Metadata",
+    "generationProgress": "Generation Progress",
+    "questionCount": "Question Count",
+    "language": "Language",
+    "tone": "Tone",
+    "selectedModules": "Selected Modules",
+    "noModules": "No modules selected",
+    "canvasCourse": "Canvas Course",
+    "courseId": "Course ID: {{id}}",
+    "quizId": "Quiz ID",
+    "created": "Created",
+    "lastUpdated": "Last Updated",
+    "tabs": {
+      "info": "Quiz Information",
+      "questions": "Questions"
+    }
+  },
+  "generationTrigger": {
+    "partialTitle": "Partial Success - Retry Available",
+    "failedTitle": "Question Generation Failed",
+    "partialMessage": "Some questions were generated successfully. Click below to retry generating the remaining {{count}} questions.",
+    "failedMessage": "The previous question generation attempt failed. Click below to retry generating {{count}} multiple-choice questions.",
+    "batchesSucceeded": "{{count}} batches succeeded",
+    "batchesFailed": "{{count}} batches failed",
+    "generationSettings": "Generation Settings",
+    "questionsCount": "Questions: {{count}}",
+    "retryFailedBatches": "Retry Failed Batches",
+    "retryGeneration": "Retry Question Generation",
+    "retryStarted": "Failed batch retry started",
+    "generationStarted": "Question generation started"
+  },
+  "questionTypeBreakdown": {
+    "batchesGeneratedByLLM": "Batches generated by LLM",
+    "noQuestionTypesConfigured": "No question types configured",
+    "moduleFallback": "Module {{id}}"
+  },
+  "questions": {
+    "title": "Question {{number}}",
+    "approved": "Approved",
+    "approvedOn": "Approved on {{date}}",
+    "correct": "Correct",
+    "explanationLabel": "Explanation:",
+    "displayError": "Display Error",
+    "loadingError": "Error loading question data",
+    "distractorLabel": "Distractor",
+    "correctAnswersLabel": "Correct Answers:",
+    "blankPosition": "Blank {{position}}:",
+    "variationsLabel": "Variations:",
+    "noQuestions": "No Questions Generated Yet",
+    "noQuestionsDescription": "Questions will appear here once the generation process is complete.",
+    "loadFailed": "Failed to Load Questions",
+    "loadFailedDescription": "There was an error loading the questions for this quiz.",
+    "notAvailable": "Questions Not Available Yet",
+    "notAvailableDescription": "Questions will appear here once the generation process is complete.",
+    "reviewTitle": "Review Questions",
+    "reviewDescription": "Review and approve each question individually. You can edit any question before approving it.",
+    "addQuestion": "Add Question",
+    "pendingApproval": "Pending Approval ({{count}})",
+    "allQuestions": "All Questions ({{count}})",
+    "noPending": "No Pending Questions",
+    "noQuestionsFound": "No Questions Found",
+    "allApprovedSwitch": "All questions have been approved! Switch to \"All Questions\" to see them.",
+    "noMatchFilter": "No questions match the current filter.",
+    "questionApproved": "Question approved",
+    "questionUpdated": "Question updated",
+    "questionRejected": "Question rejected",
+    "filter": {
+      "all": "All",
+      "approved": "Approved",
+      "pending": "Pending"
+    },
+    "stats": {
+      "approved": "{{count}} of {{total}} questions approved",
+      "progress": "Progress",
+      "countOf": "{{approved}} of {{total}}",
+      "allReviewed": "All questions have been reviewed and approved!",
+      "exportedSuccess": "Quiz has been successfully exported to Canvas",
+      "exportedOn": "Exported on {{date}}",
+      "noQuestionsYet": "No questions generated yet. Questions will appear here once generation is complete.",
+      "exportStarted": "Quiz export to Canvas started successfully",
+      "readyToExport": "Ready to export to Canvas"
+    },
+    "editor": {
+      "questionText": "Question Text",
+      "answerOptions": "Answer Options",
+      "optionA": "Option A",
+      "optionB": "Option B",
+      "optionC": "Option C",
+      "optionD": "Option D",
+      "correctAnswer": "Correct Answer",
+      "correctAnswers": "Correct Answers",
+      "explanation": "Explanation",
+      "explanationOptional": "Explanation (Optional)",
+      "cancel": "Cancel",
+      "saveChanges": "Save Changes",
+      "true": "True",
+      "false": "False",
+      "categories": "Categories",
+      "categoryName": "Category Name",
+      "items": "Items",
+      "addCategory": "Add Category",
+      "removeCategory": "Remove Category",
+      "addItem": "Add Item",
+      "removeItem": "Remove Item",
+      "matchingPairs": "Matching Pairs ({{count}}/{{max}})",
+      "pair": "Pair {{number}}",
+      "questionLeftItem": "Question/Left Item",
+      "answerRightItem": "Answer/Right Item",
+      "addPair": "Add Pair",
+      "removePair": "Remove Pair",
+      "pairsRequirement": "At least 3 pairs required, maximum 10 pairs allowed.",
+      "distractors": "Distractors ({{count}}/{{max}})",
+      "distractor": "Distractor {{number}}",
+      "addDistractor": "Add Distractor",
+      "distractorsDescription": "Optional incorrect answers that don't match any question. Maximum 5 allowed.",
+      "blanks": "Blanks",
+      "blankNumber": "Blank {{number}}",
+      "addBlank": "Add Blank",
+      "remove": "Remove",
+      "answerVariations": "Answer Variations",
+      "answerVariationsHelper": "Separate multiple variations with commas",
+      "caseSensitiveCheckbox": "Case sensitive",
+      "blankHelperText": "Use [blank_1], [blank_2], etc. to mark blanks in your question",
+      "addBlankDisabledText": "Add question text first to enable smart blank creation",
+      "nextPosition": "Next position: {{position}}",
+      "fixValidationErrors": "Fix validation errors to save",
+      "completeRequiredFields": "Complete required fields to save",
+      "noChangesToSave": "No changes to save",
+      "categoriesCount": "Categories ({{count}}/{{max}})",
+      "itemsCount": "Items ({{count}})",
+      "category": "Category {{number}}",
+      "acceptedVariations": "Accepted Variations",
+      "caseSensitive": "(Case sensitive)"
+    }
+  }
+}

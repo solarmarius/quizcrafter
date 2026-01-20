@@ -1,6 +1,7 @@
 import { Box, Container, Tabs, Text, VStack } from "@chakra-ui/react"
 import { createFileRoute } from "@tanstack/react-router"
 import { useState } from "react"
+import { useTranslation } from "react-i18next"
 
 import DeleteAccount from "@/components/UserSettings/DeleteAccount"
 import UserInformation from "@/components/UserSettings/UserInformation"
@@ -13,6 +14,7 @@ export const Route = createFileRoute("/_layout/settings")({
 function UserSettings() {
   const { user: currentUser } = useAuth()
   const [currentTab, setCurrentTab] = useState("my-profile")
+  const { t } = useTranslation("common")
 
   if (!currentUser) {
     return null
@@ -24,11 +26,9 @@ function UserSettings() {
         {/* Header */}
         <Box>
           <Text fontSize="3xl" fontWeight="bold">
-            User Settings
+            {t("userSettings.title")}
           </Text>
-          <Text color="gray.600">
-            Manage your account settings and preferences
-          </Text>
+          <Text color="gray.600">{t("userSettings.description")}</Text>
         </Box>
 
         {/* Settings Tabs */}
@@ -38,8 +38,12 @@ function UserSettings() {
           size="lg"
         >
           <Tabs.List>
-            <Tabs.Trigger value="my-profile">My profile</Tabs.Trigger>
-            <Tabs.Trigger value="danger-zone">Danger zone</Tabs.Trigger>
+            <Tabs.Trigger value="my-profile">
+              {t("userSettings.tabs.myProfile")}
+            </Tabs.Trigger>
+            <Tabs.Trigger value="danger-zone">
+              {t("userSettings.tabs.dangerZone")}
+            </Tabs.Trigger>
           </Tabs.List>
 
           <Tabs.Content value="my-profile">

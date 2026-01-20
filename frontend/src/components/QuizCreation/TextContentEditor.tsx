@@ -1,5 +1,6 @@
 import { Box, Text, Textarea, VStack } from "@chakra-ui/react"
 import { memo, useCallback } from "react"
+import { useTranslation } from "react-i18next"
 
 interface TextContentEditorProps {
   /** Current text content value */
@@ -38,8 +39,11 @@ export const TextContentEditor = memo(function TextContentEditor({
   onChange,
   disabled = false,
   error,
-  placeholder = "Paste your course content here...",
+  placeholder,
 }: TextContentEditorProps) {
+  const { t } = useTranslation("creation")
+  const finalPlaceholder = placeholder || t("textContent.placeholder")
+
   const handleChange = useCallback(
     (e: React.ChangeEvent<HTMLTextAreaElement>) => {
       onChange(e.target.value)
@@ -54,14 +58,14 @@ export const TextContentEditor = memo(function TextContentEditor({
   return (
     <VStack gap={4} align="stretch">
       <Text fontSize="lg" fontWeight="semibold">
-        Enter Text Content
+        {t("textContent.title")}
       </Text>
 
       <Box position="relative">
         <Textarea
           value={value}
           onChange={handleChange}
-          placeholder={placeholder}
+          placeholder={finalPlaceholder}
           disabled={disabled}
           resize="vertical"
           minH="300px"
@@ -92,7 +96,10 @@ export const TextContentEditor = memo(function TextContentEditor({
           fontSize="xs"
           color="gray.600"
         >
-          {wordCount} words, {characterCount} characters
+          {t("textContent.stats", {
+            words: wordCount,
+            characters: characterCount,
+          })}
         </Box>
       </Box>
 
@@ -111,8 +118,7 @@ export const TextContentEditor = memo(function TextContentEditor({
       )}
 
       <Text fontSize="sm" color="gray.600">
-        Enter the content you want to generate questions from. This could be
-        lecture notes, course materials, or any educational text content.
+        {t("textContent.description")}
       </Text>
     </VStack>
   )

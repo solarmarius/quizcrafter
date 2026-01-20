@@ -10,6 +10,7 @@ import {
 } from "@chakra-ui/react"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { memo, useMemo } from "react"
+import { useTranslation } from "react-i18next"
 import { SiCanvas } from "react-icons/si"
 
 import { type Quiz, QuizService } from "@/client"
@@ -56,6 +57,7 @@ interface QuestionStatsProps {
 export const QuestionStats = memo(function QuestionStats({
   quiz,
 }: QuestionStatsProps) {
+  const { t, i18n } = useTranslation("quiz")
   const { showSuccessToast } = useCustomToast()
   const { handleError } = useErrorHandler()
   const queryClient = useQueryClient()
@@ -98,7 +100,7 @@ export const QuestionStats = memo(function QuestionStats({
       return await QuizService.exportQuizToCanvas({ quizId: quiz.id })
     },
     onSuccess: async () => {
-      showSuccessToast("Quiz export to Canvas started successfully")
+      showSuccessToast(t("questions.stats.exportStarted"))
 
       // Add small delay to ensure backend has processed the export request
       // This improves the chances of catching the status update on first try
@@ -130,6 +132,18 @@ export const QuestionStats = memo(function QuestionStats({
     onError: handleError,
   })
 
+  // Format exported date based on current language
+  const formatExportDate = (dateString: string) => {
+    const locale = i18n.language === "no" ? "nb-NO" : "en-GB"
+    return new Date(dateString).toLocaleDateString(locale, {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    })
+  }
+
   if (isLoading) {
     return <QuestionStatsSkeleton />
   }
@@ -139,8 +153,8 @@ export const QuestionStats = memo(function QuestionStats({
       <Card.Root>
         <Card.Body>
           <ErrorState
-            title="Failed to load question statistics"
-            message="There was an error loading the statistics for this quiz."
+            title={t("questions.loadFailed")}
+            message={t("questions.loadFailedDescription")}
             showRetry={false}
           />
         </Card.Body>
@@ -154,7 +168,7 @@ export const QuestionStats = memo(function QuestionStats({
         <HStack justify="space-between" mb={2}>
           {" "}
           <Text fontSize="xl" fontWeight="semibold">
-            Progress
+            {t("questions.stats.progress")}
           </Text>
           <HStack justify="flex-end" mb={2}>
             <Text fontSize="sm" color="gray.600">
@@ -162,7 +176,10 @@ export const QuestionStats = memo(function QuestionStats({
             </Text>
             <HStack justify="center">
               <Badge variant="outline" colorScheme="green" size="lg">
-                {stats.approved_questions} of {stats.total_questions}
+                {t("questions.stats.countOf", {
+                  approved: stats.approved_questions,
+                  total: stats.total_questions,
+                })}
               </Badge>
             </HStack>
           </HStack>
@@ -197,7 +214,7 @@ export const QuestionStats = memo(function QuestionStats({
                   textAlign="center"
                   mb={quiz.status !== QUIZ_STATUS.PUBLISHED ? 3 : 2}
                 >
-                  All questions have been reviewed and approved!
+                  {t("questions.stats.allReviewed")}
                 </Text>
 
                 {(() => {
@@ -217,7 +234,7 @@ export const QuestionStats = memo(function QuestionStats({
                         width="100%"
                       >
                         <SiCanvas />
-                        Post to Canvas
+                        {t("actions.postToCanvas")}
                       </Button>
                     )
                   }
@@ -231,7 +248,7 @@ export const QuestionStats = memo(function QuestionStats({
                           color="green.600"
                           textAlign="center"
                         >
-                          Quiz has been successfully exported to Canvas
+                          {t("questions.stats.exportedSuccess")}
                         </Text>
                         {quiz.exported_at && (
                           <Text
@@ -239,17 +256,9 @@ export const QuestionStats = memo(function QuestionStats({
                             color="green.500"
                             textAlign="center"
                           >
-                            Exported on{" "}
-                            {new Date(quiz.exported_at).toLocaleDateString(
-                              "en-GB",
-                              {
-                                year: "numeric",
-                                month: "long",
-                                day: "numeric",
-                                hour: "2-digit",
-                                minute: "2-digit",
-                              },
-                            )}
+                            {t("questions.stats.exportedOn", {
+                              date: formatExportDate(quiz.exported_at),
+                            })}
                           </Text>
                         )}
                       </VStack>
@@ -270,8 +279,7 @@ export const QuestionStats = memo(function QuestionStats({
               borderColor="gray.200"
             >
               <Text fontSize="sm" color="gray.600" textAlign="center">
-                No questions generated yet. Questions will appear here once
-                generation is complete.
+                {t("questions.stats.noQuestionsYet")}
               </Text>
             </Box>
           )}

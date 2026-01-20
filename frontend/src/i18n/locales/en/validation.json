@@ -1,0 +1,13 @@
+{
+  "questionBatch": {
+    "maxBatches": "Maximum 4 question batches per module",
+    "duplicateTypes": "Cannot have duplicate question types in the same module",
+    "duplicateCombinations": "Cannot have duplicate question type and difficulty combinations",
+    "invalidCount": "Question count must be between 1 and 20",
+    "noBatches": "Each module must have at least one question batch"
+  },
+  "quiz": {
+    "minTitleLength": "Title is required",
+    "maxTitleLength": "Title must be less than 255 characters"
+  }
+}

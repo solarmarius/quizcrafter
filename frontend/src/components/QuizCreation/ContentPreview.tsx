@@ -1,5 +1,6 @@
 import { Box, HStack, Spinner, Text, VStack } from "@chakra-ui/react"
 import { memo } from "react"
+import { useTranslation } from "react-i18next"
 
 interface ContentPreviewProps {
   /** Content preview text */
@@ -36,16 +37,18 @@ export const ContentPreview = memo(function ContentPreview({
   wordCount,
   isLoading = false,
 }: ContentPreviewProps) {
+  const { t } = useTranslation("creation")
+
   if (isLoading) {
     return (
       <VStack gap={4} align="center" py={8}>
         <Spinner size="lg" color="blue.500" />
         <VStack gap={1}>
           <Text fontSize="lg" fontWeight="medium">
-            Processing content...
+            {t("contentPreview.processing")}
           </Text>
           <Text fontSize="sm" color="gray.600">
-            This may take a few seconds
+            {t("contentPreview.processingHint")}
           </Text>
         </VStack>
       </VStack>
@@ -55,7 +58,7 @@ export const ContentPreview = memo(function ContentPreview({
   if (!content) {
     return (
       <Box p={6} bg="gray.50" borderRadius="md" textAlign="center">
-        <Text color="gray.600">No content to preview yet</Text>
+        <Text color="gray.600">{t("contentPreview.noContent")}</Text>
       </Box>
     )
   }
@@ -64,13 +67,13 @@ export const ContentPreview = memo(function ContentPreview({
     <VStack gap={4} align="stretch">
       <HStack justify="space-between" align="center">
         <Text fontSize="lg" fontWeight="semibold">
-          Content Preview
+          {t("contentPreview.title")}
         </Text>
 
         <HStack gap={4}>
           <Box>
             <Text fontSize="sm" color="gray.600">
-              Word Count
+              {t("contentPreview.wordCount")}
             </Text>
             <Text fontSize="lg" fontWeight="bold" color="blue.600">
               {wordCount.toLocaleString()}
