@@ -1812,10 +1812,10 @@ def validate_multiple_choice_question(entry: dict):
                 )
 
         choice_id = choice["id"]
-        if not isinstance(choice_id, str) or not choice_id.startswith("choice_"):
+        if not isinstance(choice_id, str) or not choice_id.strip():
             raise HTTPException(
                 status_code=400,
-                detail=f"item[entry][interaction_data][choices][{i}][id] must be a string starting with 'choice_'",
+                detail=f"item[entry][interaction_data][choices][{i}][id] must be a non-empty string",
             )
 
         if choice_id in choice_ids:
