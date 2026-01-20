@@ -77,7 +77,8 @@
     "questions": "spørsmål",
     "modules": "moduler",
     "words": "ord",
-    "batches": "grupper"
+    "batches": "grupper",
+    "notAvailable": "Ikke tilgjengelig"
   },
   "time": {
     "justNow": "akkurat nå",
@@ -104,7 +105,7 @@
     "language": {
       "title": "Språk for grensesnitt",
       "description": "Velg ditt foretrukne språk for applikasjonsgrensesnittet. Dette er uavhengig av quiz-innholdsspråket.",
-      "englishDescription": "Use English for the user interface",
+      "englishDescription": "Bruk engelsk for brukergrensesnittet",
       "norwegianDescription": "Bruk norsk for brukergrensesnittet"
     }
   },
@@ -147,6 +148,14 @@
       "message": "Siden du leter etter ble ikke funnet.",
       "goBack": "Gå tilbake"
     }
+  },
+  "login": {
+    "welcome": "Velkommen til QuizCrafter",
+    "description": "Gjør Canvas-kursmaterialet ditt om til quizer av høy kvalitet med LLM-er. Bygg spørsmålsbanken din, godkjenn med et klikk, og generer quizer på få minutter.",
+    "errorMessage": "Det oppstod en feil under behandling av forespørselen din: {{error}}",
+    "helpTitle": "Usikker på hvordan det fungerer?",
+    "videoTitle": "QuizCrafter demonstrasjonsvideo",
+    "videoDescription": "Se hvordan QuizCrafter sømløst integreres med Canvas for å analysere kursmaterialet ditt og generere quizer av høy kvalitet."
   },
   "navigation": {
     "backToQuestionTypes": "Tilbake til spørsmålstyper"

@@ -87,7 +87,7 @@ const UserInformation = () => {
                 truncate
                 maxW="sm"
               >
-                {currentUser?.name || "N/A"}
+                {currentUser?.name || t("labels.notAvailable")}
               </Text>
             )}
           </FormField>

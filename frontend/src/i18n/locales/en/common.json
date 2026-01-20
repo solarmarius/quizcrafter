@@ -77,7 +77,8 @@
     "questions": "questions",
     "modules": "modules",
     "words": "words",
-    "batches": "batches"
+    "batches": "batches",
+    "notAvailable": "N/A"
   },
   "time": {
     "justNow": "just now",
@@ -147,6 +148,14 @@
       "message": "The page you are looking for was not found.",
       "goBack": "Go Back"
     }
+  },
+  "login": {
+    "welcome": "Welcome to QuizCrafter",
+    "description": "Turn your Canvas course material into high-quality quizzes with LLMs. Build your question bank, approve with a click, and generate quizzes in minutes.",
+    "errorMessage": "There was an error processing your request: {{error}}",
+    "helpTitle": "Unsure how it works?",
+    "videoTitle": "QuizCrafter demonstration video",
+    "videoDescription": "Watch how QuizCrafter seamlessly integrates with Canvas to analyze your course materials and generate high-quality quizzes."
   },
   "navigation": {
     "backToQuestionTypes": "Back to Question Types"
