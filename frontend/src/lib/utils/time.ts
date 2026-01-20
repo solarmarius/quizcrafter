@@ -54,26 +54,6 @@ export function getRelativeTimeData(timestamp: string): {
 }
 
 /**
- * Format a timestamp as a relative time string (e.g., "2 hours ago")
- * @deprecated Use getRelativeTimeData with translations instead
- */
-export function formatTimeAgo(timestamp: string): string {
-  const data = getRelativeTimeData(timestamp)
-  if (!data) return ""
-
-  switch (data.key) {
-    case "justNow":
-      return "just now"
-    case "minutesAgo":
-      return `${data.count} minute${data.count === 1 ? "" : "s"} ago`
-    case "hoursAgo":
-      return `${data.count} hour${data.count === 1 ? "" : "s"} ago`
-    case "daysAgo":
-      return `${data.count} day${data.count === 1 ? "" : "s"} ago`
-  }
-}
-
-/**
  * Get the current timestamp as an ISO string
  */
 export function getCurrentTimestamp(): string {
