@@ -47,7 +47,7 @@ export const FileUploadZone = memo(function FileUploadZone({
   error,
   onValidationError,
 }: FileUploadZoneProps) {
-  const { t } = useTranslation("creation")
+  const { t } = useTranslation(["creation", "common"])
   const [selectedFiles, setSelectedFiles] = useState<File[]>([])
   const [localValidationError, setLocalValidationError] = useState<
     string | null
@@ -235,7 +235,9 @@ export const FileUploadZone = memo(function FileUploadZone({
                   </Text>
                 </VStack>
                 <IconButton
-                  aria-label={`Remove ${file.name}`}
+                  aria-label={t("common:accessibility.removeFile", {
+                    fileName: file.name,
+                  })}
                   size="sm"
                   variant="ghost"
                   colorScheme="red"

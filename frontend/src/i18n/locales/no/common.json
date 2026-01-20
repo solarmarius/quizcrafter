@@ -147,5 +147,16 @@
       "message": "Siden du leter etter ble ikke funnet.",
       "goBack": "Gå tilbake"
     }
+  },
+  "navigation": {
+    "backToQuestionTypes": "Tilbake til spørsmålstyper"
+  },
+  "accessibility": {
+    "close": "Lukk",
+    "removeFile": "Fjern {{fileName}}",
+    "removePair": "Fjern par {{number}}",
+    "removeDistractor": "Fjern distraktor {{number}}",
+    "removeCategory": "Fjern kategori {{number}}",
+    "removeItem": "Fjern element {{number}}"
   }
 }

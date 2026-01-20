@@ -1,5 +1,6 @@
 import { Card, HStack, Table, VStack } from "@chakra-ui/react"
 import { memo } from "react"
+import { useTranslation } from "react-i18next"
 
 import { UI_SIZES } from "@/lib/constants"
 import { LoadingSkeleton } from "./LoadingSkeleton"
@@ -11,18 +12,20 @@ interface QuizTableSkeletonProps {
 export const QuizTableSkeleton = memo(function QuizTableSkeleton({
   rows = 5,
 }: QuizTableSkeletonProps) {
+  const { t } = useTranslation("dashboard")
+
   return (
     <Card.Root>
       <Card.Body p={0}>
         <Table.Root>
           <Table.Header>
             <Table.Row>
-              <Table.ColumnHeader>Quiz Title</Table.ColumnHeader>
-              <Table.ColumnHeader>Course</Table.ColumnHeader>
-              <Table.ColumnHeader>Questions</Table.ColumnHeader>
-              <Table.ColumnHeader>Status</Table.ColumnHeader>
-              <Table.ColumnHeader>Created</Table.ColumnHeader>
-              <Table.ColumnHeader>Actions</Table.ColumnHeader>
+              <Table.ColumnHeader>{t("table.quizTitle")}</Table.ColumnHeader>
+              <Table.ColumnHeader>{t("table.course")}</Table.ColumnHeader>
+              <Table.ColumnHeader>{t("table.questions")}</Table.ColumnHeader>
+              <Table.ColumnHeader>{t("table.status")}</Table.ColumnHeader>
+              <Table.ColumnHeader>{t("table.created")}</Table.ColumnHeader>
+              <Table.ColumnHeader>{t("table.actions")}</Table.ColumnHeader>
             </Table.Row>
           </Table.Header>
           <Table.Body>

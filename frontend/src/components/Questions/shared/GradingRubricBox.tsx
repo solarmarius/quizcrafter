@@ -1,5 +1,6 @@
 import { Box, Text } from "@chakra-ui/react"
 import { memo } from "react"
+import { useTranslation } from "react-i18next"
 
 interface GradingRubricBoxProps {
   rubric: string
@@ -8,6 +9,8 @@ interface GradingRubricBoxProps {
 export const GradingRubricBox = memo(function GradingRubricBox({
   rubric,
 }: GradingRubricBoxProps) {
+  const { t } = useTranslation("quiz")
+
   return (
     <Box
       p={3}
@@ -17,7 +20,7 @@ export const GradingRubricBox = memo(function GradingRubricBox({
       borderColor="green.200"
     >
       <Text fontSize="sm" fontWeight="medium" color="green.700" mb={1}>
-        Grading Rubric:
+        {t("questions.gradingRubric")}
       </Text>
       <Text fontSize="sm" color="green.600" whiteSpace="pre-wrap">
         {rubric}

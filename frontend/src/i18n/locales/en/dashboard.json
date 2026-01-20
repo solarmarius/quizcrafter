@@ -57,5 +57,17 @@
     "emptyDescription": "You haven't created any quizzes yet. Get started by creating your first quiz.",
     "loadFailed": "Failed to Load Quizzes",
     "loadFailedMessage": "There was an error loading your quizzes. Please try again."
+  },
+  "badges": {
+    "questionCount": "{{count}} question",
+    "questionCount_other": "{{count}} questions"
+  },
+  "table": {
+    "quizTitle": "Quiz Title",
+    "course": "Course",
+    "questions": "Questions",
+    "status": "Status",
+    "created": "Created",
+    "actions": "Actions"
   }
 }

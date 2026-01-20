@@ -147,5 +147,16 @@
       "message": "The page you are looking for was not found.",
       "goBack": "Go Back"
     }
+  },
+  "navigation": {
+    "backToQuestionTypes": "Back to Question Types"
+  },
+  "accessibility": {
+    "close": "Close",
+    "removeFile": "Remove {{fileName}}",
+    "removePair": "Remove pair {{number}}",
+    "removeDistractor": "Remove distractor {{number}}",
+    "removeCategory": "Remove category {{number}}",
+    "removeItem": "Remove item {{number}}"
   }
 }

@@ -158,7 +158,7 @@ export const MatchingEditor = memo(function MatchingEditor({
             >
               <Textarea
                 {...field}
-                placeholder="Enter the matching question instructions..."
+                placeholder={t("placeholders.matchingInstructions")}
                 rows={3}
               />
             </FormField>
@@ -214,7 +214,7 @@ export const MatchingEditor = memo(function MatchingEditor({
                         >
                           <Input
                             {...inputField}
-                            placeholder="Enter question or left item..."
+                            placeholder={t("placeholders.matchingQuestion")}
                           />
                         </FormField>
                       )}
@@ -232,7 +232,7 @@ export const MatchingEditor = memo(function MatchingEditor({
                         >
                           <Input
                             {...inputField}
-                            placeholder="Enter answer or right item..."
+                            placeholder={t("placeholders.matchingAnswer")}
                           />
                         </FormField>
                       )}
@@ -292,7 +292,7 @@ export const MatchingEditor = memo(function MatchingEditor({
                       onChange={(e) =>
                         handleDistractorChange(index, e.target.value)
                       }
-                      placeholder="Enter incorrect answer option..."
+                      placeholder={t("placeholders.matchingDistractor")}
                     />
                   </FormField>
                 </Box>
@@ -336,7 +336,7 @@ export const MatchingEditor = memo(function MatchingEditor({
             >
               <Textarea
                 {...field}
-                placeholder="Optional explanation for the correct matches..."
+                placeholder={t("placeholders.matchingExplanation")}
                 rows={3}
               />
             </FormField>

@@ -106,7 +106,7 @@ test.describe("HelpPanel Component", () => {
     await expect(githubLink).toBeVisible()
     await expect(githubLink).toHaveAttribute(
       "href",
-      "https://github.com/uit-no/quizcrafter",
+      "https://github.com/solarmarius/quizcrafter",
     )
   })
 

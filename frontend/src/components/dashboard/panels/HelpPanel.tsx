@@ -8,7 +8,7 @@ import {
   Text,
   VStack,
 } from "@chakra-ui/react"
-import { useTranslation } from "react-i18next"
+import { Trans, useTranslation } from "react-i18next"
 import { LuExternalLink } from "react-icons/lu"
 
 export function HelpPanel() {
@@ -111,7 +111,7 @@ export function HelpPanel() {
                 {t("panels.help.helpfulLinks.contactDeveloper")}
               </Link>
               <Link
-                href="https://github.com/uit-no/quizcrafter"
+                href="https://github.com/solarmarius/quizcrafter"
                 fontSize="sm"
                 color="blue.600"
                 _hover={{ textDecoration: "underline" }}
@@ -148,14 +148,19 @@ export function HelpPanel() {
           <Alert.Root status="info" variant="subtle" colorPalette="orange">
             <Alert.Content>
               <Alert.Description>
-                {t("common:userSettings.privacyNotice")}{" "}
-                <Link
-                  href="/privacy-policy"
-                  color="blue.500"
-                  textDecoration="underline"
-                >
-                  Privacy Policy
-                </Link>
+                <Trans
+                  i18nKey="userSettings.privacyNotice"
+                  ns="common"
+                  components={{
+                    privacyLink: (
+                      <Link
+                        href="/privacy-policy"
+                        color="blue.500"
+                        textDecoration="underline"
+                      />
+                    ),
+                  }}
+                />
               </Alert.Description>
             </Alert.Content>
           </Alert.Root>

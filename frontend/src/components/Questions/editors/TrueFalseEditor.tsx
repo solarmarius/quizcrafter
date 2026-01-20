@@ -65,7 +65,7 @@ export const TrueFalseEditor = memo(function TrueFalseEditor({
             >
               <Textarea
                 {...field}
-                placeholder="Enter your true/false statement..."
+                placeholder={t("placeholders.trueFalseStatement")}
                 rows={3}
               />
             </FormField>
@@ -106,7 +106,7 @@ export const TrueFalseEditor = memo(function TrueFalseEditor({
             >
               <Textarea
                 {...field}
-                placeholder="Optional explanation for the correct answer..."
+                placeholder={t("placeholders.trueFalseExplanation")}
                 rows={3}
               />
             </FormField>

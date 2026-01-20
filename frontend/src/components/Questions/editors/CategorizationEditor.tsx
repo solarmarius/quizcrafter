@@ -217,7 +217,7 @@ function CategorizationEditorComponent({
               render={({ field }) => (
                 <Textarea
                   {...field}
-                  placeholder="Enter instructions for the categorization question..."
+                  placeholder={t("placeholders.categorizationInstructions")}
                   rows={3}
                 />
               )}
@@ -324,7 +324,9 @@ function CategorizationEditorComponent({
                             render={({ field: inputField }) => (
                               <Input
                                 {...inputField}
-                                placeholder="Enter distractor text..."
+                                placeholder={t(
+                                  "placeholders.categorizationDistractor",
+                                )}
                                 size="sm"
                               />
                             )}
@@ -364,7 +366,7 @@ function CategorizationEditorComponent({
               render={({ field }) => (
                 <Textarea
                   {...field}
-                  placeholder="Optional explanation for the correct categorization..."
+                  placeholder={t("placeholders.categorizationExplanation")}
                   rows={3}
                 />
               )}
@@ -467,7 +469,7 @@ function CategoryEditor({
               render={({ field }) => (
                 <Input
                   {...field}
-                  placeholder="Enter category name..."
+                  placeholder={t("placeholders.categorizationCategory")}
                   size="sm"
                 />
               )}
@@ -502,7 +504,7 @@ function CategoryEditor({
                         <Box>
                           <Input
                             {...inputField}
-                            placeholder="Enter item text..."
+                            placeholder={t("placeholders.categorizationItem")}
                             size="sm"
                             bg="green.50"
                             borderColor="green.300"

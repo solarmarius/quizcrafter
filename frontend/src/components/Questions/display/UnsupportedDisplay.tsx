@@ -1,10 +1,13 @@
 import { Box, Text } from "@chakra-ui/react"
+import { useTranslation } from "react-i18next"
 
 interface UnsupportedDisplayProps {
   questionType: string
 }
 
 export function UnsupportedDisplay({ questionType }: UnsupportedDisplayProps) {
+  const { t } = useTranslation("quiz")
+
   return (
     <Box
       p={4}
@@ -14,11 +17,10 @@ export function UnsupportedDisplay({ questionType }: UnsupportedDisplayProps) {
       borderColor="orange.200"
     >
       <Text fontSize="md" fontWeight="medium" color="orange.700" mb={1}>
-        Unsupported Question Type
+        {t("questions.unsupportedType")}
       </Text>
       <Text fontSize="sm" color="orange.600">
-        Question type "{questionType}" is not yet supported in the display
-        interface.
+        {t("questions.unsupportedTypeMessage", { questionType })}
       </Text>
     </Box>
   )

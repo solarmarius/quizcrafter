@@ -195,7 +195,7 @@ export const FillInBlankEditor = memo(function FillInBlankEditor({
             >
               <Textarea
                 {...field}
-                placeholder="Enter question text with blanks marked as [blank_1], [blank_2]..."
+                placeholder={t("quiz:placeholders.fillInBlankQuestion")}
                 rows={3}
               />
             </FormField>
@@ -239,7 +239,7 @@ export const FillInBlankEditor = memo(function FillInBlankEditor({
                       >
                         <Input
                           {...field}
-                          placeholder="Enter correct answer..."
+                          placeholder={t("quiz:placeholders.fillInBlankAnswer")}
                         />
                       </FormField>
                     )}
@@ -260,7 +260,9 @@ export const FillInBlankEditor = memo(function FillInBlankEditor({
                       >
                         <Input
                           {...field}
-                          placeholder="Enter variations separated by commas..."
+                          placeholder={t(
+                            "quiz:placeholders.fillInBlankVariations",
+                          )}
                         />
                       </FormField>
                     )}
@@ -320,7 +322,7 @@ export const FillInBlankEditor = memo(function FillInBlankEditor({
             >
               <Textarea
                 {...field}
-                placeholder="Enter explanation for the answers..."
+                placeholder={t("quiz:placeholders.fillInBlankExplanation")}
                 rows={2}
               />
             </FormField>

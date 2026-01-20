@@ -57,5 +57,17 @@
     "emptyDescription": "Du har ikke opprettet noen quizer ennå. Kom i gang ved å opprette din første quiz.",
     "loadFailed": "Kunne ikke laste quizer",
     "loadFailedMessage": "Det oppstod en feil ved lasting av quizene dine. Vennligst prøv igjen."
+  },
+  "badges": {
+    "questionCount": "{{count}} spørsmål",
+    "questionCount_other": "{{count}} spørsmål"
+  },
+  "table": {
+    "quizTitle": "Quiz-tittel",
+    "course": "Emne",
+    "questions": "Spørsmål",
+    "status": "Status",
+    "created": "Opprettet",
+    "actions": "Handlinger"
   }
 }

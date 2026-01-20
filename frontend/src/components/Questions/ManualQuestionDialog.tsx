@@ -160,7 +160,7 @@ export const ManualQuestionDialog = memo(function ManualQuestionDialog({
                     onClick={handleBackToTypeSelection}
                     disabled={createQuestionMutation.isPending}
                   >
-                    ← Back to Question Types
+                    ← {t("common:navigation.backToQuestionTypes")}
                   </Button>
 
                   <ManualQuestionCreator
