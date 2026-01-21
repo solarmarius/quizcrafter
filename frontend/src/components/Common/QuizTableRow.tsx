@@ -1,12 +1,13 @@
 import { Badge, HStack, Table, Text, VStack } from "@chakra-ui/react"
 import { Link as RouterLink } from "@tanstack/react-router"
 import { memo } from "react"
+import { useTranslation } from "react-i18next"
 
 import type { Quiz } from "@/client/types.gen"
 import { Button } from "@/components/ui/button"
 import { StatusLight } from "@/components/ui/status-light"
 import { useFormattedDate } from "@/hooks"
-import { getQuizStatusText, getSelectedModulesCount } from "@/lib/utils"
+import { getQuizStatusKey, getSelectedModulesCount } from "@/lib/utils"
 
 interface QuizTableRowProps {
   quiz: Quiz
@@ -15,24 +16,20 @@ interface QuizTableRowProps {
 export const QuizTableRow = memo(function QuizTableRow({
   quiz,
 }: QuizTableRowProps) {
+  const { t } = useTranslation(["quiz", "common"])
   const moduleCount = getSelectedModulesCount(quiz)
   const formattedCreatedAt = useFormattedDate(quiz.created_at, "short")
 
   return (
     <Table.Row key={quiz.id}>
       <Table.Cell>
-        <VStack align="start" gap={1}>
-          <Text fontWeight="medium">{quiz.title}</Text>
-          <Text fontSize="sm" color="gray.500">
-            {moduleCount} module{moduleCount !== 1 ? "s" : ""} selected
-          </Text>
-        </VStack>
+        <Text fontWeight="medium">{quiz.title}</Text>
       </Table.Cell>
       <Table.Cell>
         <VStack align="start" gap={1}>
           <Text>{quiz.canvas_course_name}</Text>
           <Text fontSize="sm" color="gray.500">
-            ID: {quiz.canvas_course_id}
+            {t("quiz:table.modulesSelected", { count: moduleCount })}
           </Text>
         </VStack>
       </Table.Cell>
@@ -45,18 +42,21 @@ export const QuizTableRow = memo(function QuizTableRow({
         <HStack gap={2} align="center">
           <StatusLight status={quiz.status || "created"} />
           <Text fontSize="sm" color="gray.600">
-            {getQuizStatusText(quiz)}
+            {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+            {(t as any)(`quiz:status.${getQuizStatusKey(quiz)}`)}
           </Text>
         </HStack>
       </Table.Cell>
       <Table.Cell>
-        <Text fontSize="sm">{formattedCreatedAt || "Unknown"}</Text>
+        <Text fontSize="sm">
+          {formattedCreatedAt || t("common:status.unknown")}
+        </Text>
       </Table.Cell>
       <Table.Cell>
         <HStack gap={2}>
           <Button size="sm" variant="outline" asChild>
             <RouterLink to={`/quiz/${quiz.id}`} params={{ id: quiz.id! }}>
-              View
+              {t("common:actions.view")}
             </RouterLink>
           </Button>
         </HStack>

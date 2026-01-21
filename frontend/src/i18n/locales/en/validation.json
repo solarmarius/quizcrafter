@@ -1,0 +1,93 @@
+{
+  "questionBatch": {
+    "maxBatches": "Maximum 4 question batches per module",
+    "duplicateTypes": "Cannot have duplicate question types in the same module",
+    "duplicateCombinations": "Cannot have duplicate question type and difficulty combinations",
+    "invalidCount": "Question count must be between 1 and 20",
+    "invalidCountWithIndex": "Batch {{index}}: Question count must be between 1 and 20",
+    "noBatches": "Each module must have at least one question batch"
+  },
+  "quiz": {
+    "minTitleLength": "Title is required",
+    "maxTitleLength": "Title must be less than 255 characters"
+  },
+  "fillInBlank": {
+    "header": "Validation Errors ({{count}})",
+    "fixMessage": "Please fix the following issues before saving:",
+    "howToFix": "How to fix:",
+    "details": "Details:",
+    "positions": "Positions: {{positions}}",
+    "invalidTags": "Invalid tags: {{tags}}",
+    "missingPositions": "Missing positions: {{positions}}",
+    "extraPositions": "Extra positions: {{positions}}",
+    "criticalIssues": "Critical Issues:",
+    "warnings": "Warnings:",
+    "information": "Information:",
+    "quickHelp": "Quick Help:",
+    "quickHelpText": "Fill-in-the-blank questions need [blank_1], [blank_2] tags in the question text with matching blank configurations below. Positions must be sequential (1, 2, 3...) and synchronized between text and configuration.",
+    "errorCount": "{{count}} validation error found",
+    "errorCount_other": "{{count}} validation errors found",
+    "andMore": "(and {{count}} more)",
+    "suggestions": {
+      "invalidTagFormat": {
+        "1": "Use lowercase format: [blank_1], [blank_2], etc.",
+        "2": "Ensure proper brackets and underscore",
+        "3": "Use only numeric positions"
+      },
+      "caseSensitivity": {
+        "1": "Change uppercase [BLANK_1] to lowercase [blank_1]",
+        "2": "Use consistent lowercase formatting throughout question"
+      },
+      "duplicatePositions": {
+        "1": "Each blank position should appear only once in question text",
+        "2": "Check for duplicate [blank_N] tags and remove extras",
+        "3": "Use sequential numbering: [blank_1], [blank_2], [blank_3]"
+      },
+      "nonSequentialPositions": {
+        "1": "Renumber blanks sequentially starting from 1",
+        "2": "Avoid gaps in numbering (e.g., [blank_1], [blank_3])",
+        "3": "Update blank configurations to match sequential positions"
+      },
+      "positionGap": {
+        "1": "Fill in missing blank positions",
+        "2": "Ensure continuous numbering without gaps",
+        "3": "Add missing [blank_N] tags to question text"
+      },
+      "missingBlankConfig": {
+        "1": "Add blank configurations for each [blank_N] tag in question text",
+        "2": "Click \"Add Blank\" to create missing configurations",
+        "3": "Ensure position numbers match question text"
+      },
+      "extraBlankConfig": {
+        "1": "Remove blank configurations without corresponding [blank_N] tags",
+        "2": "Add missing [blank_N] tags to question text",
+        "3": "Ensure synchronization between text and configurations"
+      },
+      "unsynchronizedBlanks": {
+        "1": "Ensure each [blank_N] tag has a corresponding blank configuration",
+        "2": "Remove extra configurations or add missing question text tags",
+        "3": "Check position numbers match exactly"
+      },
+      "noBlanksInText": {
+        "1": "Add at least one [blank_1] tag to your question text",
+        "2": "Identify the word or phrase to be filled in",
+        "3": "Replace it with [blank_1], [blank_2], etc."
+      },
+      "noBlankConfigurations": {
+        "1": "Click \"Add Blank\" to create blank configurations",
+        "2": "Provide correct answers for each blank position",
+        "3": "Configure answer variations if needed"
+      }
+    }
+  },
+  "editors": {
+    "mcqLoadError": "Error loading MCQ question data",
+    "fillInBlankLoadError": "Error loading Fill in Blank question data",
+    "editorError": "Editor Error",
+    "unsupportedType": "Unsupported Question Type",
+    "unsupportedMessage": "Editing for question type \"{{questionType}}\" is not yet supported."
+  },
+  "questions": {
+    "createSuccess": "Question created successfully"
+  }
+}

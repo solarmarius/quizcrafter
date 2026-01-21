@@ -1,5 +1,6 @@
 import { Box, Text } from "@chakra-ui/react"
 import { memo } from "react"
+import { useTranslation } from "react-i18next"
 
 interface SampleAnswerBoxProps {
   sampleAnswer: string
@@ -8,6 +9,8 @@ interface SampleAnswerBoxProps {
 export const SampleAnswerBox = memo(function SampleAnswerBox({
   sampleAnswer,
 }: SampleAnswerBoxProps) {
+  const { t } = useTranslation("quiz")
+
   return (
     <Box
       p={3}
@@ -17,7 +20,7 @@ export const SampleAnswerBox = memo(function SampleAnswerBox({
       borderColor="blue.200"
     >
       <Text fontSize="sm" fontWeight="medium" color="blue.700" mb={1}>
-        Sample Answer:
+        {t("questions.sampleAnswer")}
       </Text>
       <Text fontSize="sm" color="blue.600" whiteSpace="pre-wrap">
         {sampleAnswer}

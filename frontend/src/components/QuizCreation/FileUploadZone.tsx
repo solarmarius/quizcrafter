@@ -8,6 +8,7 @@ import {
   VStack,
 } from "@chakra-ui/react"
 import { memo, useCallback, useState } from "react"
+import { useTranslation } from "react-i18next"
 import { HiUpload, HiX } from "react-icons/hi"
 
 interface FileUploadZoneProps {
@@ -46,6 +47,7 @@ export const FileUploadZone = memo(function FileUploadZone({
   error,
   onValidationError,
 }: FileUploadZoneProps) {
+  const { t } = useTranslation(["creation", "common"])
   const [selectedFiles, setSelectedFiles] = useState<File[]>([])
   const [localValidationError, setLocalValidationError] = useState<
     string | null
@@ -60,21 +62,22 @@ export const FileUploadZone = memo(function FileUploadZone({
       // Check total file count
       const totalFiles = files.length + existingFiles.length
       if (totalFiles > maxFiles) {
-        return `Maximum ${maxFiles} files allowed per manual module`
+        return t("fileUpload.maxFilesError", { max: maxFiles })
       }
 
       // Check each file
       for (const file of files) {
         // Check file type
         if (!file.name.toLowerCase().endsWith(".pdf")) {
-          return `Only PDF files are supported. Invalid file: ${file.name}`
+          return t("fileUpload.invalidTypeError", { name: file.name })
         }
 
         // Check individual file size
         if (file.size > maxFileSize) {
-          return `File '${file.name}' exceeds maximum size of ${
-            maxFileSize / (1024 * 1024)
-          }MB`
+          return t("fileUpload.fileTooLargeError", {
+            name: file.name,
+            max: maxFileSize / (1024 * 1024),
+          })
         }
       }
 
@@ -84,14 +87,12 @@ export const FileUploadZone = memo(function FileUploadZone({
         0,
       )
       if (totalSize > maxTotalSize) {
-        return `Total file size (${(totalSize / (1024 * 1024)).toFixed(
-          1,
-        )}MB) exceeds maximum limit of ${maxTotalSize / (1024 * 1024)}MB`
+        return t("fileUpload.totalSizeError")
       }
 
       return null
     },
-    [],
+    [t],
   )
 
   const handleFileChange = useCallback(
@@ -140,7 +141,7 @@ export const FileUploadZone = memo(function FileUploadZone({
   return (
     <VStack gap={4} align="stretch">
       <Text fontSize="lg" fontWeight="semibold">
-        Upload PDF Files
+        {t("fileUpload.title")}
       </Text>
 
       <FileUpload.Root
@@ -179,15 +180,15 @@ export const FileUploadZone = memo(function FileUploadZone({
               <VStack gap={1}>
                 <Text fontSize="md" fontWeight="medium" color="gray.700">
                   {isLoading
-                    ? "Processing..."
-                    : "Click to upload or drag and drop"}
+                    ? t("manualModule.processing")
+                    : t("fileUpload.dropzone")}
                 </Text>
                 <Text fontSize="sm" color="gray.500">
-                  PDF files only, up to 5 files, 5MB each, 25MB total
+                  {t("fileUpload.restrictions")}
                 </Text>
               </VStack>
               <Button variant="outline" size="sm" disabled={isLoading}>
-                <HiUpload /> Choose File
+                <HiUpload /> {t("fileUpload.chooseFile")}
               </Button>
             </VStack>
           </Box>
@@ -213,7 +214,7 @@ export const FileUploadZone = memo(function FileUploadZone({
       {selectedFiles.length > 0 && (
         <VStack gap={2} align="stretch">
           <Text fontSize="sm" fontWeight="medium" color="gray.700">
-            Selected Files ({selectedFiles.length}/5):
+            {t("fileUpload.selectedFiles", { count: selectedFiles.length })}
           </Text>
           {selectedFiles.map((file, index) => (
             <Box
@@ -234,7 +235,9 @@ export const FileUploadZone = memo(function FileUploadZone({
                   </Text>
                 </VStack>
                 <IconButton
-                  aria-label={`Remove ${file.name}`}
+                  aria-label={t("common:accessibility.removeFile", {
+                    fileName: file.name,
+                  })}
                   size="sm"
                   variant="ghost"
                   colorScheme="red"

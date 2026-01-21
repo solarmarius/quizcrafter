@@ -7,18 +7,25 @@ import {
   Link,
   Text,
   VStack,
-} from "@chakra-ui/react";
-import { LuExternalLink } from "react-icons/lu";
+} from "@chakra-ui/react"
+import { Trans, useTranslation } from "react-i18next"
+import { LuExternalLink } from "react-icons/lu"
+
+import { useLocalizedRoute } from "@/hooks/common"
+import { LOCALIZED_ROUTES } from "@/lib/routes"
 
 export function HelpPanel() {
+  const { t } = useTranslation(["dashboard", "common"])
+  const { getLocalizedRoute } = useLocalizedRoute()
+
   return (
     <Card.Root>
       <Card.Header>
         <Text fontSize="lg" fontWeight="semibold">
-          Help and Resources
+          {t("panels.help.title")}
         </Text>
         <Text fontSize="sm" color="gray.600">
-          Learn how to use QuizCrafter effectively
+          {t("panels.help.description")}
         </Text>
       </Card.Header>
       <Card.Body>
@@ -26,20 +33,17 @@ export function HelpPanel() {
           {/* About Section */}
           <Box>
             <Text fontSize="sm" fontWeight="semibold" mb={2} color="gray.700">
-              About QuizCrafter
+              {t("panels.help.about.title")}
             </Text>
             <Text fontSize="sm" color="gray.600" lineHeight="relaxed">
-              QuizCrafter uses LLMs to generate multiple-choice questions from
-              your Canvas course materials. The system analyzes the modules from
-              a course and creates relevant questions that you can review,
-              approve, and export directly to Canvas.
+              {t("panels.help.about.content")}
             </Text>
           </Box>
 
           {/* How It Works Section */}
           <Box>
             <Text fontSize="sm" fontWeight="semibold" mb={3} color="gray.700">
-              How It Works
+              {t("panels.help.howItWorks.title")}
             </Text>
             <VStack gap={2} align="stretch">
               <HStack gap={3}>
@@ -47,7 +51,7 @@ export function HelpPanel() {
                   1
                 </Badge>
                 <Text fontSize="sm" color="gray.600">
-                  Select course and modules from Canvas
+                  {t("panels.help.howItWorks.step1")}
                 </Text>
               </HStack>
               <HStack gap={3}>
@@ -55,7 +59,7 @@ export function HelpPanel() {
                   2
                 </Badge>
                 <Text fontSize="sm" color="gray.600">
-                  The app extracts PDFs and pages from modules
+                  {t("panels.help.howItWorks.step2")}
                 </Text>
               </HStack>
               <HStack gap={3}>
@@ -63,7 +67,7 @@ export function HelpPanel() {
                   3
                 </Badge>
                 <Text fontSize="sm" color="gray.600">
-                  LLM generate questions per module
+                  {t("panels.help.howItWorks.step3")}
                 </Text>
               </HStack>
               <HStack gap={3}>
@@ -71,7 +75,7 @@ export function HelpPanel() {
                   4
                 </Badge>
                 <Text fontSize="sm" color="gray.600">
-                  Review and approve questions
+                  {t("panels.help.howItWorks.step4")}
                 </Text>
               </HStack>
               <HStack gap={3}>
@@ -79,7 +83,7 @@ export function HelpPanel() {
                   5
                 </Badge>
                 <Text fontSize="sm" color="gray.600">
-                  Export to Canvas as a quiz
+                  {t("panels.help.howItWorks.step5")}
                 </Text>
               </HStack>
             </VStack>
@@ -88,7 +92,7 @@ export function HelpPanel() {
           {/* Helpful Links Section */}
           <Box>
             <Text fontSize="sm" fontWeight="semibold" mb={3} color="gray.700">
-              Helpful Links
+              {t("panels.help.helpfulLinks.title")}
             </Text>
             <VStack gap={2} align="stretch">
               <Link
@@ -99,7 +103,7 @@ export function HelpPanel() {
                 color="blue.600"
                 _hover={{ textDecoration: "underline" }}
               >
-                Canvas UiT
+                {t("panels.help.helpfulLinks.canvasUit")}
                 <LuExternalLink />
               </Link>
               <Link
@@ -108,15 +112,15 @@ export function HelpPanel() {
                 color="blue.600"
                 _hover={{ textDecoration: "underline" }}
               >
-                Contact Developer
+                {t("panels.help.helpfulLinks.contactDeveloper")}
               </Link>
               <Link
-                href="https://github.com/uit-no/quizcrafter"
+                href="https://github.com/solarmarius/quizcrafter"
                 fontSize="sm"
                 color="blue.600"
                 _hover={{ textDecoration: "underline" }}
               >
-                GitHub Repository
+                {t("panels.help.helpfulLinks.githubRepo")}
                 <LuExternalLink />
               </Link>
             </VStack>
@@ -131,38 +135,41 @@ export function HelpPanel() {
             borderColor="blue.200"
           >
             <Text fontSize="sm" fontWeight="semibold" color="blue.700" mb={2}>
-              💡 Tips for Best Results
+              {t("panels.help.tips.title")}
             </Text>
             <VStack gap={1} align="stretch">
               <Text fontSize="sm" color="blue.600">
-                • Adjust question count based on module content length
+                • {t("panels.help.tips.tip1")}
               </Text>
               <Text fontSize="sm" color="blue.600">
-                • Review all generated questions before approval
+                • {t("panels.help.tips.tip2")}
               </Text>
               <Text fontSize="sm" color="blue.600">
-                • Make sure diagrams and images in the course are explained with
-                text
+                • {t("panels.help.tips.tip3")}
               </Text>
             </VStack>
           </Box>
           <Alert.Root status="info" variant="subtle" colorPalette="orange">
             <Alert.Content>
               <Alert.Description>
-                Review our{" "}
-                <Link
-                  href="/privacy-policy"
-                  color="blue.500"
-                  textDecoration="underline"
-                >
-                  Privacy Policy
-                </Link>{" "}
-                to understand how we handle your data.
+                <Trans
+                  i18nKey="userSettings.privacyNotice"
+                  ns="common"
+                  components={{
+                    privacyLink: (
+                      <Link
+                        href={getLocalizedRoute(LOCALIZED_ROUTES.privacyPolicy)}
+                        color="blue.500"
+                        textDecoration="underline"
+                      />
+                    ),
+                  }}
+                />
               </Alert.Description>
             </Alert.Content>
           </Alert.Root>
         </VStack>
       </Card.Body>
     </Card.Root>
-  );
+  )
 }

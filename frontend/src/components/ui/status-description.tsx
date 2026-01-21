@@ -1,7 +1,8 @@
 import type { FailureReason, QuizStatus } from "@/client/types.gen"
-import { QUIZ_STATUS, UI_TEXT } from "@/lib/constants"
-import { formatTimeAgo } from "@/lib/utils"
+import { QUIZ_STATUS } from "@/lib/constants"
+import { getRelativeTimeData } from "@/lib/utils"
 import { Text } from "@chakra-ui/react"
+import { useTranslation } from "react-i18next"
 
 interface StatusDescriptionProps {
   /** Current quiz status */
@@ -14,72 +15,82 @@ interface StatusDescriptionProps {
   detailed?: boolean
 }
 
+/**
+ * Helper to format relative time with translation
+ */
+function useRelativeTime(timestamp: string | null | undefined) {
+  const { t } = useTranslation("common")
+
+  if (!timestamp) return null
+
+  const data = getRelativeTimeData(timestamp)
+  if (!data) return null
+
+  switch (data.key) {
+    case "justNow":
+      return t("time.justNow")
+    case "minutesAgo":
+      return t("time.minutesAgo", { count: data.count })
+    case "hoursAgo":
+      return t("time.hoursAgo", { count: data.count })
+    case "daysAgo":
+      return t("time.daysAgo", { count: data.count })
+  }
+}
+
 export function StatusDescription({
   status,
   failureReason,
   timestamp,
   detailed = false,
 }: StatusDescriptionProps) {
-  const getDescription = () => {
-    const timeAgo = timestamp ? formatTimeAgo(timestamp) : ""
+  const { t } = useTranslation("quiz")
+  const timeAgo = useRelativeTime(timestamp)
 
+  const getDescription = () => {
     switch (status) {
       case QUIZ_STATUS.CREATED:
-        return detailed
-          ? "Quiz created and ready to start content extraction"
-          : UI_TEXT.STATUS.CREATED
+        return detailed ? t("statusDetailed.created") : t("status.created")
 
       case QUIZ_STATUS.EXTRACTING_CONTENT:
         return detailed
-          ? "Extracting and cleaning content from Canvas pages. This may take a few minutes depending on the amount of content."
-          : UI_TEXT.STATUS.EXTRACTING_CONTENT
+          ? t("statusDetailed.extracting_content")
+          : t("status.extracting_content")
 
       case QUIZ_STATUS.GENERATING_QUESTIONS:
         return detailed
-          ? "Generating questions using the language model. This process typically takes 2-5 minutes."
-          : UI_TEXT.STATUS.GENERATING_QUESTIONS
+          ? t("statusDetailed.generating_questions")
+          : t("status.generating_questions")
 
       case QUIZ_STATUS.READY_FOR_REVIEW:
+        if (detailed && timeAgo) {
+          return t("statusDetailed.ready_for_review_timestamp", { timeAgo })
+        }
         return detailed
-          ? `Questions generated successfully${timeAgo ? ` (${timeAgo})` : ""}`
-          : UI_TEXT.STATUS.READY_FOR_REVIEW
+          ? t("statusDetailed.ready_for_review")
+          : t("status.ready_for_review")
 
       case QUIZ_STATUS.EXPORTING_TO_CANVAS:
         return detailed
-          ? "Exporting quiz to Canvas. This includes creating the quiz and adding all approved questions."
-          : UI_TEXT.STATUS.EXPORTING_TO_CANVAS
+          ? t("statusDetailed.exporting_to_canvas")
+          : t("status.exporting_to_canvas")
 
       case QUIZ_STATUS.PUBLISHED:
-        return detailed
-          ? `Quiz exported to Canvas successfully${
-              timeAgo ? ` (${timeAgo})` : ""
-            }`
-          : UI_TEXT.STATUS.PUBLISHED
+        if (detailed && timeAgo) {
+          return t("statusDetailed.published_timestamp", { timeAgo })
+        }
+        return detailed ? t("statusDetailed.published") : t("status.published")
 
       case QUIZ_STATUS.FAILED:
         if (detailed && failureReason) {
-          const errorMessages = {
-            content_extraction_error:
-              "Content extraction failed. This may be due to network issues, Canvas permissions, or content size limits.",
-            no_content_found:
-              "No content found in the selected modules. Please check your module selection.",
-            llm_generation_error:
-              "Question generation failed. This may be due to LLM service issues or content processing errors.",
-            no_questions_generated:
-              "No questions could be generated from the extracted content. Please try different modules.",
-            canvas_export_error:
-              "Quiz export to Canvas failed. This may be due to Canvas API issues or permissions.",
-            network_error:
-              "Network error occurred. Please check your connection and try again.",
-            validation_error:
-              "Validation error occurred. Please check your quiz settings.",
-          }
-          return errorMessages[failureReason] || "Process failed"
+          return t(`failureMessages.${failureReason}.message`, {
+            defaultValue: t("statusDetailed.failed"),
+          })
         }
-        return UI_TEXT.STATUS.FAILED
+        return t("status.failed")
 
       default:
-        return "Status unknown"
+        return t("statusDetailed.unknown")
     }
   }
 

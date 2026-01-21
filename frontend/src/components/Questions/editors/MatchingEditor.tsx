@@ -18,6 +18,7 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod"
 import { memo, useCallback } from "react"
 import { Controller, useFieldArray, useForm } from "react-hook-form"
+import { useTranslation } from "react-i18next"
 import { MdAdd, MdDelete } from "react-icons/md"
 import { ErrorEditor } from "./ErrorEditor"
 
@@ -34,6 +35,8 @@ export const MatchingEditor = memo(function MatchingEditor({
   onCancel,
   isLoading,
 }: MatchingEditorProps) {
+  const { t } = useTranslation("quiz")
+
   try {
     const matchingData = extractQuestionData(question, "matching")
 
@@ -149,13 +152,13 @@ export const MatchingEditor = memo(function MatchingEditor({
           control={control}
           render={({ field }) => (
             <FormField
-              label="Question Text"
+              label={t("questions.editor.questionText")}
               isRequired
               error={errors.questionText?.message}
             >
               <Textarea
                 {...field}
-                placeholder="Enter the matching question instructions..."
+                placeholder={t("placeholders.matchingInstructions")}
                 rows={3}
               />
             </FormField>
@@ -164,7 +167,10 @@ export const MatchingEditor = memo(function MatchingEditor({
 
         <Fieldset.Root>
           <Fieldset.Legend>
-            Matching Pairs ({pairFields.length}/10)
+            {t("questions.editor.matchingPairs", {
+              count: pairFields.length,
+              max: 10,
+            })}
           </Fieldset.Legend>
           <VStack gap={4} align="stretch">
             {errors.pairs?.message && (
@@ -182,7 +188,7 @@ export const MatchingEditor = memo(function MatchingEditor({
               <Box key={field.id} p={4} borderWidth={1} borderRadius="md">
                 <HStack align="flex-start" gap={4} mb={2}>
                   <Text fontSize="sm" fontWeight="medium" color="gray.600">
-                    Pair {index + 1}
+                    {t("questions.editor.pair", { number: index + 1 })}
                   </Text>
                   <Button
                     size="sm"
@@ -202,13 +208,13 @@ export const MatchingEditor = memo(function MatchingEditor({
                       control={control}
                       render={({ field: inputField }) => (
                         <FormField
-                          label="Question/Left Item"
+                          label={t("questions.editor.questionLeftItem")}
                           isRequired
                           error={errors.pairs?.[index]?.question?.message}
                         >
                           <Input
                             {...inputField}
-                            placeholder="Enter question or left item..."
+                            placeholder={t("placeholders.matchingQuestion")}
                           />
                         </FormField>
                       )}
@@ -220,13 +226,13 @@ export const MatchingEditor = memo(function MatchingEditor({
                       control={control}
                       render={({ field: inputField }) => (
                         <FormField
-                          label="Answer/Right Item"
+                          label={t("questions.editor.answerRightItem")}
                           isRequired
                           error={errors.pairs?.[index]?.answer?.message}
                         >
                           <Input
                             {...inputField}
-                            placeholder="Enter answer or right item..."
+                            placeholder={t("placeholders.matchingAnswer")}
                           />
                         </FormField>
                       )}
@@ -244,18 +250,21 @@ export const MatchingEditor = memo(function MatchingEditor({
               size="sm"
             >
               <MdAdd />
-              Add Pair
+              {t("questions.editor.addPair")}
             </Button>
 
             <Text fontSize="sm" color="gray.600">
-              At least 3 pairs required, maximum 10 pairs allowed.
+              {t("questions.editor.pairsRequirement")}
             </Text>
           </VStack>
         </Fieldset.Root>
 
         <Fieldset.Root>
           <Fieldset.Legend>
-            Distractors ({distractors.length}/5)
+            {t("questions.editor.distractors", {
+              count: distractors.length,
+              max: 5,
+            })}
           </Fieldset.Legend>
           <VStack gap={3} align="stretch">
             {errors.distractors?.message && (
@@ -273,7 +282,9 @@ export const MatchingEditor = memo(function MatchingEditor({
               <HStack key={`distractor-${index}`} align="flex-start">
                 <Box flex={1}>
                   <FormField
-                    label={`Distractor ${index + 1}`}
+                    label={t("questions.editor.distractor", {
+                      number: index + 1,
+                    })}
                     error={errors.distractors?.[index]?.message}
                   >
                     <Input
@@ -281,7 +292,7 @@ export const MatchingEditor = memo(function MatchingEditor({
                       onChange={(e) =>
                         handleDistractorChange(index, e.target.value)
                       }
-                      placeholder="Enter incorrect answer option..."
+                      placeholder={t("placeholders.matchingDistractor")}
                     />
                   </FormField>
                 </Box>
@@ -306,12 +317,11 @@ export const MatchingEditor = memo(function MatchingEditor({
               size="sm"
             >
               <MdAdd />
-              Add Distractor
+              {t("questions.editor.addDistractor")}
             </Button>
 
             <Text fontSize="sm" color="gray.600">
-              Optional incorrect answers that don't match any question. Maximum
-              5 allowed.
+              {t("questions.editor.distractorsDescription")}
             </Text>
           </VStack>
         </Fieldset.Root>
@@ -320,10 +330,13 @@ export const MatchingEditor = memo(function MatchingEditor({
           name="explanation"
           control={control}
           render={({ field }) => (
-            <FormField label="Explanation" error={errors.explanation?.message}>
+            <FormField
+              label={t("questions.editor.explanation")}
+              error={errors.explanation?.message}
+            >
               <Textarea
                 {...field}
-                placeholder="Optional explanation for the correct matches..."
+                placeholder={t("placeholders.matchingExplanation")}
                 rows={3}
               />
             </FormField>
@@ -332,7 +345,7 @@ export const MatchingEditor = memo(function MatchingEditor({
 
         <HStack gap={3} justify="end">
           <Button variant="outline" onClick={onCancel} disabled={isLoading}>
-            Cancel
+            {t("questions.editor.cancel")}
           </Button>
           <Button
             colorScheme="blue"
@@ -340,7 +353,7 @@ export const MatchingEditor = memo(function MatchingEditor({
             loading={isLoading}
             disabled={!isDirty}
           >
-            Save Changes
+            {t("questions.editor.saveChanges")}
           </Button>
         </HStack>
       </FormGroup>

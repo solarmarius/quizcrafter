@@ -14,6 +14,7 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod"
 import { memo } from "react"
 import { Controller, useForm } from "react-hook-form"
+import { useTranslation } from "react-i18next"
 import { ErrorEditor } from "./ErrorEditor"
 
 interface MCQEditorProps {
@@ -29,6 +30,8 @@ export const MCQEditor = memo(function MCQEditor({
   onCancel,
   isLoading,
 }: MCQEditorProps) {
+  const { t } = useTranslation(["quiz", "validation"])
+
   try {
     const mcqData = extractQuestionData(question, "multiple_choice")
 
@@ -71,32 +74,30 @@ export const MCQEditor = memo(function MCQEditor({
           control={control}
           render={({ field }) => (
             <FormField
-              label="Question Text"
+              label={t("questions.editor.questionText")}
               isRequired
               error={errors.questionText?.message}
             >
-              <Textarea
-                {...field}
-                placeholder="Enter question text..."
-                rows={3}
-              />
+              <Textarea {...field} rows={3} />
             </FormField>
           )}
         />
 
         <Fieldset.Root>
-          <Fieldset.Legend>Answer Options</Fieldset.Legend>
+          <Fieldset.Legend>
+            {t("questions.editor.answerOptions")}
+          </Fieldset.Legend>
           <VStack gap={3} align="stretch">
             <Controller
               name="optionA"
               control={control}
               render={({ field }) => (
                 <FormField
-                  label="Option A"
+                  label={t("questions.editor.optionA")}
                   isRequired
                   error={errors.optionA?.message}
                 >
-                  <Input {...field} placeholder="Enter option A..." />
+                  <Input {...field} />
                 </FormField>
               )}
             />
@@ -105,11 +106,11 @@ export const MCQEditor = memo(function MCQEditor({
               control={control}
               render={({ field }) => (
                 <FormField
-                  label="Option B"
+                  label={t("questions.editor.optionB")}
                   isRequired
                   error={errors.optionB?.message}
                 >
-                  <Input {...field} placeholder="Enter option B..." />
+                  <Input {...field} />
                 </FormField>
               )}
             />
@@ -118,11 +119,11 @@ export const MCQEditor = memo(function MCQEditor({
               control={control}
               render={({ field }) => (
                 <FormField
-                  label="Option C"
+                  label={t("questions.editor.optionC")}
                   isRequired
                   error={errors.optionC?.message}
                 >
-                  <Input {...field} placeholder="Enter option C..." />
+                  <Input {...field} />
                 </FormField>
               )}
             />
@@ -131,11 +132,11 @@ export const MCQEditor = memo(function MCQEditor({
               control={control}
               render={({ field }) => (
                 <FormField
-                  label="Option D"
+                  label={t("questions.editor.optionD")}
                   isRequired
                   error={errors.optionD?.message}
                 >
-                  <Input {...field} placeholder="Enter option D..." />
+                  <Input {...field} />
                 </FormField>
               )}
             />
@@ -147,7 +148,7 @@ export const MCQEditor = memo(function MCQEditor({
           control={control}
           render={({ field: { onChange, value } }) => (
             <FormField
-              label="Correct Answer"
+              label={t("questions.editor.correctAnswer")}
               isRequired
               error={errors.correctAnswer?.message}
             >
@@ -172,19 +173,18 @@ export const MCQEditor = memo(function MCQEditor({
           name="explanation"
           control={control}
           render={({ field }) => (
-            <FormField label="Explanation" error={errors.explanation?.message}>
-              <Textarea
-                {...field}
-                placeholder="Enter explanation for the answer..."
-                rows={2}
-              />
+            <FormField
+              label={t("questions.editor.explanation")}
+              error={errors.explanation?.message}
+            >
+              <Textarea {...field} rows={2} />
             </FormField>
           )}
         />
 
         <HStack gap={3} justify="end">
           <Button variant="outline" onClick={onCancel} disabled={isLoading}>
-            Cancel
+            {t("questions.editor.cancel")}
           </Button>
           <Button
             colorScheme="blue"
@@ -192,7 +192,7 @@ export const MCQEditor = memo(function MCQEditor({
             loading={isLoading}
             disabled={!isDirty}
           >
-            Save Changes
+            {t("questions.editor.saveChanges")}
           </Button>
         </HStack>
       </FormGroup>
@@ -200,7 +200,7 @@ export const MCQEditor = memo(function MCQEditor({
   } catch (error) {
     return (
       <ErrorEditor
-        error="Error loading MCQ question data"
+        error={t("validation:editors.mcqLoadError")}
         onCancel={onCancel}
       />
     )

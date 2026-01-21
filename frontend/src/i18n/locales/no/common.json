@@ -1,0 +1,171 @@
+{
+  "appName": "QuizCrafter",
+  "actions": {
+    "save": "Lagre",
+    "cancel": "Avbryt",
+    "delete": "Slett",
+    "edit": "Rediger",
+    "close": "Lukk",
+    "confirm": "Bekreft",
+    "tryAgain": "Prøv igjen",
+    "next": "Neste",
+    "previous": "Forrige",
+    "getStarted": "Kom i gang",
+    "logOut": "Logg ut",
+    "view": "Vis",
+    "approve": "Godkjenn",
+    "reject": "Avvis",
+    "addBatch": "Legg til gruppe",
+    "addQuestion": "Legg til spørsmål"
+  },
+  "toast": {
+    "successTitle": "Vellykket!",
+    "errorTitle": "Noe gikk galt!"
+  },
+  "status": {
+    "loading": "Laster...",
+    "retrying": "Prøver på nytt...",
+    "processing": "Behandler...",
+    "completed": "Fullført",
+    "failed": "Feilet",
+    "waiting": "Venter",
+    "unknown": "Ukjent"
+  },
+  "errors": {
+    "generic": "Det oppstod en feil",
+    "somethingWentWrong": "Noe gikk galt",
+    "networkError": "Nettverksfeil. Vennligst sjekk tilkoblingen din.",
+    "sessionExpired": "Økten er utløpt",
+    "sessionExpiredDescription": "Vennligst logg inn på nytt for å fortsette.",
+    "unexpected": "Det oppstod en uventet feil",
+    "contactSupport": "Prøv igjen eller kontakt support hvis problemet vedvarer.",
+    "loadingData": "Det oppstod en feil under lasting av data",
+    "apiError": "Det oppstod en API-feil",
+    "requestFailed": "Forespørsel til {{url}} mislyktes",
+    "unknown": "Det oppstod en ukjent feil",
+    "canvas": {
+      "sessionExpired": "Canvas-økten din har utløpt",
+      "sessionExpiredGuidance": "Prøv igjen, eller oppdater nettleseren og logg inn på nytt hvis problemet vedvarer.",
+      "noPermission": "Du har ikke tilgang til dette Canvas-innholdet",
+      "noPermissionGuidance": "Dette kurset kan være begrenset, eller du trenger flere tillatelser. Kontakt Canvas-administratoren eller kursinstruktøren for tilgang.",
+      "notFound": "Canvas-innhold ikke funnet",
+      "notFoundGuidance": "Det forespurte kurset eller modulene kan ha blitt fjernet eller er ikke lenger tilgjengelig.",
+      "serverError": "Canvas-serverfeil",
+      "serverErrorGuidance": "Det er et problem med Canvas-integrasjonen. Prøv igjen om noen minutter.",
+      "connectionIssue": "Canvas-tilkoblingsproblem",
+      "connectionGuidance": "Vennligst sjekk Canvas-tilkoblingen din og prøv igjen."
+    },
+    "auth": {
+      "loginRequired": "Du må logge inn på nytt for å fortsette",
+      "refreshGuidance": "Vennligst oppdater siden og logg inn på nytt."
+    },
+    "network": {
+      "issue": "Nettverkstilkoblingsproblem. Vennligst sjekk internettforbindelsen din og prøv igjen.",
+      "guidance": "Sjekk internettforbindelsen din og prøv igjen. Hvis problemet vedvarer, kan tjenesten være midlertidig utilgjengelig."
+    },
+    "retryable": {
+      "temporary": "Dette ser ut til å være et midlertidig problem. Prøv igjen om et øyeblikk.",
+      "contactSupport": "Hvis dette problemet fortsetter, vennligst kontakt support for hjelp."
+    }
+  },
+  "labels": {
+    "name": "Navn",
+    "required": "Påkrevd",
+    "optional": "Valgfritt",
+    "selected": "Valgt",
+    "total": "Totalt",
+    "questions": "spørsmål",
+    "modules": "moduler",
+    "words": "ord",
+    "batches": "grupper",
+    "notAvailable": "Ikke tilgjengelig"
+  },
+  "time": {
+    "justNow": "akkurat nå",
+    "minutesAgo": "{{count}} minutt siden",
+    "minutesAgo_other": "{{count}} minutter siden",
+    "hoursAgo": "{{count}} time siden",
+    "hoursAgo_other": "{{count}} timer siden",
+    "daysAgo": "{{count}} dag siden",
+    "daysAgo_other": "{{count}} dager siden"
+  },
+  "userSettings": {
+    "title": "Brukerinnstillinger",
+    "description": "Administrer kontoinnstillinger og preferanser",
+    "tabs": {
+      "myProfile": "Min profil",
+      "dangerZone": "Faresone"
+    },
+    "name": {
+      "label": "Navn",
+      "placeholder": "Skriv inn navnet ditt"
+    },
+    "updateSuccess": "Bruker oppdatert.",
+    "privacyNotice": "Les vår <privacyLink>personvernerklæring</privacyLink> for å forstå hvordan vi håndterer dataene dine.",
+    "language": {
+      "title": "Språk for grensesnitt",
+      "description": "Velg ditt foretrukne språk for applikasjonsgrensesnittet. Dette er uavhengig av quiz-innholdsspråket.",
+      "englishDescription": "Bruk engelsk for brukergrensesnittet",
+      "norwegianDescription": "Bruk norsk for brukergrensesnittet"
+    }
+  },
+  "deleteAccount": {
+    "title": "Slett konto",
+    "description": "Dette vil slette alle brukerdataene dine. Quizer og spørsmål du har opprettet vil ikke bli slettet, men de vil ikke lenger være koblet til kontoen din. Bruker-ID-en til quizene dine vil bli satt til \"NULL\".",
+    "warningOngoing": "Sørg for at eventuelle pågående quizer er fullført før du fortsetter.",
+    "confirmationRequired": "Bekreftelse påkrevd",
+    "confirmationMessage": "Alle kontodataene dine vil bli permanent slettet. Hvis du er sikker, klikk 'Slett' for å fortsette. Denne handlingen kan ikke angres.",
+    "confirmButton": "Slett",
+    "success": "Kontoen din har blitt slettet"
+  },
+  "onboarding": {
+    "stepProgress": "Steg {{current}} av {{total}}",
+    "welcome": {
+      "title": "Velkommen til QuizCrafter",
+      "description": "Takk for at du prøver oss. La oss vise deg rundt og hjelpe deg i gang med alt applikasjonen vår har å tilby.",
+      "developmentWarning": "Denne applikasjonen er for øyeblikket i en utviklingsfase av IFI-UIT og er ikke offisielt lansert ennå. Vær oppmerksom på at løpende støtte og fremtidig utvikling ikke er garantert. Quiz-data kan bli slettet når som helst. Funksjoner kan endres eller fjernes når som helst."
+    },
+    "setup": {
+      "title": "Gjennomgang av applikasjonen"
+    },
+    "features": {
+      "title": "Forbered kursene dine",
+      "intro": "For å generere de beste spørsmålene fra materialet, sørg for at",
+      "tip1": "Innhold bruker \"sider\" eller er lastet opp som PDF-er",
+      "tip2": "Alt innhold er referert med en modul",
+      "tip3": "Beskriv eventuelle diagrammer/bilder/ligninger med ren tekst"
+    },
+    "privacy": {
+      "title": "Personvern og databruk",
+      "description": "Før du kommer i gang, ta et øyeblikk til å lese vår personvernerklæring for å forstå hvordan vi håndterer dataene dine og quiz-informasjon.",
+      "viewPolicy": "Se personvernerklæring",
+      "agreement": "Ved å fortsette bekrefter du at du har lest og godtar vår personvernerklæring."
+    }
+  },
+  "pages": {
+    "notFound": {
+      "title": "Oops!",
+      "message": "Siden du leter etter ble ikke funnet.",
+      "goBack": "Gå tilbake"
+    }
+  },
+  "login": {
+    "welcome": "Velkommen til QuizCrafter",
+    "description": "Gjør Canvas-kursmaterialet ditt om til quizer av høy kvalitet med LLM-er. Bygg spørsmålsbanken din, godkjenn med et klikk, og generer quizer på få minutter.",
+    "errorMessage": "Det oppstod en feil under behandling av forespørselen din: {{error}}",
+    "helpTitle": "Usikker på hvordan det fungerer?",
+    "videoTitle": "QuizCrafter demonstrasjonsvideo",
+    "videoDescription": "Se hvordan QuizCrafter sømløst integreres med Canvas for å analysere kursmaterialet ditt og generere quizer av høy kvalitet."
+  },
+  "navigation": {
+    "backToQuestionTypes": "Tilbake til spørsmålstyper"
+  },
+  "accessibility": {
+    "close": "Lukk",
+    "removeFile": "Fjern {{fileName}}",
+    "removePair": "Fjern par {{number}}",
+    "removeDistractor": "Fjern distraktor {{number}}",
+    "removeCategory": "Fjern kategori {{number}}",
+    "removeItem": "Fjern element {{number}}"
+  }
+}

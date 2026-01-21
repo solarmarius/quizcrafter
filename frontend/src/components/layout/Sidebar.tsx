@@ -1,17 +1,19 @@
-import { Box, Button, Flex, Image } from "@chakra-ui/react";
-import { Link } from "@tanstack/react-router";
+import { Box, Button, Flex, Image } from "@chakra-ui/react"
+import { Link } from "@tanstack/react-router"
+import { useTranslation } from "react-i18next"
 
-import Logo from "/assets/images/quizcrafterlogo.svg";
+import Logo from "/assets/images/quizcrafterlogo.svg"
 
-import { useAuth } from "@/hooks/auth";
-import SidebarItems from "./SidebarItems";
+import { useAuth } from "@/hooks/auth"
+import SidebarItems from "./SidebarItems"
 
 const Sidebar = () => {
-  const { logout } = useAuth();
+  const { logout } = useAuth()
+  const { t } = useTranslation("common")
 
   const handleLogout = async () => {
-    logout();
-  };
+    logout()
+  }
 
   return (
     <>
@@ -32,12 +34,12 @@ const Sidebar = () => {
             <SidebarItems />
           </Box>
           <Button onClick={handleLogout} w="90%" mt={4} colorPalette="blue">
-            Log out
+            {t("actions.logOut")}
           </Button>
         </Flex>
       </Box>
     </>
-  );
-};
+  )
+}
 
-export default Sidebar;
+export default Sidebar

@@ -1,0 +1,332 @@
+{
+  "status": {
+    "created": "Klar til å starte",
+    "extracting_content": "Henter innhold",
+    "generating_questions": "Genererer spørsmål",
+    "ready_for_review": "Klar for gjennomgang",
+    "ready_for_review_partial": "Delvis suksess - Klar for gjennomgang",
+    "exporting_to_canvas": "Eksporterer til Canvas",
+    "published": "Publisert til Canvas",
+    "failed": "Feilet"
+  },
+  "statusDetailed": {
+    "created": "Quiz opprettet og klar til å starte innholdshenting",
+    "extracting_content": "Henter og renser innhold fra Canvas-sider. Dette kan ta noen minutter avhengig av innholdsmengden.",
+    "generating_questions": "Genererer spørsmål med språkmodellen. Denne prosessen tar vanligvis 2-5 minutter.",
+    "ready_for_review": "Spørsmål generert",
+    "ready_for_review_timestamp": "Spørsmål generert ({{timeAgo}})",
+    "exporting_to_canvas": "Eksporterer quiz til Canvas. Dette inkluderer å opprette quizen og legge til alle godkjente spørsmål.",
+    "published": "Quiz eksportert til Canvas",
+    "published_timestamp": "Quiz eksportert til Canvas ({{timeAgo}})",
+    "failed": "Prosessen feilet",
+    "unknown": "Status ukjent"
+  },
+  "failureMessages": {
+    "canvas_export_error": {
+      "title": "Eksport til Canvas feilet",
+      "message": "Det oppstod en feil ved eksport av quizen til Canvas. Prøv å eksportere igjen eller ta kontakt med oss."
+    },
+    "content_extraction_error": {
+      "title": "Innholdshenting feilet",
+      "message": "Kunne ikke hente innhold fra de valgte Canvas-modulene. Vennligst sjekk modulvalget og prøv igjen."
+    },
+    "no_content_found": {
+      "title": "Ingen innhold funnet",
+      "message": "Ingen innhold ble funnet i de valgte Canvas-modulene. Velg andre moduler eller sjekk om modulene inneholder innhold."
+    },
+    "llm_generation_error": {
+      "title": "Spørsmålsgenerering feilet",
+      "message": "Kunne ikke generere spørsmål fra det hentede innholdet. Vennligst prøv igjen eller juster quiz-innstillingene."
+    },
+    "no_questions_generated": {
+      "title": "Ingen spørsmål generert",
+      "message": "Ingen spørsmål kunne genereres fra tilgjengelig innhold. Vennligst prøv med annet innhold eller juster quiz-innstillingene."
+    },
+    "network_error": {
+      "title": "Nettverksfeil",
+      "message": "En nettverksfeil oppstod under behandling av quizen. Vennligst sjekk tilkoblingen og prøv igjen."
+    },
+    "validation_error": {
+      "title": "Valideringsfeil",
+      "message": "Det oppstod en valideringsfeil under behandling av quizen. Vennligst sjekk quiz-innstillingene og prøv igjen."
+    },
+    "generic": {
+      "title": "Quiz-behandling feilet",
+      "message": "Det oppstod en feil under behandling av quizen. Vennligst prøv igjen eller kontakt support hvis problemet vedvarer."
+    }
+  },
+  "phases": {
+    "extraction": {
+      "title": "Innholdshenting",
+      "pending": "Venter på å hente innhold fra valgte Canvas-moduler",
+      "processing": "Henter og behandler innhold fra Canvas-moduler...",
+      "completed": "Innhold hentet fra Canvas-moduler",
+      "failed": "Innholdshenting feilet. Vennligst sjekk modulvalget og prøv igjen."
+    },
+    "generation": {
+      "title": "Spørsmålsgenerering",
+      "pending": "Venter på at innholdshenting skal fullføres",
+      "processing": "Språkmodellen genererer spørsmål fra hentet innhold...",
+      "completed": "Spørsmål generert og klare for gjennomgang",
+      "partial": "Noen spørsmål ble generert - prøv igjen for gjenværende spørsmål",
+      "failed": "Spørsmålsgenerering feilet. Dette kan skyldes utilstrekkelig innhold eller feil hos tjenesten."
+    },
+    "export": {
+      "title": "Canvas-eksport",
+      "pending": "Venter på at spørsmål skal gjennomgås og godkjennes",
+      "processing": "Eksporterer godkjente spørsmål til Canvas som en ny quiz...",
+      "completed": "Quiz publisert til Canvas",
+      "failed": "Canvas-eksport feilet. Vennligst sjekk Canvas-tillatelsene og prøv igjen."
+    }
+  },
+  "table": {
+    "headers": {
+      "title": "Tittel",
+      "course": "Emne",
+      "questions": "Spørsmål",
+      "status": "Status",
+      "created": "Opprettet",
+      "actions": "Handlinger"
+    },
+    "modulesSelected": "{{count}} modul valgt",
+    "modulesSelected_other": "{{count}} moduler valgt",
+    "totalQuestions": "{{count}} spørsmål totalt",
+    "noQuestionsConfigured": "Ingen spørsmål konfigurert"
+  },
+  "emptyStates": {
+    "noQuizzes": "Ingen quizer funnet",
+    "noQuizzesGenerating": "Ingen quizer under generering",
+    "noQuizzesReview": "Ingen quizer klare for gjennomgang"
+  },
+  "actions": {
+    "createQuiz": "Opprett ny quiz",
+    "createFirstQuiz": "Opprett din første quiz",
+    "viewDetails": "Vis detaljer",
+    "viewAll": "Vis alle quizer",
+    "review": "Gjennomgå",
+    "postToCanvas": "Publiser til Canvas",
+    "deleteQuiz": "Slett quiz"
+  },
+  "settings": {
+    "language": {
+      "label": "Språk",
+      "description": "Velg språk for spørsmålsgenerering",
+      "en": "Engelsk",
+      "enDescription": "Generer spørsmål på engelsk",
+      "no": "Norsk",
+      "noDescription": "Generer spørsmål på norsk"
+    },
+    "tone": {
+      "label": "Tone",
+      "description": "Velg tone for spørsmålsgenerering",
+      "academic": "Formell/Akademisk",
+      "academicDescription": "Bruk formelt akademisk språk med presis terminologi",
+      "casual": "Uformell/Hverdagslig",
+      "casualDescription": "Bruk hverdagslig språk som føles tilgjengelig",
+      "encouraging": "Vennlig/Oppmuntrende",
+      "encouragingDescription": "Bruk varmt, støttende språk med nyttige hint i spørsmålene",
+      "professional": "Profesjonell/Forretningsmessig",
+      "professionalDescription": "Bruk klart, direkte forretningsspråk for arbeidsplassopplæring"
+    }
+  },
+  "questionTypes": {
+    "multiple_choice": "Flervalg",
+    "fill_in_blank": "Fyll inn",
+    "matching": "Kobling",
+    "categorization": "Kategorisering",
+    "true_false": "Sant/Usant"
+  },
+  "questionTypeDescriptions": {
+    "multiple_choice": "Velg riktig svar fra 4 alternativer (A, B, C, D)",
+    "true_false": "Enkle sant eller usant-påstander",
+    "fill_in_blank": "Fullfør setninger med manglende ord",
+    "matching": "Koble spørsmål til riktige svar",
+    "categorization": "Grupper elementer i passende kategorier"
+  },
+  "questionSelector": {
+    "title": "Velg spørsmålstype",
+    "description": "Velg hvilken type spørsmål du vil opprette.",
+    "selectAriaLabel": "Velg {{type}} spørsmålstype"
+  },
+  "difficulty": {
+    "easy": "Lett",
+    "easyDescription": "Grunnleggende gjenkjenning og enkel forståelse",
+    "medium": "Middels",
+    "mediumDescription": "Anvendelse og moderat problemløsning",
+    "hard": "Vanskelig",
+    "hardDescription": "Kompleks analyse og kritisk tenkning"
+  },
+  "deleteConfirmation": {
+    "title": "Slett quiz",
+    "message": "Er du sikker på at du vil slette quizen «{{quizTitle}}»? Denne handlingen kan ikke angres.",
+    "success": "Quiz slettet"
+  },
+  "detail": {
+    "notFound": "Quiz ikke funnet",
+    "notFoundMessage": "Quizen du leter etter finnes ikke, eller du har ikke tilgang til å se den.",
+    "loadingInfo": "Laster quiz-informasjon...",
+    "notAvailable": "Ikke tilgjengelig",
+    "courseInfo": "Emneinformasjon",
+    "settings": "Innstillinger",
+    "metadata": "Metadata",
+    "generationProgress": "Genereringsfremgang",
+    "questionCount": "Antall spørsmål",
+    "language": "Språk",
+    "tone": "Tone",
+    "selectedModules": "Valgte moduler",
+    "noModules": "Ingen moduler valgt",
+    "canvasCourse": "Canvas-emne",
+    "courseId": "Emne-ID: {{id}}",
+    "quizId": "Quiz-ID",
+    "created": "Opprettet",
+    "lastUpdated": "Sist oppdatert",
+    "tabs": {
+      "info": "Quiz-informasjon",
+      "questions": "Spørsmål"
+    }
+  },
+  "generationTrigger": {
+    "partialTitle": "Delvis suksess - Prøv igjen tilgjengelig",
+    "failedTitle": "Spørsmålsgenerering feilet",
+    "partialMessage": "Noen spørsmål ble generert. Klikk nedenfor for å prøve å generere de gjenværende {{count}} spørsmålene.",
+    "failedMessage": "Forrige forsøk på å generere spørsmål feilet. Klikk nedenfor for å prøve igjen med {{count}} flervalgsoppgaver.",
+    "batchesSucceeded": "{{count}} grupper fullført",
+    "batchesFailed": "{{count}} grupper feilet",
+    "generationSettings": "Genereringsinnstillinger",
+    "questionsCount": "Spørsmål: {{count}}",
+    "retryFailedBatches": "Prøv feilede grupper igjen",
+    "retryGeneration": "Prøv spørsmålsgenerering igjen",
+    "retryStarted": "Ny forsøk på feilede grupper startet",
+    "generationStarted": "Spørsmålsgenerering startet"
+  },
+  "questionTypeBreakdown": {
+    "batchesGeneratedByLLM": "Grupper generert av LLM",
+    "noQuestionTypesConfigured": "Ingen spørsmålstyper konfigurert",
+    "moduleFallback": "Modul {{id}}"
+  },
+  "placeholders": {
+    "matchingInstructions": "Skriv inn spørsmålstekst...",
+    "matchingQuestion": "Skriv inn spørsmål eller venstre element...",
+    "matchingAnswer": "Skriv inn svar eller høyre element...",
+    "matchingDistractor": "Skriv inn feil svaralternativ...",
+    "matchingExplanation": "Valgfri forklaring for de riktige koblingene...",
+    "trueFalseStatement": "Skriv inn din sant/usant-påstand...",
+    "trueFalseExplanation": "Valgfri forklaring for riktig svar...",
+    "categorizationInstructions": "Skriv inn spørsmålstekst...",
+    "categorizationDistractor": "Skriv inn distraktortekst...",
+    "categorizationExplanation": "Valgfri forklaring for riktig kategorisering...",
+    "categorizationCategory": "Skriv inn kategorinavn...",
+    "categorizationItem": "Skriv inn elementtekst...",
+    "fillInBlankQuestion": "Skriv inn spørsmålstekst med blanke felt markert som [blank_1], [blank_2]...",
+    "fillInBlankAnswer": "Skriv inn riktig svar...",
+    "fillInBlankVariations": "Skriv inn variasjoner atskilt med komma...",
+    "fillInBlankExplanation": "Skriv inn forklaring for svarene..."
+  },
+  "questions": {
+    "createType": "Opprett {{type}}-spørsmål",
+    "gradingRubric": "Vurderingskriterier:",
+    "sampleAnswer": "Eksempelsvar:",
+    "unsupportedType": "Ikke-støttet spørsmålstype",
+    "unsupportedTypeMessage": "Spørsmålstype «{{questionType}}» er ikke støttet i visningsgrensesnittet ennå.",
+    "title": "Spørsmål {{number}}",
+    "approved": "Godkjent",
+    "approvedOn": "Godkjent {{date}}",
+    "correct": "Riktig",
+    "explanationLabel": "Forklaring:",
+    "displayError": "Visningsfeil",
+    "loadingError": "Feil ved lasting av spørsmålsdata",
+    "distractorLabel": "Distraktor",
+    "correctAnswersLabel": "Riktige svar:",
+    "blankPosition": "Felt {{position}}:",
+    "variationsLabel": "Variasjoner:",
+    "noQuestions": "Ingen spørsmål generert ennå",
+    "noQuestionsDescription": "Spørsmål vil vises her når genereringsprosessen er fullført.",
+    "loadFailed": "Kunne ikke laste spørsmål",
+    "loadFailedDescription": "Det oppstod en feil ved lasting av spørsmålene for denne quizen.",
+    "notAvailable": "Spørsmål ikke tilgjengelig ennå",
+    "notAvailableDescription": "Spørsmål vil vises her når genereringsprosessen er fullført.",
+    "reviewTitle": "Gjennomgå spørsmål",
+    "reviewDescription": "Gjennomgå og godkjenn hvert spørsmål individuelt. Du kan redigere spørsmål før du godkjenner dem.",
+    "addQuestion": "Legg til spørsmål",
+    "pendingApproval": "Venter på godkjenning ({{count}})",
+    "allQuestions": "Alle spørsmål ({{count}})",
+    "noPending": "Ingen ventende spørsmål",
+    "noQuestionsFound": "Ingen spørsmål funnet",
+    "allApprovedSwitch": "Alle spørsmål er godkjent! Bytt til «Alle spørsmål» for å se dem.",
+    "noMatchFilter": "Ingen spørsmål matcher gjeldende filter.",
+    "questionApproved": "Spørsmål godkjent",
+    "questionUpdated": "Spørsmål oppdatert",
+    "questionRejected": "Spørsmål avvist",
+    "filter": {
+      "all": "Alle",
+      "approved": "Godkjente",
+      "pending": "Ventende"
+    },
+    "stats": {
+      "approved": "{{count}} av {{total}} spørsmål godkjent",
+      "progress": "Fremgang",
+      "countOf": "{{approved}} av {{total}}",
+      "allReviewed": "Alle spørsmål er gjennomgått og godkjent!",
+      "exportedSuccess": "Quizen er eksportert til Canvas",
+      "exportedOn": "Eksportert {{date}}",
+      "noQuestionsYet": "Ingen spørsmål generert ennå. Spørsmål vil vises her når genereringen er fullført.",
+      "exportStarted": "Quiz-eksport til Canvas startet",
+      "readyToExport": "Klar til å eksportere til Canvas"
+    },
+    "editor": {
+      "questionText": "Spørsmålstekst",
+      "answerOptions": "Svaralternativer",
+      "optionA": "Alternativ A",
+      "optionB": "Alternativ B",
+      "optionC": "Alternativ C",
+      "optionD": "Alternativ D",
+      "correctAnswer": "Riktig svar",
+      "correctAnswers": "Riktige svar",
+      "explanation": "Forklaring",
+      "cancel": "Avbryt",
+      "saveChanges": "Lagre endringer",
+      "true": "Sant",
+      "false": "Usant",
+      "categories": "Kategorier",
+      "categoryName": "Kategorinavn",
+      "items": "Elementer",
+      "addCategory": "Legg til kategori",
+      "removeCategory": "Fjern kategori",
+      "addItem": "Legg til element",
+      "removeItem": "Fjern element",
+      "pairs": "Par",
+      "question": "Spørsmål",
+      "answer": "Svar",
+      "addPair": "Legg til par",
+      "removePair": "Fjern par",
+      "blanks": "Blanke felt",
+      "blankNumber": "Blank {{number}}",
+      "addBlank": "Legg til blank",
+      "remove": "Fjern",
+      "answerVariations": "Svarvariasjoner",
+      "answerVariationsHelper": "Skill flere variasjoner med komma",
+      "caseSensitiveCheckbox": "Skill mellom store og små bokstaver",
+      "blankHelperText": "Bruk [blank_1], [blank_2], osv. for å markere blanke felt i spørsmålet",
+      "addBlankDisabledText": "Legg til spørsmålstekst først for å aktivere smart blanke felt-oppretting",
+      "nextPosition": "Neste posisjon: {{position}}",
+      "fixValidationErrors": "Rett valideringsfeil for å lagre",
+      "completeRequiredFields": "Fyll ut påkrevde felt for å lagre",
+      "noChangesToSave": "Ingen endringer å lagre",
+      "categoriesCount": "Kategorier ({{count}}/{{max}})",
+      "itemsCount": "Elementer ({{count}})",
+      "category": "Kategori {{number}}",
+      "explanationOptional": "Forklaring (valgfritt)",
+      "matchingPairs": "Koblingspar ({{count}}/{{max}})",
+      "questionLeftItem": "Spørsmål/Venstre element",
+      "answerRightItem": "Svar/Høyre element",
+      "pairsRequirement": "Minst 3 par kreves, maksimalt 10 par tillatt.",
+      "distractors": "Distraktorer ({{count}}/{{max}})",
+      "distractor": "Distraktor {{number}}",
+      "addDistractor": "Legg til distraktor",
+      "removeDistractor": "Fjern distraktor",
+      "distractorsDescription": "Valgfrie feilsvar som ikke matcher noe spørsmål. Maksimalt 5 tillatt.",
+      "acceptedVariations": "Godkjente variasjoner",
+      "caseSensitive": "(Skill mellom store og små bokstaver)"
+    }
+  }
+}

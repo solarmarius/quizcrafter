@@ -1,11 +1,13 @@
 import { Flex } from "@chakra-ui/react"
 import { Outlet, createFileRoute, redirect } from "@tanstack/react-router"
 
+import { NotFound } from "@/components/Common"
 import { Sidebar } from "@/components/layout"
 import { isAuthenticated } from "@/lib/api/client"
 
 export const Route = createFileRoute("/_layout")({
   component: Layout,
+  notFoundComponent: () => <NotFound />,
   beforeLoad: async () => {
     if (!isAuthenticated()) {
       throw redirect({

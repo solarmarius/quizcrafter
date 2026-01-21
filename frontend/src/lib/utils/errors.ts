@@ -1,4 +1,5 @@
 import { ApiError } from "@/client"
+import i18n from "@/i18n"
 
 /**
  * Error handling utility functions
@@ -41,9 +42,8 @@ export function analyzeCanvasError(error: unknown): CanvasErrorInfo {
     return {
       isCanvasError: false,
       isPermissionError: false,
-      userFriendlyMessage: "An unexpected error occurred",
-      actionableGuidance:
-        "Please try again or contact support if the problem persists.",
+      userFriendlyMessage: i18n.t("errors.unexpected", { ns: "common" }),
+      actionableGuidance: i18n.t("errors.contactSupport", { ns: "common" }),
     }
   }
 
@@ -54,9 +54,12 @@ export function analyzeCanvasError(error: unknown): CanvasErrorInfo {
     return {
       isCanvasError: true,
       isPermissionError: true,
-      userFriendlyMessage: "Your Canvas session has expired",
-      actionableGuidance:
-        "Please try again, or refresh your browser and log back in if the problem persists.",
+      userFriendlyMessage: i18n.t("errors.canvas.sessionExpired", {
+        ns: "common",
+      }),
+      actionableGuidance: i18n.t("errors.canvas.sessionExpiredGuidance", {
+        ns: "common",
+      }),
     }
   }
 
@@ -65,10 +68,12 @@ export function analyzeCanvasError(error: unknown): CanvasErrorInfo {
     return {
       isCanvasError: true,
       isPermissionError: true,
-      userFriendlyMessage:
-        "You don't have permission to access this Canvas content",
-      actionableGuidance:
-        "This course may be restricted or you may need additional permissions. Contact your Canvas administrator or course instructor for access.",
+      userFriendlyMessage: i18n.t("errors.canvas.noPermission", {
+        ns: "common",
+      }),
+      actionableGuidance: i18n.t("errors.canvas.noPermissionGuidance", {
+        ns: "common",
+      }),
     }
   }
 
@@ -78,9 +83,10 @@ export function analyzeCanvasError(error: unknown): CanvasErrorInfo {
       return {
         isCanvasError: true,
         isPermissionError: false,
-        userFriendlyMessage: "Canvas content not found",
-        actionableGuidance:
-          "The requested course or modules may have been removed or are no longer available.",
+        userFriendlyMessage: i18n.t("errors.canvas.notFound", { ns: "common" }),
+        actionableGuidance: i18n.t("errors.canvas.notFoundGuidance", {
+          ns: "common",
+        }),
       }
     }
 
@@ -88,17 +94,24 @@ export function analyzeCanvasError(error: unknown): CanvasErrorInfo {
       return {
         isCanvasError: true,
         isPermissionError: false,
-        userFriendlyMessage: "Canvas server error",
-        actionableGuidance:
-          "There's an issue with the Canvas integration. Please try again in a few minutes.",
+        userFriendlyMessage: i18n.t("errors.canvas.serverError", {
+          ns: "common",
+        }),
+        actionableGuidance: i18n.t("errors.canvas.serverErrorGuidance", {
+          ns: "common",
+        }),
       }
     }
 
     return {
       isCanvasError: true,
       isPermissionError: false,
-      userFriendlyMessage: "Canvas connection issue",
-      actionableGuidance: "Please check your Canvas connection and try again.",
+      userFriendlyMessage: i18n.t("errors.canvas.connectionIssue", {
+        ns: "common",
+      }),
+      actionableGuidance: i18n.t("errors.canvas.connectionGuidance", {
+        ns: "common",
+      }),
     }
   }
 
@@ -106,9 +119,8 @@ export function analyzeCanvasError(error: unknown): CanvasErrorInfo {
   return {
     isCanvasError: false,
     isPermissionError: false,
-    userFriendlyMessage: "An error occurred while loading data",
-    actionableGuidance:
-      "Please try again or contact support if the problem persists.",
+    userFriendlyMessage: i18n.t("errors.loadingData", { ns: "common" }),
+    actionableGuidance: i18n.t("errors.contactSupport", { ns: "common" }),
   }
 }
 
@@ -119,7 +131,7 @@ export function extractErrorDetails(error: unknown): ErrorDetails {
   if (error instanceof ApiError) {
     const errorBody = error.body as ApiErrorBody | undefined
     const errDetail = errorBody?.detail
-    let message = "An API error occurred"
+    let message = i18n.t("errors.apiError", { ns: "common" })
 
     if (typeof errDetail === "string") {
       message = errDetail
@@ -133,7 +145,9 @@ export function extractErrorDetails(error: unknown): ErrorDetails {
       code: error.status,
       isRetryable:
         error.status >= 500 || error.status === 408 || error.status === 429,
-      details: error.url ? `Request to ${error.url} failed` : undefined,
+      details: error.url
+        ? i18n.t("errors.requestFailed", { url: error.url, ns: "common" })
+        : undefined,
     }
   }
 
@@ -153,7 +167,7 @@ export function extractErrorDetails(error: unknown): ErrorDetails {
   }
 
   return {
-    message: "An unknown error occurred",
+    message: i18n.t("errors.unknown", { ns: "common" }),
     isRetryable: false,
   }
 }
@@ -194,11 +208,11 @@ export function isAuthError(error: unknown): boolean {
  */
 export function getUserFriendlyErrorMessage(error: unknown): string {
   if (isAuthError(error)) {
-    return "You need to log in again to continue"
+    return i18n.t("errors.auth.loginRequired", { ns: "common" })
   }
 
   if (isNetworkError(error)) {
-    return "Network connection issue. Please check your internet connection and try again."
+    return i18n.t("errors.network.issue", { ns: "common" })
   }
 
   const canvasInfo = analyzeCanvasError(error)
@@ -215,11 +229,11 @@ export function getUserFriendlyErrorMessage(error: unknown): string {
  */
 export function getErrorActionableGuidance(error: unknown): string {
   if (isAuthError(error)) {
-    return "Please refresh the page and log in again."
+    return i18n.t("errors.auth.refreshGuidance", { ns: "common" })
   }
 
   if (isNetworkError(error)) {
-    return "Check your internet connection and try again. If the problem persists, the service may be temporarily unavailable."
+    return i18n.t("errors.network.guidance", { ns: "common" })
   }
 
   const canvasInfo = analyzeCanvasError(error)
@@ -229,8 +243,8 @@ export function getErrorActionableGuidance(error: unknown): string {
 
   const details = extractErrorDetails(error)
   if (details.isRetryable) {
-    return "This appears to be a temporary issue. Please try again in a few moments."
+    return i18n.t("errors.retryable.temporary", { ns: "common" })
   }
 
-  return "If this problem continues, please contact support for assistance."
+  return i18n.t("errors.retryable.contactSupport", { ns: "common" })
 }

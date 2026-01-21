@@ -3,6 +3,7 @@ import { ErrorState } from "@/components/Common"
 import { extractQuestionData } from "@/types/questionTypes"
 import { Box, HStack, Text, VStack } from "@chakra-ui/react"
 import { memo } from "react"
+import { useTranslation } from "react-i18next"
 import { ExplanationBox } from "../shared/ExplanationBox"
 
 interface TrueFalseDisplayProps {
@@ -14,6 +15,8 @@ export const TrueFalseDisplay = memo(function TrueFalseDisplay({
   question,
   showCorrectAnswer,
 }: TrueFalseDisplayProps) {
+  const { t } = useTranslation("quiz")
+
   try {
     const trueFalseData = extractQuestionData(question, "true_false")
 
@@ -44,7 +47,7 @@ export const TrueFalseDisplay = memo(function TrueFalseDisplay({
             }
             textAlign="center"
           >
-            <Text fontSize="sm">True</Text>
+            <Text fontSize="sm">{t("questions.editor.true")}</Text>
           </Box>
 
           {/* False Box */}
@@ -65,7 +68,7 @@ export const TrueFalseDisplay = memo(function TrueFalseDisplay({
             }
             textAlign="center"
           >
-            <Text fontSize="sm">False</Text>
+            <Text fontSize="sm">{t("questions.editor.false")}</Text>
           </Box>
         </HStack>
 
@@ -77,8 +80,8 @@ export const TrueFalseDisplay = memo(function TrueFalseDisplay({
   } catch (error) {
     return (
       <ErrorState
-        title="Display Error"
-        message="Error loading true/false question data"
+        title={t("questions.displayError")}
+        message={t("questions.loadingError")}
         variant="inline"
         showRetry={false}
       />

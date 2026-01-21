@@ -1,4 +1,5 @@
 import { useNavigate } from "@tanstack/react-router"
+import { useTranslation } from "react-i18next"
 
 import { QuizService } from "@/client"
 import ConfirmationDialog from "@/components/ui/confirmation-dialog"
@@ -12,6 +13,7 @@ const DeleteQuizConfirmation = ({
   quizId,
   quizTitle,
 }: DeleteQuizConfirmationProps) => {
+  const { t } = useTranslation("quiz")
   const navigate = useNavigate()
 
   const handleSuccess = () => {
@@ -20,12 +22,12 @@ const DeleteQuizConfirmation = ({
 
   return (
     <ConfirmationDialog
-      triggerButtonText="Delete"
+      triggerButtonText={t("actions.deleteQuiz")}
       triggerButtonSize="sm"
-      title="Delete Quiz"
-      message={`Are you sure you want to delete the quiz "${quizTitle}"? This action cannot be undone.`}
-      confirmButtonText="Delete Quiz"
-      successMessage="Quiz deleted successfully"
+      title={t("deleteConfirmation.title")}
+      message={t("deleteConfirmation.message", { quizTitle })}
+      confirmButtonText={t("actions.deleteQuiz")}
+      successMessage={t("deleteConfirmation.success")}
       mutationFn={() => QuizService.deleteQuizEndpoint({ quizId })}
       onSuccess={handleSuccess}
       invalidateQueries={[["quizzes"]]}

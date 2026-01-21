@@ -1,0 +1,136 @@
+{
+  "title": "Opprett ny quiz",
+  "stepOf": "Steg {{current}} av {{total}}: {{stepName}}",
+  "steps": {
+    "selectCourse": "Velg emne",
+    "selectModules": "Velg moduler",
+    "configureQuestions": "Konfigurer spørsmålstyper",
+    "quizConfiguration": "Quiz-konfigurasjon"
+  },
+  "courseSelection": {
+    "title": "Velg et emne å lage quiz for",
+    "description": "Her er emnene vi fant der du har lærerrolle.",
+    "chooseDescription": "Velg emnet du vil generere quiz-spørsmål fra modulinnholdet.",
+    "loadingCourses": "Laster emnene dine...",
+    "noCourses": "Ingen læreremner funnet",
+    "noCoursesDescription": "Du har ingen emner der du er registrert som lærer. Vennligst sjekk Canvas-kontoen din eller kontakt administrator.",
+    "failedToLoad": "Kunne ikke laste emner",
+    "selected": "Valgt: {{courseName}}",
+    "courseId": "Emne-ID: {{id}}",
+    "unnamedCourse": "Emne uten navn",
+    "devWarning": "Under utvikling vises bare emner med prefikser 'INF-' og 'MIK-'. Kontakt oss hvis du ønsker å teste med andre emner."
+  },
+  "quizTitle": {
+    "label": "Tittel",
+    "placeholder": "Skriv inn tittel",
+    "description": "Dette er tittelen som vises i Canvas og ved navigering i quizer. Du kan endre den før du fortsetter."
+  },
+  "moduleSelection": {
+    "title": "Velg moduler å inkludere i quizen",
+    "description": "Velg hvilke emnemoduler du vil generere quiz-spørsmål fra. Du kan velge flere moduler.",
+    "skipHint": "Du kan for eksempel hoppe over moduler med administrative detaljer.",
+    "loadingModules": "Laster emnemoduler...",
+    "noModules": "Ingen moduler funnet",
+    "noModulesDescription": "Dette emnet har ingen moduler ennå. Vennligst legg til innhold i emnet i Canvas før du genererer en quiz.",
+    "failedToLoad": "Kunne ikke laste emnemoduler",
+    "noCourseSelected": "Ingen emne valgt",
+    "noCourseSelectedDescription": "Vennligst gå tilbake til forrige steg og velg et emne først.",
+    "selectedCount": "Valgt {{count}} modul for quiz-generering",
+    "selectedCount_other": "Valgt {{count}} moduler for quiz-generering",
+    "unnamedModule": "Modul uten navn",
+    "addManualModule": "Legg til manuell modul",
+    "addManualModuleDescription": "Last opp PDF-filer eller lim inn tekstinnhold for å opprette en tilpasset modul",
+    "addModule": "Legg til modul",
+    "manual": "Manuell",
+    "words": "{{count}} ord",
+    "moduleSelected": "{{count}} modul valgt",
+    "moduleSelected_other": "{{count}} moduler valgt"
+  },
+  "questionConfig": {
+    "title": "Konfigurer spørsmålstyper per modul",
+    "description": "Legg til spørsmålsgrupper for hver modul. Hver gruppe kan ha forskjellig spørsmålstype, antall (1-20 spørsmål) og vanskelighetsgrad (maks 4 grupper per modul).",
+    "totalQuestions": "Totalt antall spørsmål",
+    "acrossModules": "På tvers av {{count}} moduler",
+    "largeCountWarning": "Stort antall spørsmål",
+    "largeCountMessage": "Stort antall spørsmål kan ta lengre tid å generere.",
+    "questionType": "Spørsmålstype",
+    "selectQuestionType": "Velg spørsmålstype",
+    "questions": "Spørsmål",
+    "difficulty": "Vanskelighetsgrad",
+    "selectDifficulty": "Velg vanskelighetsgrad",
+    "questionsTotal": "{{count}} spørsmål totalt",
+    "batchCount": "{{count}} grupper",
+    "addBatch": "Legg til gruppe",
+    "noBatches": "Ingen spørsmålsgrupper konfigurert",
+    "noBatchesHint": "Klikk «Legg til gruppe» for å komme i gang",
+    "noModulesSelected": "Ingen moduler valgt. Gå tilbake for å velge moduler først.",
+    "tip": "Tips: Bland forskjellige spørsmålstyper og vanskelighetsgrader for å lage omfattende vurderinger. Hver modul kan ha opptil 4 forskjellige spørsmålsgrupper med 1-20 spørsmål hver."
+  },
+  "manualModule": {
+    "title": "Legg til manuell modul",
+    "stepUpload": "Last opp PDF-fil",
+    "stepText": "Skriv inn tekstinnhold",
+    "stepReview": "Forhåndsvis innhold",
+    "moduleName": {
+      "label": "Modulnavn",
+      "placeholder": "Skriv inn et navn for denne modulen"
+    },
+    "contentMethod": "Hvordan vil du legge til innhold for denne modulen?",
+    "uploadPdf": "Last opp PDF-fil",
+    "uploadPdfDescription": "Last opp PDF-dokumenter (forelesningsnotater, transkripsjoner, osv.)",
+    "enterText": "Skriv inn tekstinnhold",
+    "enterTextDescription": "Lim inn eller skriv innhold direkte",
+    "back": "Tilbake",
+    "cancel": "Avbryt",
+    "addModule": "Legg til modul",
+    "processContent": "Behandle innhold",
+    "processing": "Behandler..."
+  },
+  "fileUpload": {
+    "title": "Last opp PDF-filer",
+    "dropzone": "Klikk for å laste opp eller dra og slipp",
+    "restrictions": "Kun PDF-filer, opptil 5 filer, 5MB hver, 25MB totalt",
+    "chooseFile": "Velg fil",
+    "selectedFiles": "Valgte filer ({{count}}/5):",
+    "maxFilesError": "Maksimalt {{max}} filer tillatt per manuell modul",
+    "invalidTypeError": "Kun PDF-filer støttes. Ugyldig fil: {{name}}",
+    "fileTooLargeError": "Filen '{{name}}' overskrider maksimal størrelse på {{max}}MB",
+    "totalSizeError": "Total filstørrelse overskrider maksimal grense"
+  },
+  "textContent": {
+    "title": "Skriv inn tekstinnhold",
+    "placeholder": "Lim inn emneinnholdet ditt her...",
+    "stats": "{{words}} ord, {{characters}} tegn",
+    "description": "Skriv inn innholdet du vil generere spørsmål fra. Dette kan være forelesningsnotater, emnemateriale eller annet pedagogisk tekstinnhold."
+  },
+  "contentPreview": {
+    "title": "Forhåndsvisning av innhold",
+    "wordCount": "Antall ord",
+    "processing": "Behandler innhold...",
+    "processingHint": "Dette kan ta noen sekunder",
+    "noContent": "Ingen innhold å forhåndsvise ennå"
+  },
+  "navigation": {
+    "cancel": "Avbryt",
+    "previous": "Forrige",
+    "next": "Neste",
+    "createQuiz": "Opprett quiz"
+  },
+  "success": {
+    "created": "Quiz opprettet!",
+    "contentProcessed": "Innhold behandlet!"
+  },
+  "errors": {
+    "missingData": "Manglende påkrevd quiz-data",
+    "createFailed": "Kunne ikke opprette quiz",
+    "moduleNameRequired": "Modulnavn er påkrevd",
+    "selectPdfFile": "Vennligst velg minst én PDF-fil",
+    "enterTextContent": "Vennligst skriv inn tekstinnhold",
+    "processContentFailed": "Kunne ikke behandle innhold"
+  },
+  "common": {
+    "retrying": "Prøver igjen...",
+    "tryAgain": "Prøv igjen",
+    "words": "ord"
+  }
+}

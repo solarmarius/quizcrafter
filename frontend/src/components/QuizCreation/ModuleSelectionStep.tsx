@@ -11,6 +11,7 @@ import {
 import { useQuery } from "@tanstack/react-query"
 import type React from "react"
 import { useCallback, useMemo, useState } from "react"
+import { useTranslation } from "react-i18next"
 
 import { CanvasService } from "@/client"
 import { LoadingSkeleton } from "@/components/Common"
@@ -47,15 +48,16 @@ export function ModuleSelectionStep({
   onModulesSelect,
   onManualModuleAdd,
 }: ModuleSelectionStepProps) {
+  const { t } = useTranslation("creation")
   const [isManualDialogOpen, setIsManualDialogOpen] = useState(false)
   // Show message if no course is selected
   if (!courseId || courseId <= 0) {
     return (
       <Alert.Root status="warning">
         <Alert.Indicator />
-        <Alert.Title>No course selected</Alert.Title>
+        <Alert.Title>{t("moduleSelection.noCourseSelected")}</Alert.Title>
         <Alert.Description>
-          Please go back to the previous step and select a course first.
+          {t("moduleSelection.noCourseSelectedDescription")}
         </Alert.Description>
       </Alert.Root>
     )
@@ -131,7 +133,9 @@ export function ModuleSelectionStep({
     return (
       <VStack gap={4} align="stretch">
         <Text fontSize="lg" fontWeight="semibold">
-          {isLoading ? "Loading course modules..." : "Retrying..."}
+          {isLoading
+            ? t("moduleSelection.loadingModules")
+            : t("common.retrying")}
         </Text>
         <LoadingSkeleton height="60px" lines={4} />
       </VStack>
@@ -144,7 +148,7 @@ export function ModuleSelectionStep({
     return (
       <Alert.Root status="error">
         <Alert.Indicator />
-        <Alert.Title>Failed to load course modules</Alert.Title>
+        <Alert.Title>{t("moduleSelection.failedToLoad")}</Alert.Title>
         <Alert.Description>
           <VStack gap={3} align="stretch">
             <Text>{errorInfo.userFriendlyMessage}</Text>
@@ -158,7 +162,7 @@ export function ModuleSelectionStep({
               disabled={isFetching}
               loading={isFetching}
             >
-              Try Again
+              {t("common.tryAgain")}
             </Button>
           </VStack>
         </Alert.Description>
@@ -170,10 +174,9 @@ export function ModuleSelectionStep({
     return (
       <Alert.Root status="info">
         <Alert.Indicator />
-        <Alert.Title>No modules found</Alert.Title>
+        <Alert.Title>{t("moduleSelection.noModules")}</Alert.Title>
         <Alert.Description>
-          This course doesn't have any modules yet. Please add some content to
-          the course in Canvas before generating a quiz.
+          {t("moduleSelection.noModulesDescription")}
         </Alert.Description>
       </Alert.Root>
     )
@@ -183,15 +186,13 @@ export function ModuleSelectionStep({
     <VStack gap={4} align="stretch">
       <Box>
         <Text fontSize="lg" fontWeight="semibold" mb={2}>
-          Select modules to include in the quiz
+          {t("moduleSelection.title")}
         </Text>
         <Text color="gray.600" fontSize="sm">
-          Choose which course modules you want to generate quiz questions from.
-          You can select multiple modules.
+          {t("moduleSelection.description")}
         </Text>
         <Text color="gray.600" fontSize="sm">
-          For instance, you can skip including modules with administrative
-          details.
+          {t("moduleSelection.skipHint")}
         </Text>
       </Box>
 
@@ -210,10 +211,10 @@ export function ModuleSelectionStep({
             <Box fontSize="xl">➕</Box>
             <Box flex={1}>
               <Text fontWeight="medium" fontSize="md" color="green.700">
-                Add Manual Module
+                {t("moduleSelection.addManualModule")}
               </Text>
               <Text fontSize="sm" color="green.600" mt={1}>
-                Upload PDF files or paste text content to create a custom module
+                {t("moduleSelection.addManualModuleDescription")}
               </Text>
             </Box>
             <Button
@@ -225,7 +226,7 @@ export function ModuleSelectionStep({
                 setIsManualDialogOpen(true)
               }}
             >
-              Add Module
+              {t("moduleSelection.addModule")}
             </Button>
           </HStack>
         </Card.Body>
@@ -258,7 +259,7 @@ export function ModuleSelectionStep({
                 />
                 <Box flex={1}>
                   <Text fontWeight="medium" fontSize="md" lineClamp={2}>
-                    {module.name || "Unnamed Module"}
+                    {module.name || t("moduleSelection.unnamedModule")}
                   </Text>
                 </Box>
               </HStack>
@@ -293,7 +294,7 @@ export function ModuleSelectionStep({
                 <Box flex={1}>
                   <HStack gap={2} align="center">
                     <Text fontWeight="medium" fontSize="md" lineClamp={2}>
-                      {module.name || "Unnamed Module"}
+                      {module.name || t("moduleSelection.unnamedModule")}
                     </Text>
                     <Box
                       px={2}
@@ -304,11 +305,11 @@ export function ModuleSelectionStep({
                       fontWeight="medium"
                       borderRadius="md"
                     >
-                      Manual
+                      {t("moduleSelection.manual")}
                     </Box>
                   </HStack>
                   <Text fontSize="sm" color="gray.600" mt={1}>
-                    {module.wordCount.toLocaleString()} words
+                    {module.wordCount.toLocaleString()} {t("common.words")}
                   </Text>
                 </Box>
               </HStack>
@@ -321,8 +322,7 @@ export function ModuleSelectionStep({
         <Alert.Root status="success">
           <Alert.Indicator />
           <Alert.Description>
-            Selected {selectedCount} module{selectedCount === 1 ? "" : "s"} for
-            quiz generation
+            {t("moduleSelection.selectedCount", { count: selectedCount })}
           </Alert.Description>
         </Alert.Root>
       )}

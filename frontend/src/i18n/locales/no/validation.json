@@ -1,0 +1,93 @@
+{
+  "questionBatch": {
+    "maxBatches": "Maksimalt 4 spørsmålsgrupper per modul",
+    "duplicateTypes": "Kan ikke ha dupliserte spørsmålstyper i samme modul",
+    "duplicateCombinations": "Kan ikke ha dupliserte kombinasjoner av spørsmålstype og vanskelighetsgrad",
+    "invalidCount": "Antall spørsmål må være mellom 1 og 20",
+    "invalidCountWithIndex": "Gruppe {{index}}: Antall spørsmål må være mellom 1 og 20",
+    "noBatches": "Hver modul må ha minst én spørsmålsgruppe"
+  },
+  "quiz": {
+    "minTitleLength": "Tittel er påkrevd",
+    "maxTitleLength": "Tittel må være kortere enn 255 tegn"
+  },
+  "fillInBlank": {
+    "header": "Valideringsfeil ({{count}})",
+    "fixMessage": "Vennligst fiks følgende problemer før du lagrer:",
+    "howToFix": "Slik løser du det:",
+    "details": "Detaljer:",
+    "positions": "Posisjoner: {{positions}}",
+    "invalidTags": "Ugyldige tagger: {{tags}}",
+    "missingPositions": "Manglende posisjoner: {{positions}}",
+    "extraPositions": "Ekstra posisjoner: {{positions}}",
+    "criticalIssues": "Kritiske problemer:",
+    "warnings": "Advarsler:",
+    "information": "Informasjon:",
+    "quickHelp": "Hurtig hjelp:",
+    "quickHelpText": "Fyll-inn-spørsmål trenger [blank_1], [blank_2] tagger i spørsmålsteksten med tilsvarende blank-konfigurasjoner nedenfor. Posisjoner må være sekvensielle (1, 2, 3...) og synkronisert mellom tekst og konfigurasjon.",
+    "errorCount": "{{count}} valideringsfeil funnet",
+    "errorCount_other": "{{count}} valideringsfeil funnet",
+    "andMore": "(og {{count}} til)",
+    "suggestions": {
+      "invalidTagFormat": {
+        "1": "Bruk små bokstaver: [blank_1], [blank_2], osv.",
+        "2": "Sørg for riktige klammer og understrek",
+        "3": "Bruk kun numeriske posisjoner"
+      },
+      "caseSensitivity": {
+        "1": "Endre store bokstaver [BLANK_1] til små bokstaver [blank_1]",
+        "2": "Bruk konsekvent formatering med små bokstaver gjennom hele spørsmålet"
+      },
+      "duplicatePositions": {
+        "1": "Hver blank-posisjon skal bare vises én gang i spørsmålsteksten",
+        "2": "Sjekk for dupliserte [blank_N] tagger og fjern ekstra",
+        "3": "Bruk sekvensiell nummerering: [blank_1], [blank_2], [blank_3]"
+      },
+      "nonSequentialPositions": {
+        "1": "Nummerer blankene sekvensielt fra 1",
+        "2": "Unngå hull i nummereringen (f.eks. [blank_1], [blank_3])",
+        "3": "Oppdater blank-konfigurasjoner til å matche sekvensielle posisjoner"
+      },
+      "positionGap": {
+        "1": "Fyll inn manglende blank-posisjoner",
+        "2": "Sørg for kontinuerlig nummerering uten hull",
+        "3": "Legg til manglende [blank_N] tagger i spørsmålsteksten"
+      },
+      "missingBlankConfig": {
+        "1": "Legg til blank-konfigurasjoner for hver [blank_N] tagg i spørsmålsteksten",
+        "2": "Klikk \"Legg til blank\" for å opprette manglende konfigurasjoner",
+        "3": "Sørg for at posisjonsnumre matcher spørsmålsteksten"
+      },
+      "extraBlankConfig": {
+        "1": "Fjern blank-konfigurasjoner uten tilsvarende [blank_N] tagger",
+        "2": "Legg til manglende [blank_N] tagger i spørsmålsteksten",
+        "3": "Sørg for synkronisering mellom tekst og konfigurasjoner"
+      },
+      "unsynchronizedBlanks": {
+        "1": "Sørg for at hver [blank_N] tagg har en tilsvarende blank-konfigurasjon",
+        "2": "Fjern ekstra konfigurasjoner eller legg til manglende spørsmålstekst-tagger",
+        "3": "Sjekk at posisjonsnumrene matcher nøyaktig"
+      },
+      "noBlanksInText": {
+        "1": "Legg til minst én [blank_1] tagg i spørsmålsteksten",
+        "2": "Identifiser ordet eller frasen som skal fylles inn",
+        "3": "Erstatt det med [blank_1], [blank_2], osv."
+      },
+      "noBlankConfigurations": {
+        "1": "Klikk \"Legg til blank\" for å opprette blank-konfigurasjoner",
+        "2": "Oppgi riktige svar for hver blank-posisjon",
+        "3": "Konfigurer svarvariasjoner om nødvendig"
+      }
+    }
+  },
+  "editors": {
+    "mcqLoadError": "Feil ved lasting av flervalgsspørsmål",
+    "fillInBlankLoadError": "Feil ved lasting av fyll-inn-spørsmål",
+    "editorError": "Redigeringsfeil",
+    "unsupportedType": "Ustøttet spørsmålstype",
+    "unsupportedMessage": "Redigering for spørsmålstypen \"{{questionType}}\" er ikke støttet ennå."
+  },
+  "questions": {
+    "createSuccess": "Spørsmål opprettet"
+  }
+}

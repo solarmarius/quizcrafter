@@ -18,6 +18,7 @@ import { Route as LoginSuccessImport } from './routes/login/success'
 import { Route as LayoutSettingsImport } from './routes/_layout/settings'
 import { Route as LayoutQuizzesImport } from './routes/_layout/quizzes'
 import { Route as LayoutProjectThesisImport } from './routes/_layout/project-thesis'
+import { Route as LayoutPrivacyPolicyNoImport } from './routes/_layout/privacy-policy-no'
 import { Route as LayoutPrivacyPolicyImport } from './routes/_layout/privacy-policy'
 import { Route as LayoutCreateQuizImport } from './routes/_layout/create-quiz'
 import { Route as LayoutQuizIdImport } from './routes/_layout/quiz.$id'
@@ -58,6 +59,11 @@ const LayoutQuizzesRoute = LayoutQuizzesImport.update({
 
 const LayoutProjectThesisRoute = LayoutProjectThesisImport.update({
   path: '/project-thesis',
+  getParentRoute: () => LayoutRoute,
+} as any)
+
+const LayoutPrivacyPolicyNoRoute = LayoutPrivacyPolicyNoImport.update({
+  path: '/privacy-policy-no',
   getParentRoute: () => LayoutRoute,
 } as any)
 
@@ -106,6 +112,10 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LayoutPrivacyPolicyImport
       parentRoute: typeof LayoutImport
     }
+    '/_layout/privacy-policy-no': {
+      preLoaderRoute: typeof LayoutPrivacyPolicyNoImport
+      parentRoute: typeof LayoutImport
+    }
     '/_layout/project-thesis': {
       preLoaderRoute: typeof LayoutProjectThesisImport
       parentRoute: typeof LayoutImport
@@ -147,6 +157,7 @@ export const routeTree = rootRoute.addChildren([
   LayoutRoute.addChildren([
     LayoutCreateQuizRoute,
     LayoutPrivacyPolicyRoute,
+    LayoutPrivacyPolicyNoRoute,
     LayoutProjectThesisRoute,
     LayoutQuizzesRoute,
     LayoutSettingsRoute,

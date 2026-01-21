@@ -3,6 +3,7 @@ import { ErrorState } from "@/components/Common"
 import { extractQuestionData } from "@/types/questionTypes"
 import { Box, Text, VStack } from "@chakra-ui/react"
 import { memo } from "react"
+import { useTranslation } from "react-i18next"
 import { ExplanationBox } from "../shared/ExplanationBox"
 import { FillInBlankAnswersBox } from "../shared/FillInBlankAnswersBox"
 
@@ -15,6 +16,8 @@ export const FillInBlankDisplay = memo(function FillInBlankDisplay({
   question,
   showCorrectAnswer,
 }: FillInBlankDisplayProps) {
+  const { t } = useTranslation("quiz")
+
   try {
     const fibData = extractQuestionData(question, "fill_in_blank")
 
@@ -36,8 +39,8 @@ export const FillInBlankDisplay = memo(function FillInBlankDisplay({
   } catch (error) {
     return (
       <ErrorState
-        title="Display Error"
-        message="Error loading Fill in Blank question data"
+        title={t("questions.displayError")}
+        message={t("questions.loadingError")}
         variant="inline"
         showRetry={false}
       />

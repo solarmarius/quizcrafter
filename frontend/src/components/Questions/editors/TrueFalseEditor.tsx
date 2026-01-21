@@ -7,6 +7,7 @@ import { Button, HStack, Textarea } from "@chakra-ui/react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { memo } from "react"
 import { Controller, useForm } from "react-hook-form"
+import { useTranslation } from "react-i18next"
 import { ErrorEditor } from "./ErrorEditor"
 
 interface TrueFalseEditorProps {
@@ -22,6 +23,8 @@ export const TrueFalseEditor = memo(function TrueFalseEditor({
   onCancel,
   isLoading,
 }: TrueFalseEditorProps) {
+  const { t } = useTranslation("quiz")
+
   try {
     const trueFalseData = extractQuestionData(question, "true_false")
 
@@ -56,13 +59,13 @@ export const TrueFalseEditor = memo(function TrueFalseEditor({
           control={control}
           render={({ field }) => (
             <FormField
-              label="Question Text"
+              label={t("questions.editor.questionText")}
               isRequired
               error={errors.questionText?.message}
             >
               <Textarea
                 {...field}
-                placeholder="Enter your true/false statement..."
+                placeholder={t("placeholders.trueFalseStatement")}
                 rows={3}
               />
             </FormField>
@@ -74,7 +77,7 @@ export const TrueFalseEditor = memo(function TrueFalseEditor({
           control={control}
           render={({ field: { value, onChange } }) => (
             <FormField
-              label="Correct Answer"
+              label={t("questions.editor.correctAnswer")}
               isRequired
               error={errors.correctAnswer?.message}
             >
@@ -85,8 +88,8 @@ export const TrueFalseEditor = memo(function TrueFalseEditor({
                 }}
               >
                 <HStack gap={4}>
-                  <Radio value="true">True</Radio>
-                  <Radio value="false">False</Radio>
+                  <Radio value="true">{t("questions.editor.true")}</Radio>
+                  <Radio value="false">{t("questions.editor.false")}</Radio>
                 </HStack>
               </RadioGroup>
             </FormField>
@@ -98,12 +101,12 @@ export const TrueFalseEditor = memo(function TrueFalseEditor({
           control={control}
           render={({ field }) => (
             <FormField
-              label="Explanation (Optional)"
+              label={t("questions.editor.explanationOptional")}
               error={errors.explanation?.message}
             >
               <Textarea
                 {...field}
-                placeholder="Optional explanation for the correct answer..."
+                placeholder={t("placeholders.trueFalseExplanation")}
                 rows={3}
               />
             </FormField>
@@ -112,7 +115,7 @@ export const TrueFalseEditor = memo(function TrueFalseEditor({
 
         <HStack gap={3} justify="end">
           <Button variant="outline" onClick={onCancel} disabled={isLoading}>
-            Cancel
+            {t("questions.editor.cancel")}
           </Button>
           <Button
             colorScheme="blue"
@@ -120,7 +123,7 @@ export const TrueFalseEditor = memo(function TrueFalseEditor({
             loading={isLoading}
             disabled={!isDirty}
           >
-            Save Changes
+            {t("questions.editor.saveChanges")}
           </Button>
         </HStack>
       </FormGroup>

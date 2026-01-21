@@ -6,12 +6,13 @@ import {
   Image,
   Text,
   VStack,
-} from "@chakra-ui/react";
-import { createFileRoute, redirect } from "@tanstack/react-router";
+} from "@chakra-ui/react"
+import { createFileRoute, redirect } from "@tanstack/react-router"
+import { useTranslation } from "react-i18next"
 
-import CanvasLoginButton from "@/components/ui/canvas-button";
-import { isLoggedIn } from "@/hooks/auth";
-import Illustration from "/assets/images/test-illustration.svg";
+import CanvasLoginButton from "@/components/ui/canvas-button"
+import { isLoggedIn } from "@/hooks/auth"
+import Illustration from "/assets/images/test-illustration.svg"
 
 export const Route = createFileRoute("/login")({
   component: Login,
@@ -19,18 +20,19 @@ export const Route = createFileRoute("/login")({
     if (isLoggedIn()) {
       throw redirect({
         to: "/",
-      });
+      })
     }
   },
   validateSearch: (search: Record<string, unknown>) => {
     return {
       error: typeof search.error === "string" ? search.error : undefined,
-    };
+    }
   },
-});
+})
 
 function Login() {
-  const { error } = Route.useSearch();
+  const { t } = useTranslation("common")
+  const { error } = Route.useSearch()
 
   return (
     <Container
@@ -47,12 +49,10 @@ function Login() {
         {/* App Title/Logo */}
         <VStack mb={4}>
           <Text fontSize="2xl" fontWeight="bold" textAlign="center">
-            Welcome to QuizCrafter
+            {t("login.welcome")}
           </Text>
           <Text fontSize="sm" color="gray.600" textAlign="center">
-            Turn your Canvas course material into high-quality quizzes with
-            LLMs. Build your question bank, approve with a click, and generate
-            quizzes in minutes.
+            {t("login.description")}
           </Text>
         </VStack>
 
@@ -61,8 +61,7 @@ function Login() {
           <Alert.Root status="error">
             <Alert.Indicator />
             <Alert.Title>
-              There was an error processing your request:{" "}
-              {decodeURIComponent(error)}
+              {t("login.errorMessage", { error: decodeURIComponent(error) })}
             </Alert.Title>
           </Alert.Root>
         )}
@@ -73,14 +72,14 @@ function Login() {
         {/* Help Section */}
         <Box bg="gray.50" p={4} borderRadius="md" width="100%" mt={4}>
           <Text fontSize="sm" fontWeight="medium" mb={3}>
-            Unsure how it works?
+            {t("login.helpTitle")}
           </Text>
           <AspectRatio ratio={16 / 9} mb={3}>
             <iframe
               width="560"
               height="315"
               src="https://www.youtube.com/embed/zV6bP3IMZ9w?si=9L1scxQGRYqMuCP-"
-              title="YouTube video player"
+              title={t("login.videoTitle")}
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
               referrerPolicy="strict-origin-when-cross-origin"
               allowFullScreen
@@ -91,11 +90,10 @@ function Login() {
             />
           </AspectRatio>
           <Text fontSize="xs" color="gray.600">
-            Watch how QuizCrafter seamlessly integrates with Canvas to analyze
-            your course materials and generate high-quality quizzes.
+            {t("login.videoDescription")}
           </Text>
         </Box>
       </VStack>
     </Container>
-  );
+  )
 }

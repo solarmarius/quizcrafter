@@ -1,4 +1,5 @@
 import { Button, Card, HStack, Stack, Text } from "@chakra-ui/react"
+import { useTranslation } from "react-i18next"
 import {
   DialogBackdrop,
   DialogBody,
@@ -27,6 +28,7 @@ export const OnboardingModal = ({
   onPrevious,
   onComplete,
 }: OnboardingModalProps) => {
+  const { t } = useTranslation("common")
   const totalSteps = 4
   const progressValue = (currentStep / totalSteps) * 100
 
@@ -56,7 +58,10 @@ export const OnboardingModal = ({
           <Stack gap={3}>
             <HStack justify="space-between" align="center">
               <Text fontSize="sm" color="gray.500">
-                Step {currentStep} of {totalSteps}
+                {t("onboarding.stepProgress", {
+                  current: currentStep,
+                  total: totalSteps,
+                })}
               </Text>
             </HStack>
             <Stack bg="gray.100" h="2" borderRadius="full" overflow="hidden">
@@ -93,14 +98,14 @@ export const OnboardingModal = ({
               disabled={isFirstStep}
               visibility={isFirstStep ? "hidden" : "visible"}
             >
-              Previous
+              {t("actions.previous")}
             </Button>
 
             <Button
               colorPalette="teal"
               onClick={isLastStep ? onComplete : onNext}
             >
-              {isLastStep ? "Get Started" : "Next"}
+              {isLastStep ? t("actions.getStarted") : t("actions.next")}
             </Button>
           </HStack>
         </DialogFooter>

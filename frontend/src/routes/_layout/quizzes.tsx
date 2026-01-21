@@ -2,6 +2,7 @@ import { Box, Card, Container, HStack, Text, VStack } from "@chakra-ui/react"
 import { useQueryClient } from "@tanstack/react-query"
 import { Link as RouterLink, createFileRoute } from "@tanstack/react-router"
 import { useEffect } from "react"
+import { useTranslation } from "react-i18next"
 
 import {
   EmptyState,
@@ -13,7 +14,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { useUserQuizzes } from "@/hooks/api"
 import { useErrorHandler } from "@/hooks/common"
-import { UI_SIZES, UI_TEXT } from "@/lib/constants"
+import { UI_SIZES } from "@/lib/constants"
 import { queryKeys } from "@/lib/queryConfig"
 
 export const Route = createFileRoute("/_layout/quizzes")({
@@ -23,6 +24,7 @@ export const Route = createFileRoute("/_layout/quizzes")({
 function QuizList() {
   const { handleError } = useErrorHandler()
   const queryClient = useQueryClient()
+  const { t } = useTranslation(["dashboard", "quiz"])
 
   // Force fresh data every time user visits this route
   // This ensures quiz status updates are immediately visible
@@ -43,8 +45,8 @@ function QuizList() {
         <Card.Root>
           <Card.Body>
             <ErrorState
-              title="Failed to Load Quizzes"
-              message="There was an error loading your quizzes. Please try again."
+              title={t("quizList.loadFailed")}
+              message={t("quizList.loadFailedMessage")}
               showRetry={false}
             />
           </Card.Body>
@@ -60,15 +62,13 @@ function QuizList() {
         <HStack justify="space-between" align="center">
           <Box>
             <Text fontSize="3xl" fontWeight="bold">
-              My Quizzes
+              {t("quizList.title")}
             </Text>
-            <Text color="gray.600">
-              Manage and view all your created quizzes
-            </Text>
+            <Text color="gray.600">{t("quizList.description")}</Text>
           </Box>
           <Button asChild>
             <RouterLink to="/create-quiz">
-              {UI_TEXT.ACTIONS.CREATE_QUIZ}
+              {t("quiz:actions.createQuiz")}
             </RouterLink>
           </Button>
         </HStack>
@@ -78,12 +78,12 @@ function QuizList() {
           <Card.Root>
             <Card.Body>
               <EmptyState
-                title={UI_TEXT.EMPTY_STATES.NO_QUIZZES}
-                description="You haven't created any quizzes yet. Get started by creating your first quiz."
+                title={t("quiz:emptyStates.noQuizzes")}
+                description={t("quizList.emptyDescription")}
                 action={
                   <Button asChild>
                     <RouterLink to="/create-quiz">
-                      {UI_TEXT.ACTIONS.CREATE_FIRST_QUIZ}
+                      {t("quiz:actions.createFirstQuiz")}
                     </RouterLink>
                   </Button>
                 }

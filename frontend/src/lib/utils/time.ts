@@ -17,9 +17,13 @@ function isValidDate(date: Date): boolean {
 }
 
 /**
- * Format a timestamp as a relative time string (e.g., "2 hours ago")
+ * Get relative time data from a timestamp for translation
+ * Returns an object with the key suffix and count for i18n interpolation
  */
-export function formatTimeAgo(timestamp: string): string {
+export function getRelativeTimeData(timestamp: string): {
+  key: "justNow" | "minutesAgo" | "hoursAgo" | "daysAgo"
+  count: number
+} | null {
   try {
     // Ensure the timestamp is treated as UTC if it doesn't have timezone info
     let normalizedTimestamp = timestamp
@@ -36,20 +40,16 @@ export function formatTimeAgo(timestamp: string): string {
     const diffMs = now.getTime() - date.getTime()
     const diffMins = Math.floor(diffMs / (1000 * 60))
 
-    if (diffMins < 1) return "just now"
-    if (diffMins < 60) {
-      return `${diffMins} minute${diffMins === 1 ? "" : "s"} ago`
-    }
+    if (diffMins < 1) return { key: "justNow", count: 0 }
+    if (diffMins < 60) return { key: "minutesAgo", count: diffMins }
 
     const diffHours = Math.floor(diffMins / 60)
-    if (diffHours < 24) {
-      return `${diffHours} hour${diffHours === 1 ? "" : "s"} ago`
-    }
+    if (diffHours < 24) return { key: "hoursAgo", count: diffHours }
 
     const diffDays = Math.floor(diffHours / 24)
-    return `${diffDays} day${diffDays === 1 ? "" : "s"} ago`
+    return { key: "daysAgo", count: diffDays }
   } catch {
-    return ""
+    return null
   }
 }
 

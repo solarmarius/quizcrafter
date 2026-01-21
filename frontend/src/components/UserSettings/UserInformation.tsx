@@ -2,6 +2,7 @@ import { Alert, Box, Button, Flex, Input, Link, Text } from "@chakra-ui/react"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { useState } from "react"
 import { type SubmitHandler, useForm } from "react-hook-form"
+import { Trans, useTranslation } from "react-i18next"
 
 import {
   type ApiError,
@@ -11,9 +12,17 @@ import {
 } from "@/client"
 import { FormField, FormGroup } from "@/components/forms"
 import { useAuth } from "@/hooks/auth"
-import { useCustomToast, useErrorHandler } from "@/hooks/common"
+import {
+  useCustomToast,
+  useErrorHandler,
+  useLocalizedRoute,
+} from "@/hooks/common"
+import { LOCALIZED_ROUTES } from "@/lib/routes"
+import LanguagePreference from "./LanguagePreference"
 
 const UserInformation = () => {
+  const { t } = useTranslation("common")
+  const { getLocalizedRoute } = useLocalizedRoute()
   const queryClient = useQueryClient()
   const { showSuccessToast } = useCustomToast()
   const { handleError } = useErrorHandler()
@@ -41,7 +50,7 @@ const UserInformation = () => {
     mutationFn: (data: UserUpdateMe) =>
       UsersService.updateUserMe({ requestBody: data }),
     onSuccess: () => {
-      showSuccessToast("User updated successfully.")
+      showSuccessToast(t("userSettings.updateSuccess"))
     },
     onError: (err: ApiError) => {
       handleError(err)
@@ -68,13 +77,13 @@ const UserInformation = () => {
         onSubmit={handleSubmit(onSubmit)}
       >
         <FormGroup>
-          <FormField label="Name" isRequired>
+          <FormField label={t("userSettings.name.label")} isRequired>
             {editMode ? (
               <Input
                 {...register("name", { maxLength: 30 })}
                 type="text"
                 size="md"
-                placeholder="Enter your name"
+                placeholder={t("userSettings.name.placeholder")}
               />
             ) : (
               <Text
@@ -84,7 +93,7 @@ const UserInformation = () => {
                 truncate
                 maxW="sm"
               >
-                {currentUser?.name || "N/A"}
+                {currentUser?.name || t("labels.notAvailable")}
               </Text>
             )}
           </FormField>
@@ -98,7 +107,7 @@ const UserInformation = () => {
               disabled={editMode ? !isDirty || !getValues("name") : false}
               colorPalette="blue"
             >
-              {editMode ? "Save" : "Edit"}
+              {editMode ? t("actions.save") : t("actions.edit")}
             </Button>
             {editMode && (
               <Button
@@ -107,25 +116,33 @@ const UserInformation = () => {
                 onClick={onCancel}
                 disabled={isSubmitting}
               >
-                Cancel
+                {t("actions.cancel")}
               </Button>
             )}
           </Flex>
         </FormGroup>
       </Box>
 
+      <Box mt={6}>
+        <LanguagePreference />
+      </Box>
+
       <Alert.Root status="info" variant="subtle" mt={6} colorPalette="orange">
         <Alert.Content>
           <Alert.Description>
-            Review our{" "}
-            <Link
-              href="/privacy-policy"
-              color="blue.500"
-              textDecoration="underline"
-            >
-              Privacy Policy
-            </Link>{" "}
-            to understand how we handle your data.
+            <Trans
+              i18nKey="userSettings.privacyNotice"
+              ns="common"
+              components={{
+                privacyLink: (
+                  <Link
+                    href={getLocalizedRoute(LOCALIZED_ROUTES.privacyPolicy)}
+                    color="blue.500"
+                    textDecoration="underline"
+                  />
+                ),
+              }}
+            />
           </Alert.Description>
         </Alert.Content>
       </Alert.Root>

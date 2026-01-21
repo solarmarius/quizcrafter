@@ -10,6 +10,7 @@ import {
 } from "@chakra-ui/react"
 import { createFileRoute, useNavigate } from "@tanstack/react-router"
 import { useCallback, useState } from "react"
+import { useTranslation } from "react-i18next"
 
 import {
   type QuestionBatch,
@@ -55,6 +56,7 @@ const TOTAL_STEPS = 4 // Course selection, Module selection, Questions per modul
 
 function CreateQuiz() {
   const navigate = useNavigate()
+  const { t } = useTranslation("creation")
   const [currentStep, setCurrentStep] = useState(1)
   const [formData, setFormData] = useState<QuizFormData>({})
   const [isCreating, setIsCreating] = useState(false)
@@ -136,7 +138,7 @@ function CreateQuiz() {
       !formData.moduleQuestions ||
       !formData.title
     ) {
-      showErrorToast("Missing required quiz data")
+      showErrorToast(t("errors.missingData"))
       return
     }
 
@@ -191,10 +193,10 @@ function CreateQuiz() {
       })
 
       if (response) {
-        showSuccessToast("Quiz created successfully!")
+        showSuccessToast(t("success.created"))
         navigate({ to: `/quiz/${response.id}`, params: { id: response.id! } })
       } else {
-        throw new Error("Failed to create quiz")
+        throw new Error(t("errors.createFailed"))
       }
     } catch (error) {
       handleError(error)
@@ -206,15 +208,15 @@ function CreateQuiz() {
   const getStepTitle = () => {
     switch (currentStep) {
       case 1:
-        return "Select Course"
+        return t("steps.selectCourse")
       case 2:
-        return "Select Modules"
+        return t("steps.selectModules")
       case 3:
-        return "Configure Question Types"
+        return t("steps.configureQuestions")
       case 4:
-        return "Quiz Configuration"
+        return t("steps.quizConfiguration")
       default:
-        return "Create Quiz"
+        return t("title")
     }
   }
 
@@ -323,10 +325,14 @@ function CreateQuiz() {
         {/* Header */}
         <Box>
           <Text fontSize="3xl" fontWeight="bold">
-            Create New Quiz
+            {t("title")}
           </Text>
           <Text color="gray.600">
-            Step {currentStep} of {TOTAL_STEPS}: {getStepTitle()}
+            {t("stepOf", {
+              current: currentStep,
+              total: TOTAL_STEPS,
+              stepName: getStepTitle(),
+            })}
           </Text>
         </Box>
 
@@ -350,13 +356,13 @@ function CreateQuiz() {
         {/* Navigation Buttons */}
         <HStack justify="space-between">
           <Button variant="outline" onClick={handleCancel}>
-            Cancel
+            {t("navigation.cancel")}
           </Button>
 
           <HStack>
             {currentStep > 1 && (
               <Button variant="outline" onClick={handlePrevious}>
-                Previous
+                {t("navigation.previous")}
               </Button>
             )}
 
@@ -366,7 +372,7 @@ function CreateQuiz() {
                 onClick={handleNext}
                 disabled={!isStepValid()}
               >
-                Next
+                {t("navigation.next")}
               </Button>
             ) : (
               <Button
@@ -375,7 +381,7 @@ function CreateQuiz() {
                 onClick={handleCreateQuiz}
                 loading={isCreating}
               >
-                Create Quiz
+                {t("navigation.createQuiz")}
               </Button>
             )}
           </HStack>

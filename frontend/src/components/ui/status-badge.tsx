@@ -1,26 +1,29 @@
 import { Badge, HStack, Spinner, Text } from "@chakra-ui/react"
+import { useTranslation } from "react-i18next"
 
 interface StatusBadgeProps {
   status: string
 }
 
 export function StatusBadge({ status }: StatusBadgeProps) {
+  const { t } = useTranslation("common")
+
   const getStatusConfig = () => {
     switch (status) {
       case "pending":
-        return { icon: "⏳", color: "gray", text: "Waiting" }
+        return { icon: "⏳", color: "gray", text: t("status.waiting") }
       case "processing":
         return {
           icon: <Spinner size="xs" />,
           color: "blue",
-          text: "Processing",
+          text: t("status.processing"),
         }
       case "completed":
-        return { icon: "✅", color: "green", text: "Completed" }
+        return { icon: "✅", color: "green", text: t("status.completed") }
       case "failed":
-        return { icon: "❌", color: "red", text: "Failed" }
+        return { icon: "❌", color: "red", text: t("status.failed") }
       default:
-        return { icon: "❓", color: "gray", text: "Unknown" }
+        return { icon: "❓", color: "gray", text: t("status.unknown") }
     }
   }
 

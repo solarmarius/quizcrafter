@@ -1,25 +1,27 @@
 import { Box, Flex, Icon, Text } from "@chakra-ui/react"
 import { Link as RouterLink, useRouterState } from "@tanstack/react-router"
+import { useTranslation } from "react-i18next"
 import { FiFileText, FiHome, FiSettings } from "react-icons/fi"
-
-const items = [
-  { icon: FiHome, title: "Dashboard", path: "/" },
-  { icon: FiFileText, title: "Quizzes", path: "/quizzes" },
-  { icon: FiSettings, title: "Settings", path: "/settings" },
-]
 
 interface SidebarItemsProps {
   onClose?: () => void
 }
 
 const SidebarItems = ({ onClose }: SidebarItemsProps) => {
+  const { t } = useTranslation("navigation")
   const location = useRouterState({
     select: (state) => state.location,
   })
 
+  const items = [
+    { icon: FiHome, title: t("sidebar.dashboard"), path: "/" },
+    { icon: FiFileText, title: t("sidebar.quizzes"), path: "/quizzes" },
+    { icon: FiSettings, title: t("sidebar.settings"), path: "/settings" },
+  ]
+
   const listItems = items.map(({ icon, title, path }) => {
     const isActive =
-      title === "Quizzes"
+      path === "/quizzes"
         ? location.pathname === path ||
           location.pathname === "/create-quiz" ||
           location.pathname.startsWith("/quiz/")
@@ -27,7 +29,7 @@ const SidebarItems = ({ onClose }: SidebarItemsProps) => {
 
     return (
       <RouterLink
-        key={title}
+        key={path}
         to={path as any}
         params={{} as any}
         onClick={onClose}

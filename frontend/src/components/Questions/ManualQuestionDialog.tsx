@@ -1,5 +1,6 @@
 import { Button, VStack } from "@chakra-ui/react"
 import { memo, useState } from "react"
+import { useTranslation } from "react-i18next"
 
 import type { QuestionCreateRequest } from "@/client"
 import { QuestionsService } from "@/client"
@@ -57,6 +58,7 @@ export const ManualQuestionDialog = memo(function ManualQuestionDialog({
   isOpen,
   onOpenChange,
 }: ManualQuestionDialogProps) {
+  const { t } = useTranslation(["validation", "quiz", "common"])
   const [currentStep, setCurrentStep] = useState<DialogStep>("type-selection")
   const [selectedQuestionType, setSelectedQuestionType] = useState<string>("")
 
@@ -78,7 +80,7 @@ export const ManualQuestionDialog = memo(function ManualQuestionDialog({
       })
     },
     {
-      successMessage: "Question created successfully",
+      successMessage: t("validation:questions.createSuccess"),
       invalidateQueries: [
         queryKeys.quizQuestions(quizId),
         queryKeys.quizQuestionStats(quizId),
@@ -129,12 +131,12 @@ export const ManualQuestionDialog = memo(function ManualQuestionDialog({
         <DialogHeader>
           <DialogTitle>
             {currentStep === "type-selection"
-              ? "Add Question"
-              : `Create ${
-                  QUESTION_TYPE_LABELS[
+              ? t("common:actions.addQuestion")
+              : t("quiz:questions.createType", {
+                  type: QUESTION_TYPE_LABELS[
                     selectedQuestionType as keyof typeof QUESTION_TYPE_LABELS
-                  ]
-                } Question`}
+                  ],
+                })}
           </DialogTitle>
         </DialogHeader>
 
@@ -158,7 +160,7 @@ export const ManualQuestionDialog = memo(function ManualQuestionDialog({
                     onClick={handleBackToTypeSelection}
                     disabled={createQuestionMutation.isPending}
                   >
-                    ← Back to Question Types
+                    ← {t("common:navigation.backToQuestionTypes")}
                   </Button>
 
                   <ManualQuestionCreator

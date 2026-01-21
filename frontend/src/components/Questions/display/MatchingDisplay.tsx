@@ -3,6 +3,7 @@ import { ErrorState } from "@/components/Common"
 import { extractQuestionData } from "@/types/questionTypes"
 import { Badge, Box, HStack, Text, VStack } from "@chakra-ui/react"
 import { memo } from "react"
+import { useTranslation } from "react-i18next"
 import { ExplanationBox } from "../shared/ExplanationBox"
 
 interface MatchingDisplayProps {
@@ -14,6 +15,8 @@ export const MatchingDisplay = memo(function MatchingDisplay({
   question,
   showCorrectAnswer,
 }: MatchingDisplayProps) {
+  const { t } = useTranslation("quiz")
+
   try {
     const matchingData = extractQuestionData(question, "matching")
 
@@ -80,7 +83,7 @@ export const MatchingDisplay = memo(function MatchingDisplay({
                       size="sm"
                       colorScheme="red"
                     >
-                      Distractor
+                      {t("questions.distractorLabel")}
                     </Badge>
                   )}
                 </Box>
@@ -98,8 +101,8 @@ export const MatchingDisplay = memo(function MatchingDisplay({
   } catch (error) {
     return (
       <ErrorState
-        title="Display Error"
-        message="Error loading matching question data"
+        title={t("questions.displayError")}
+        message={t("questions.loadingError")}
         variant="inline"
         showRetry={false}
       />

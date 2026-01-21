@@ -1,11 +1,12 @@
 import { Badge, Box, Card, HStack, Text, VStack } from "@chakra-ui/react"
 import { Link as RouterLink } from "@tanstack/react-router"
 import { memo, useMemo } from "react"
+import { useTranslation } from "react-i18next"
 
 import type { Quiz } from "@/client/types.gen"
 import { EmptyState, LoadingSkeleton, QuizCard } from "@/components/Common"
 import { Button } from "@/components/ui/button"
-import { UI_SIZES, UI_TEXT } from "@/lib/constants"
+import { UI_SIZES } from "@/lib/constants"
 import { getQuizzesNeedingReview } from "@/lib/utils"
 
 interface QuizReviewPanelProps {
@@ -17,6 +18,7 @@ export const QuizReviewPanel = memo(function QuizReviewPanel({
   quizzes,
   isLoading,
 }: QuizReviewPanelProps) {
+  const { t } = useTranslation(["dashboard", "quiz"])
   const reviewQuizzes = useMemo(
     () => getQuizzesNeedingReview(quizzes),
     [quizzes],
@@ -31,21 +33,21 @@ export const QuizReviewPanel = memo(function QuizReviewPanel({
       <Card.Header>
         <HStack justify="space-between" align="center">
           <Text fontSize="lg" fontWeight="semibold">
-            Quizzes Needing Review
+            {t("panels.review.title")}
           </Text>
           <Badge variant="outline" colorScheme="green" data-testid="badge">
             {reviewQuizzes.length}
           </Badge>
         </HStack>
         <Text fontSize="sm" color="gray.600">
-          Completed quizzes ready for question approval
+          {t("panels.review.description")}
         </Text>
       </Card.Header>
       <Card.Body>
         {reviewQuizzes.length === 0 ? (
           <EmptyState
-            title={UI_TEXT.EMPTY_STATES.NO_QUIZZES_REVIEW}
-            description="Generated quizzes will appear here when ready for approval"
+            title={t("panels.review.empty")}
+            description={t("panels.review.emptyDescription")}
           />
         ) : (
           <VStack gap={4} align="stretch">
@@ -54,7 +56,7 @@ export const QuizReviewPanel = memo(function QuizReviewPanel({
                 key={quiz.id}
                 quiz={quiz}
                 actionButton={{
-                  text: "Review",
+                  text: t("quiz:actions.review"),
                   to: "/quiz/$id/questions",
                   params: { id: quiz.id || "" },
                 }}
@@ -65,10 +67,14 @@ export const QuizReviewPanel = memo(function QuizReviewPanel({
             {reviewQuizzes.length > 5 && (
               <Box textAlign="center" pt={2}>
                 <Text fontSize="sm" color="gray.500">
-                  +{reviewQuizzes.length - 5} more quizzes need review
+                  {t("panels.review.moreNeedReview", {
+                    count: reviewQuizzes.length - 5,
+                  })}
                 </Text>
                 <Button size="sm" variant="ghost" asChild mt={2}>
-                  <RouterLink to="/quizzes">View All Quizzes</RouterLink>
+                  <RouterLink to="/quizzes">
+                    {t("quiz:actions.viewAll")}
+                  </RouterLink>
                 </Button>
               </Box>
             )}

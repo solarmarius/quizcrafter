@@ -1,7 +1,8 @@
 import type { QuizLanguage, QuizTone } from "@/client"
 import { FormField, FormGroup } from "@/components/forms"
-import { QUIZ_LANGUAGES, QUIZ_TONES, QUIZ_TONE_LABELS } from "@/lib/constants"
+import { QUIZ_LANGUAGES, QUIZ_TONES } from "@/lib/constants"
 import { Box, Card, HStack, RadioGroup, Text, VStack } from "@chakra-ui/react"
+import { useTranslation } from "react-i18next"
 
 interface QuizSettings {
   language: QuizLanguage
@@ -22,6 +23,8 @@ export function QuizSettingsStep({
   settings = DEFAULT_SETTINGS,
   onSettingsChange,
 }: QuizSettingsStepProps) {
+  const { t } = useTranslation("quiz")
+
   const updateSettings = (updates: Partial<QuizSettings>) => {
     const newSettings = { ...settings, ...updates }
     onSettingsChange(newSettings)
@@ -30,47 +33,45 @@ export function QuizSettingsStep({
   const languageOptions = [
     {
       value: QUIZ_LANGUAGES.ENGLISH,
-      label: "English",
-      description: "Generate questions in English",
+      label: t("settings.language.en"),
+      description: t("settings.language.enDescription"),
     },
     {
       value: QUIZ_LANGUAGES.NORWEGIAN,
-      label: "Norwegian",
-      description: "Generate questions in Norwegian (Norsk)",
+      label: t("settings.language.no"),
+      description: t("settings.language.noDescription"),
     },
   ]
 
   const toneOptions = [
     {
       value: QUIZ_TONES.ACADEMIC,
-      label: QUIZ_TONE_LABELS.academic,
-      description: "Use formal academic language with precise terminology",
+      label: t("settings.tone.academic"),
+      description: t("settings.tone.academicDescription"),
     },
     {
       value: QUIZ_TONES.CASUAL,
-      label: QUIZ_TONE_LABELS.casual,
-      description:
-        "Use everyday conversational language that feels approachable",
+      label: t("settings.tone.casual"),
+      description: t("settings.tone.casualDescription"),
     },
     {
       value: QUIZ_TONES.ENCOURAGING,
-      label: QUIZ_TONE_LABELS.encouraging,
-      description:
-        "Use warm, supportive language with helpful hints embedded in questions",
+      label: t("settings.tone.encouraging"),
+      description: t("settings.tone.encouragingDescription"),
     },
     {
       value: QUIZ_TONES.PROFESSIONAL,
-      label: QUIZ_TONE_LABELS.professional,
-      description: "Use clear, direct business language for workplace training",
+      label: t("settings.tone.professional"),
+      description: t("settings.tone.professionalDescription"),
     },
   ]
 
   return (
     <FormGroup gap={6}>
-      <FormField label="Quiz Language" isRequired>
+      <FormField label={t("settings.language.label")} isRequired>
         <Box>
           <Text fontSize="sm" color="gray.600" mb={3}>
-            Select the language for question generation
+            {t("settings.language.description")}
           </Text>
           <RadioGroup.Root
             value={settings.language}
@@ -110,10 +111,10 @@ export function QuizSettingsStep({
         </Box>
       </FormField>
 
-      <FormField label="Tone of Voice" isRequired>
+      <FormField label={t("settings.tone.label")} isRequired>
         <Box>
           <Text fontSize="sm" color="gray.600" mb={3}>
-            Select the tone for question generation
+            {t("settings.tone.description")}
           </Text>
           <RadioGroup.Root
             value={settings.tone}

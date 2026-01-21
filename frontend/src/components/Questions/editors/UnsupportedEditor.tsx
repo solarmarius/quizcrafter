@@ -1,5 +1,6 @@
 import { Button, HStack } from "@chakra-ui/react"
 import { memo } from "react"
+import { useTranslation } from "react-i18next"
 
 interface UnsupportedEditorProps {
   questionType: string
@@ -10,6 +11,8 @@ export const UnsupportedEditor = memo(function UnsupportedEditor({
   questionType,
   onCancel,
 }: UnsupportedEditorProps) {
+  const { t } = useTranslation(["validation", "common"])
+
   return (
     <>
       <div
@@ -21,16 +24,16 @@ export const UnsupportedEditor = memo(function UnsupportedEditor({
         }}
       >
         <p style={{ fontWeight: "600", color: "#c53030", marginBottom: "4px" }}>
-          Unsupported Question Type
+          {t("validation:editors.unsupportedType")}
         </p>
         <p style={{ fontSize: "14px", color: "#9c4221" }}>
-          Editing for question type "{questionType}" is not yet supported.
+          {t("validation:editors.unsupportedMessage", { questionType })}
         </p>
       </div>
 
       <HStack gap={3} justify="end">
         <Button variant="outline" onClick={onCancel}>
-          Close
+          {t("common:actions.close")}
         </Button>
       </HStack>
     </>

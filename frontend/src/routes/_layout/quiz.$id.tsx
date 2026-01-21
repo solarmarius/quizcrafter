@@ -15,6 +15,7 @@ import {
   useRouter,
   useRouterState,
 } from "@tanstack/react-router"
+import { useTranslation } from "react-i18next"
 
 import { type Quiz, QuizService } from "@/client"
 import { ErrorState, LoadingSkeleton } from "@/components/Common"
@@ -29,6 +30,7 @@ export const Route = createFileRoute("/_layout/quiz/$id")({
 })
 
 function QuizLayout() {
+  const { t } = useTranslation("quiz")
   const { id } = Route.useParams()
   const router = useRouter()
   const globalPollingInterval = useQuizStatusPolling()
@@ -87,8 +89,8 @@ function QuizLayout() {
         <Card.Root>
           <Card.Body>
             <ErrorState
-              title="Quiz Not Found"
-              message="The quiz you're looking for doesn't exist or you don't have permission to view it."
+              title={t("detail.notFound")}
+              message={t("detail.notFoundMessage")}
               showRetry={false}
             />
           </Card.Body>
@@ -126,7 +128,7 @@ function QuizLayout() {
                     })
                   }
                 >
-                  Review
+                  {t("actions.review")}
                 </Button>
               )}
               <DeleteQuizConfirmation quizId={id} quizTitle={quiz.title} />
@@ -146,7 +148,7 @@ function QuizLayout() {
                 })
               }
             >
-              Quiz Information
+              {t("detail.tabs.info")}
             </Tabs.Trigger>
             <Tabs.Trigger
               value="questions"
@@ -157,7 +159,7 @@ function QuizLayout() {
                 })
               }
             >
-              Questions
+              {t("detail.tabs.questions")}
             </Tabs.Trigger>
           </Tabs.List>
 

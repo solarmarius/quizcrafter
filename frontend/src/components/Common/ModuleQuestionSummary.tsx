@@ -1,5 +1,6 @@
 import { Badge, Box, HStack, Text, VStack } from "@chakra-ui/react"
 import { memo } from "react"
+import { useTranslation } from "react-i18next"
 
 import type { QuestionBatch } from "@/client/types.gen"
 import {
@@ -22,6 +23,7 @@ export const ModuleQuestionSummary = memo(function ModuleQuestionSummary({
   moduleName,
   questionBatches = [],
 }: ModuleQuestionSummaryProps) {
+  const { t } = useTranslation("quiz")
   const totalQuestions = calculateModuleQuestions(questionBatches)
 
   if (questionBatches.length === 0) {
@@ -29,7 +31,7 @@ export const ModuleQuestionSummary = memo(function ModuleQuestionSummary({
       <Box>
         <Text fontWeight="medium">{moduleName}</Text>
         <Text fontSize="sm" color="gray.500">
-          No questions configured
+          {t("table.noQuestionsConfigured")}
         </Text>
       </Box>
     )
@@ -40,7 +42,7 @@ export const ModuleQuestionSummary = memo(function ModuleQuestionSummary({
       <HStack justify="space-between">
         <Text fontWeight="medium">{moduleName}</Text>
         <Text fontSize="sm" color="gray.600">
-          {totalQuestions} total questions
+          {t("table.totalQuestions", { count: totalQuestions })}
         </Text>
       </HStack>
 

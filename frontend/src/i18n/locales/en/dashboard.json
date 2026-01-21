@@ -1,0 +1,73 @@
+{
+  "greeting": "Hi, {{name}}",
+  "welcome": "Welcome back! Here's an overview of your quizzes and helpful resources.",
+  "developmentWarning": "This application is currently in development phase by IFI-UIT and has not yet been officially released. Please be aware that ongoing support and future development are not guaranteed. Quiz data may be deleted at any time. Features may change or be discontinued at any time.",
+  "panels": {
+    "generation": {
+      "title": "Quizzes Being Generated",
+      "description": "Quizzes currently in progress",
+      "empty": "No quizzes being generated",
+      "emptyDescription": "Start creating a quiz to see generation progress here",
+      "moreInProgress": "+{{count}} more quizzes in progress"
+    },
+    "review": {
+      "title": "Quizzes Needing Review",
+      "description": "Completed quizzes ready for question approval",
+      "empty": "No quizzes ready for review",
+      "emptyDescription": "Generated quizzes will appear here when ready for approval",
+      "moreNeedReview": "+{{count}} more quizzes need review"
+    },
+    "help": {
+      "title": "Help and Resources",
+      "description": "Learn how to use QuizCrafter effectively",
+      "about": {
+        "title": "About QuizCrafter",
+        "content": "QuizCrafter uses LLMs to generate multiple-choice questions from your Canvas course materials. The system analyzes the modules from a course and creates relevant questions that you can review, approve, and export directly to Canvas."
+      },
+      "howItWorks": {
+        "title": "How It Works",
+        "step1": "Select course and modules from Canvas",
+        "step2": "The app extracts PDFs and pages from modules",
+        "step3": "LLM generates questions per module",
+        "step4": "Review and approve questions",
+        "step5": "Export to Canvas as a quiz"
+      },
+      "helpfulLinks": {
+        "title": "Helpful Links",
+        "canvasUit": "Canvas UiT",
+        "contactDeveloper": "Contact Developer",
+        "githubRepo": "GitHub Repository"
+      },
+      "tips": {
+        "title": "Tips for Best Results",
+        "tip1": "Adjust question count based on module content length",
+        "tip2": "Review all generated questions before approval",
+        "tip3": "Make sure diagrams and images in the course are explained with text"
+      }
+    }
+  },
+  "errors": {
+    "loadFailed": "Failed to load quizzes",
+    "title": "Error Loading Dashboard",
+    "message": "There was an error loading your dashboard. Please try refreshing the page."
+  },
+  "quizList": {
+    "title": "My Quizzes",
+    "description": "Manage and view all your created quizzes",
+    "emptyDescription": "You haven't created any quizzes yet. Get started by creating your first quiz.",
+    "loadFailed": "Failed to Load Quizzes",
+    "loadFailedMessage": "There was an error loading your quizzes. Please try again."
+  },
+  "badges": {
+    "questionCount": "{{count}} question",
+    "questionCount_other": "{{count}} questions"
+  },
+  "table": {
+    "quizTitle": "Quiz Title",
+    "course": "Course",
+    "questions": "Questions",
+    "status": "Status",
+    "created": "Created",
+    "actions": "Actions"
+  }
+}

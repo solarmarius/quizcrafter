@@ -2,6 +2,7 @@ import { Box, Button, Card, HStack, Text, VStack } from "@chakra-ui/react"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { createFileRoute } from "@tanstack/react-router"
 import { useEffect, useState } from "react"
+import { useTranslation } from "react-i18next"
 import { LuPlus } from "react-icons/lu"
 
 import { type Quiz, QuizService } from "@/client"
@@ -10,38 +11,81 @@ import { ManualQuestionDialog } from "@/components/Questions/ManualQuestionDialo
 import { QuestionReview } from "@/components/Questions/QuestionReview"
 import { QuestionStats } from "@/components/Questions/QuestionStats"
 import { useConditionalPolling } from "@/hooks/common"
-import { FAILURE_REASON, QUIZ_STATUS, UI_TEXT } from "@/lib/constants"
+import { FAILURE_REASON, QUIZ_STATUS } from "@/lib/constants"
 import { queryKeys, quizQueryConfig } from "@/lib/queryConfig"
 
 export const Route = createFileRoute("/_layout/quiz/$id/questions")({
   component: QuizQuestions,
 })
 
-function renderErrorForFailureReason(failureReason: string | null | undefined) {
+function FailureReasonError({
+  failureReason,
+}: { failureReason: string | null | undefined }) {
+  const { t } = useTranslation("quiz")
+
   if (!failureReason) {
     return null
   }
 
-  // Get the error message from constants or use generic fallback
-  const errorMessage =
-    UI_TEXT.FAILURE_MESSAGES[
-      failureReason as keyof typeof UI_TEXT.FAILURE_MESSAGES
-    ] || UI_TEXT.FAILURE_MESSAGES.GENERIC
+  // Get translated title and message based on failure reason
+  const getErrorContent = () => {
+    switch (failureReason) {
+      case "canvas_export_error":
+        return {
+          title: t("failureMessages.canvas_export_error.title"),
+          message: t("failureMessages.canvas_export_error.message"),
+        }
+      case "content_extraction_error":
+        return {
+          title: t("failureMessages.content_extraction_error.title"),
+          message: t("failureMessages.content_extraction_error.message"),
+        }
+      case "no_content_found":
+        return {
+          title: t("failureMessages.no_content_found.title"),
+          message: t("failureMessages.no_content_found.message"),
+        }
+      case "llm_generation_error":
+        return {
+          title: t("failureMessages.llm_generation_error.title"),
+          message: t("failureMessages.llm_generation_error.message"),
+        }
+      case "no_questions_generated":
+        return {
+          title: t("failureMessages.no_questions_generated.title"),
+          message: t("failureMessages.no_questions_generated.message"),
+        }
+      case "network_error":
+        return {
+          title: t("failureMessages.network_error.title"),
+          message: t("failureMessages.network_error.message"),
+        }
+      case "validation_error":
+        return {
+          title: t("failureMessages.validation_error.title"),
+          message: t("failureMessages.validation_error.message"),
+        }
+      default:
+        return {
+          title: t("failureMessages.generic.title"),
+          message: t("failureMessages.generic.message"),
+        }
+    }
+  }
+
+  const { title, message } = getErrorContent()
 
   return (
     <Card.Root>
       <Card.Body>
-        <ErrorState
-          title={errorMessage.TITLE}
-          message={errorMessage.MESSAGE}
-          showRetry={false}
-        />
+        <ErrorState title={title} message={message} showRetry={false} />
       </Card.Body>
     </Card.Root>
   )
 }
 
 function QuizQuestions() {
+  const { t } = useTranslation("quiz")
   const { id } = Route.useParams()
   const queryClient = useQueryClient()
 
@@ -113,8 +157,9 @@ function QuizQuestions() {
 
       {/* Canvas Export Error Banner */}
       {quiz.status === QUIZ_STATUS.FAILED &&
-        quiz.failure_reason === FAILURE_REASON.CANVAS_EXPORT_ERROR &&
-        renderErrorForFailureReason(quiz.failure_reason)}
+        quiz.failure_reason === FAILURE_REASON.CANVAS_EXPORT_ERROR && (
+          <FailureReasonError failureReason={quiz.failure_reason} />
+        )}
 
       {/* Review Questions Header with Add Question Button */}
       {(quiz.status === QUIZ_STATUS.READY_FOR_REVIEW ||
@@ -126,12 +171,9 @@ function QuizQuestions() {
         <HStack justify="space-between" align="flex-start">
           <Box>
             <Text fontSize="2xl" fontWeight="bold" mb={2}>
-              Review Questions
+              {t("questions.reviewTitle")}
             </Text>
-            <Text color="gray.600">
-              Review and approve each question individually. You can edit any
-              question before approving it.
-            </Text>
+            <Text color="gray.600">{t("questions.reviewDescription")}</Text>
           </Box>
 
           {/* Add Question Button - Only show in review states */}
@@ -145,7 +187,7 @@ function QuizQuestions() {
               flexShrink={0}
             >
               <LuPlus />
-              Add Question
+              {t("questions.addQuestion")}
             </Button>
           )}
         </HStack>
@@ -163,8 +205,9 @@ function QuizQuestions() {
 
       {/* Error Display for Failed Status (except Canvas Export Error which is handled above) */}
       {quiz.status === QUIZ_STATUS.FAILED &&
-        quiz.failure_reason !== FAILURE_REASON.CANVAS_EXPORT_ERROR &&
-        renderErrorForFailureReason(quiz.failure_reason)}
+        quiz.failure_reason !== FAILURE_REASON.CANVAS_EXPORT_ERROR && (
+          <FailureReasonError failureReason={quiz.failure_reason} />
+        )}
 
       {/* Message when questions aren't ready */}
       {quiz.status !== QUIZ_STATUS.READY_FOR_REVIEW &&
@@ -175,8 +218,8 @@ function QuizQuestions() {
           <Card.Root>
             <Card.Body>
               <EmptyState
-                title="Questions Not Available Yet"
-                description="Questions will appear here once the generation process is complete."
+                title={t("questions.notAvailable")}
+                description={t("questions.notAvailableDescription")}
               />
             </Card.Body>
           </Card.Root>

@@ -8,6 +8,8 @@ import {
   BlankValidationErrorCode,
 } from "@/types/fillInBlankValidation"
 import { Box, Text, VStack } from "@chakra-ui/react"
+import type { TFunction } from "i18next"
+import { useTranslation } from "react-i18next"
 
 interface FillInBlankValidationErrorsProps {
   errors: BlankValidationError[]
@@ -17,108 +19,86 @@ interface FillInBlankValidationErrorsProps {
 interface ErrorConfig {
   severity: "error" | "warning" | "info"
   colorScheme: string
-  suggestions: string[]
+  suggestionKey: string
+  suggestionCount: number
 }
 
 /**
- * Configuration for different error types with user guidance
+ * Configuration for different error types with suggestion keys
  */
 const ERROR_CONFIGS: Record<BlankValidationErrorCode, ErrorConfig> = {
   [BlankValidationErrorCode.INVALID_TAG_FORMAT]: {
     severity: "error",
     colorScheme: "red",
-    suggestions: [
-      "Use lowercase format: [blank_1], [blank_2], etc.",
-      "Ensure proper brackets and underscore",
-      "Use only numeric positions",
-    ],
+    suggestionKey: "invalidTagFormat",
+    suggestionCount: 3,
   },
   [BlankValidationErrorCode.CASE_SENSITIVITY_ERROR]: {
     severity: "error",
     colorScheme: "red",
-    suggestions: [
-      "Change uppercase [BLANK_1] to lowercase [blank_1]",
-      "Use consistent lowercase formatting throughout question",
-    ],
+    suggestionKey: "caseSensitivity",
+    suggestionCount: 2,
   },
   [BlankValidationErrorCode.DUPLICATE_POSITIONS]: {
     severity: "error",
     colorScheme: "red",
-    suggestions: [
-      "Each blank position should appear only once in question text",
-      "Check for duplicate [blank_N] tags and remove extras",
-      "Use sequential numbering: [blank_1], [blank_2], [blank_3]",
-    ],
+    suggestionKey: "duplicatePositions",
+    suggestionCount: 3,
   },
   [BlankValidationErrorCode.NON_SEQUENTIAL_POSITIONS]: {
     severity: "error",
     colorScheme: "red",
-    suggestions: [
-      "Renumber blanks sequentially starting from 1",
-      "Avoid gaps in numbering (e.g., [blank_1], [blank_3])",
-      "Update blank configurations to match sequential positions",
-    ],
+    suggestionKey: "nonSequentialPositions",
+    suggestionCount: 3,
   },
   [BlankValidationErrorCode.POSITION_GAP]: {
     severity: "error",
     colorScheme: "red",
-    suggestions: [
-      "Fill in missing blank positions",
-      "Ensure continuous numbering without gaps",
-      "Add missing [blank_N] tags to question text",
-    ],
+    suggestionKey: "positionGap",
+    suggestionCount: 3,
   },
   [BlankValidationErrorCode.MISSING_BLANK_CONFIG]: {
     severity: "error",
     colorScheme: "orange",
-    suggestions: [
-      "Add blank configurations for each [blank_N] tag in question text",
-      'Click "Add Blank" to create missing configurations',
-      "Ensure position numbers match question text",
-    ],
+    suggestionKey: "missingBlankConfig",
+    suggestionCount: 3,
   },
   [BlankValidationErrorCode.EXTRA_BLANK_CONFIG]: {
     severity: "error",
     colorScheme: "orange",
-    suggestions: [
-      "Remove blank configurations without corresponding [blank_N] tags",
-      "Add missing [blank_N] tags to question text",
-      "Ensure synchronization between text and configurations",
-    ],
+    suggestionKey: "extraBlankConfig",
+    suggestionCount: 3,
   },
   [BlankValidationErrorCode.UNSYNCHRONIZED_BLANKS]: {
     severity: "error",
     colorScheme: "orange",
-    suggestions: [
-      "Ensure each [blank_N] tag has a corresponding blank configuration",
-      "Remove extra configurations or add missing question text tags",
-      "Check position numbers match exactly",
-    ],
+    suggestionKey: "unsynchronizedBlanks",
+    suggestionCount: 3,
   },
   [BlankValidationErrorCode.NO_BLANKS_IN_TEXT]: {
     severity: "error",
     colorScheme: "blue",
-    suggestions: [
-      "Add at least one [blank_1] tag to your question text",
-      "Identify the word or phrase to be filled in",
-      "Replace it with [blank_1], [blank_2], etc.",
-    ],
+    suggestionKey: "noBlanksInText",
+    suggestionCount: 3,
   },
   [BlankValidationErrorCode.NO_BLANK_CONFIGURATIONS]: {
     severity: "error",
     colorScheme: "blue",
-    suggestions: [
-      'Click "Add Blank" to create blank configurations',
-      "Provide correct answers for each blank position",
-      "Configure answer variations if needed",
-    ],
+    suggestionKey: "noBlankConfigurations",
+    suggestionCount: 3,
   },
 }
 
 /**
  * Individual error display component
  */
-function ValidationErrorItem({ error }: { error: BlankValidationError }) {
+function ValidationErrorItem({
+  error,
+  t,
+}: {
+  error: BlankValidationError
+  t: TFunction<"validation", undefined>
+}) {
   const config = ERROR_CONFIGS[error.code]
 
   const getBorderColor = (severity: string) => {
@@ -147,6 +127,14 @@ function ValidationErrorItem({ error }: { error: BlankValidationError }) {
     }
   }
 
+  // Get translated suggestions - use type assertion for dynamic keys
+  const suggestions: string[] = Array.from(
+    { length: config.suggestionCount },
+    (_, i) =>
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (t as any)(`fillInBlank.suggestions.${config.suggestionKey}.${i + 1}`),
+  )
+
   return (
     <Box
       p={3}
@@ -165,13 +153,13 @@ function ValidationErrorItem({ error }: { error: BlankValidationError }) {
         {error.message}
       </Text>
 
-      {config.suggestions.length > 0 && (
+      {suggestions.length > 0 && (
         <Box>
           <Text fontSize="xs" fontWeight="medium" color="gray.600" mb={1}>
-            How to fix:
+            {t("fillInBlank.howToFix")}
           </Text>
           <Box pl={2}>
-            {config.suggestions.map((suggestion, index) => (
+            {suggestions.map((suggestion, index) => (
               <Text key={index} fontSize="xs" color="gray.600" mb={1}>
                 • {suggestion}
               </Text>
@@ -184,26 +172,34 @@ function ValidationErrorItem({ error }: { error: BlankValidationError }) {
       {error.details && (
         <Box mt={2} p={2} bg="gray.100" borderRadius="sm">
           <Text fontSize="xs" fontWeight="medium" color="gray.700" mb={1}>
-            Details:
+            {t("fillInBlank.details")}
           </Text>
           {error.details.positions && (
             <Text fontSize="xs" color="gray.600">
-              Positions: {error.details.positions.join(", ")}
+              {t("fillInBlank.positions", {
+                positions: error.details.positions.join(", "),
+              })}
             </Text>
           )}
           {error.details.invalidTags && (
             <Text fontSize="xs" color="gray.600">
-              Invalid tags: {error.details.invalidTags.join(", ")}
+              {t("fillInBlank.invalidTags", {
+                tags: error.details.invalidTags.join(", "),
+              })}
             </Text>
           )}
           {error.details.missingPositions && (
             <Text fontSize="xs" color="gray.600">
-              Missing positions: {error.details.missingPositions.join(", ")}
+              {t("fillInBlank.missingPositions", {
+                positions: error.details.missingPositions.join(", "),
+              })}
             </Text>
           )}
           {error.details.extraPositions && (
             <Text fontSize="xs" color="gray.600">
-              Extra positions: {error.details.extraPositions.join(", ")}
+              {t("fillInBlank.extraPositions", {
+                positions: error.details.extraPositions.join(", "),
+              })}
             </Text>
           )}
         </Box>
@@ -219,6 +215,8 @@ export function FillInBlankValidationErrors({
   errors,
   className,
 }: FillInBlankValidationErrorsProps) {
+  const { t } = useTranslation("validation")
+
   if (!errors || errors.length === 0) {
     return null
   }
@@ -254,10 +252,10 @@ export function FillInBlankValidationErrors({
           borderColor="red.400"
         >
           <Text fontWeight="bold" color="red.700" fontSize="sm">
-            Validation Errors ({errors.length})
+            {t("fillInBlank.header", { count: errors.length })}
           </Text>
           <Text fontSize="xs" color="red.600" mt={1}>
-            Please fix the following issues before saving:
+            {t("fillInBlank.fixMessage")}
           </Text>
         </Box>
 
@@ -265,10 +263,10 @@ export function FillInBlankValidationErrors({
         {hasErrors && (
           <Box>
             <Text fontSize="sm" fontWeight="medium" color="red.700" mb={2}>
-              Critical Issues:
+              {t("fillInBlank.criticalIssues")}
             </Text>
             {errorsBySeverity.error.map((error, index) => (
-              <ValidationErrorItem key={`error-${index}`} error={error} />
+              <ValidationErrorItem key={`error-${index}`} error={error} t={t} />
             ))}
           </Box>
         )}
@@ -277,10 +275,14 @@ export function FillInBlankValidationErrors({
         {hasWarnings && (
           <Box>
             <Text fontSize="sm" fontWeight="medium" color="orange.700" mb={2}>
-              Warnings:
+              {t("fillInBlank.warnings")}
             </Text>
             {errorsBySeverity.warning.map((error, index) => (
-              <ValidationErrorItem key={`warning-${index}`} error={error} />
+              <ValidationErrorItem
+                key={`warning-${index}`}
+                error={error}
+                t={t}
+              />
             ))}
           </Box>
         )}
@@ -289,10 +291,10 @@ export function FillInBlankValidationErrors({
         {errorsBySeverity.info && errorsBySeverity.info.length > 0 && (
           <Box>
             <Text fontSize="sm" fontWeight="medium" color="blue.700" mb={2}>
-              Information:
+              {t("fillInBlank.information")}
             </Text>
             {errorsBySeverity.info.map((error, index) => (
-              <ValidationErrorItem key={`info-${index}`} error={error} />
+              <ValidationErrorItem key={`info-${index}`} error={error} t={t} />
             ))}
           </Box>
         )}
@@ -306,13 +308,10 @@ export function FillInBlankValidationErrors({
           borderColor="blue.300"
         >
           <Text fontSize="xs" fontWeight="medium" color="blue.700" mb={1}>
-            Quick Help:
+            {t("fillInBlank.quickHelp")}
           </Text>
           <Text fontSize="xs" color="blue.600">
-            Fill-in-the-blank questions need [blank_1], [blank_2] tags in the
-            question text with matching blank configurations below. Positions
-            must be sequential (1, 2, 3...) and synchronized between text and
-            configuration.
+            {t("fillInBlank.quickHelpText")}
           </Text>
         </Box>
       </VStack>
@@ -326,6 +325,8 @@ export function FillInBlankValidationErrors({
 export function FillInBlankValidationSummary({
   errors,
 }: { errors: BlankValidationError[] }) {
+  const { t } = useTranslation("validation")
+
   if (!errors || errors.length === 0) {
     return null
   }
@@ -343,11 +344,12 @@ export function FillInBlankValidationSummary({
       borderColor="red.200"
     >
       <Text fontSize="xs" color="red.700" fontWeight="medium">
-        ⚠️ {errorCount} validation {hasMultiple ? "errors" : "error"} found
+        ⚠️ {t("fillInBlank.errorCount", { count: errorCount })}
       </Text>
       <Text fontSize="xs" color="red.600" mt={1}>
         {errors[0].message}
-        {hasMultiple && ` (and ${errorCount - 1} more)`}
+        {hasMultiple &&
+          ` ${t("fillInBlank.andMore", { count: errorCount - 1 })}`}
       </Text>
     </Box>
   )

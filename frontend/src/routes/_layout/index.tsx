@@ -5,49 +5,51 @@ import {
   SimpleGrid,
   Text,
   VStack,
-} from "@chakra-ui/react";
-import { Link as RouterLink, createFileRoute } from "@tanstack/react-router";
+} from "@chakra-ui/react"
+import { Link as RouterLink, createFileRoute } from "@tanstack/react-router"
+import { useTranslation } from "react-i18next"
 
-import { ErrorState } from "@/components/Common";
-import { OnboardingModal } from "@/components/Onboarding/OnboardingModal";
+import { ErrorState } from "@/components/Common"
+import { OnboardingModal } from "@/components/Onboarding/OnboardingModal"
 import {
   HelpPanel,
   QuizGenerationPanel,
   QuizReviewPanel,
-} from "@/components/dashboard";
-import { Button } from "@/components/ui/button";
-import { useUserQuizzes } from "@/hooks/api";
-import { useAuth } from "@/hooks/auth";
-import { useCustomToast, useOnboarding } from "@/hooks/common";
+} from "@/components/dashboard"
+import { Button } from "@/components/ui/button"
+import { useUserQuizzes } from "@/hooks/api"
+import { useAuth } from "@/hooks/auth"
+import { useCustomToast, useOnboarding } from "@/hooks/common"
 
 export const Route = createFileRoute("/_layout/")({
   component: Dashboard,
-});
+})
 
 function Dashboard() {
-  const { user: currentUser } = useAuth();
-  const { showErrorToast } = useCustomToast();
+  const { user: currentUser } = useAuth()
+  const { showErrorToast } = useCustomToast()
+  const { t } = useTranslation(["dashboard", "quiz"])
   const {
     currentStep,
     isOpen,
     nextStep,
     previousStep,
     markOnboardingCompleted,
-  } = useOnboarding();
+  } = useOnboarding()
 
-  const { data: quizzes, isLoading, error } = useUserQuizzes();
+  const { data: quizzes, isLoading, error } = useUserQuizzes()
 
   if (error) {
-    showErrorToast("Failed to load quizzes");
+    showErrorToast(t("errors.loadFailed"))
     return (
       <Container maxW="6xl" py={8}>
         <ErrorState
-          title="Error Loading Dashboard"
-          message="There was an error loading your dashboard. Please try refreshing the page."
+          title={t("errors.title")}
+          message={t("errors.message")}
           showRetry={false}
         />
       </Container>
-    );
+    )
   }
 
   return (
@@ -58,15 +60,14 @@ function Dashboard() {
           <HStack justify="space-between" align="center">
             <Box>
               <Text fontSize="3xl" fontWeight="bold">
-                Hi, {currentUser?.name} 👋🏼
+                {t("greeting", { name: currentUser?.name })} 👋🏼
               </Text>
-              <Text color="gray.600">
-                Welcome back! Here's an overview of your quizzes and helpful
-                resources.
-              </Text>
+              <Text color="gray.600">{t("welcome")}</Text>
             </Box>
             <Button asChild>
-              <RouterLink to="/create-quiz">Create New Quiz</RouterLink>
+              <RouterLink to="/create-quiz">
+                {t("quiz:actions.createQuiz")}
+              </RouterLink>
             </Button>
           </HStack>
           {/* Warning Box */}
@@ -79,11 +80,7 @@ function Dashboard() {
             py={3}
           >
             <Text color="orange.700" fontWeight="medium">
-              ⚠️ This application is currently in development phase by IFI-UIT
-              and has not yet been officially released. Please be aware that
-              ongoing support and future development are not guaranteed. Quiz
-              data may be deleted at any time. Features may change or be
-              discontinued at any time.
+              ⚠️ {t("developmentWarning")}
             </Text>
           </Box>
 
@@ -111,5 +108,5 @@ function Dashboard() {
         onComplete={markOnboardingCompleted}
       />
     </>
-  );
+  )
 }

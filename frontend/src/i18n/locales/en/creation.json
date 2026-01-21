@@ -1,0 +1,136 @@
+{
+  "title": "Create New Quiz",
+  "stepOf": "Step {{current}} of {{total}}: {{stepName}}",
+  "steps": {
+    "selectCourse": "Select Course",
+    "selectModules": "Select Modules",
+    "configureQuestions": "Configure Question Types",
+    "quizConfiguration": "Quiz Configuration"
+  },
+  "courseSelection": {
+    "title": "Select a course to create a quiz for",
+    "description": "Here are the courses we found where you have a teacher role.",
+    "chooseDescription": "Choose the course where you want to generate quiz questions from the module materials.",
+    "loadingCourses": "Loading your courses...",
+    "noCourses": "No teacher courses found",
+    "noCoursesDescription": "You don't have any courses where you are enrolled as a teacher. Please check your Canvas account or contact your administrator.",
+    "failedToLoad": "Failed to load courses",
+    "selected": "Selected: {{courseName}}",
+    "courseId": "Course ID: {{id}}",
+    "unnamedCourse": "Unnamed Course",
+    "devWarning": "During development, only courses with certain prefixes are shown. Contact us if you would like to test with other courses."
+  },
+  "quizTitle": {
+    "label": "Quiz Title",
+    "placeholder": "Enter quiz title",
+    "description": "This is the quiz title shown in Canvas and when browsing quizzes. You can modify it before continuing."
+  },
+  "moduleSelection": {
+    "title": "Select modules to include in the quiz",
+    "description": "Choose which course modules you want to generate quiz questions from. You can select multiple modules.",
+    "skipHint": "For instance, you can skip including modules with administrative details.",
+    "loadingModules": "Loading course modules...",
+    "noModules": "No modules found",
+    "noModulesDescription": "This course doesn't have any modules yet. Please add some content to the course in Canvas before generating a quiz.",
+    "failedToLoad": "Failed to load course modules",
+    "noCourseSelected": "No course selected",
+    "noCourseSelectedDescription": "Please go back to the previous step and select a course first.",
+    "selectedCount": "Selected {{count}} module for quiz generation",
+    "selectedCount_other": "Selected {{count}} modules for quiz generation",
+    "unnamedModule": "Unnamed Module",
+    "addManualModule": "Add Manual Module",
+    "addManualModuleDescription": "Upload PDF files or paste text content to create a custom module",
+    "addModule": "Add Module",
+    "manual": "Manual",
+    "words": "{{count}} words",
+    "moduleSelected": "{{count}} module selected",
+    "moduleSelected_other": "{{count}} modules selected"
+  },
+  "questionConfig": {
+    "title": "Configure Question Types per Module",
+    "description": "Add question batches for each module. Each batch can have a different question type, count (1-20 questions), and difficulty level (max 4 batches per module).",
+    "totalQuestions": "Total Questions",
+    "acrossModules": "Across {{count}} modules",
+    "largeCountWarning": "Large Question Count",
+    "largeCountMessage": "Large number of questions may take longer to generate.",
+    "questionType": "Question Type",
+    "selectQuestionType": "Select question type",
+    "questions": "Questions",
+    "difficulty": "Difficulty",
+    "selectDifficulty": "Select difficulty",
+    "questionsTotal": "{{count}} questions total",
+    "batchCount": "{{count}} batches",
+    "addBatch": "Add Batch",
+    "noBatches": "No question batches configured",
+    "noBatchesHint": "Click \"Add Batch\" to get started",
+    "noModulesSelected": "No modules selected. Go back to select modules first.",
+    "tip": "Tip: Mix different question types and difficulty levels to create comprehensive assessments. Each module can have up to 4 different question batches with 1-20 questions each."
+  },
+  "manualModule": {
+    "title": "Add Manual Module",
+    "stepUpload": "Upload PDF File",
+    "stepText": "Enter Text Content",
+    "stepReview": "Review Content",
+    "moduleName": {
+      "label": "Module Name",
+      "placeholder": "Enter a name for this module"
+    },
+    "contentMethod": "How would you like to add content for this module?",
+    "uploadPdf": "Upload PDF File",
+    "uploadPdfDescription": "Upload PDF documents (lecture notes, transcripts, etc.)",
+    "enterText": "Enter Text Content",
+    "enterTextDescription": "Paste or type content directly",
+    "back": "Back",
+    "cancel": "Cancel",
+    "addModule": "Add Module",
+    "processContent": "Process Content",
+    "processing": "Processing..."
+  },
+  "fileUpload": {
+    "title": "Upload PDF Files",
+    "dropzone": "Click to upload or drag and drop",
+    "restrictions": "PDF files only, up to 5 files, 5MB each, 25MB total",
+    "chooseFile": "Choose File",
+    "selectedFiles": "Selected Files ({{count}}/5):",
+    "maxFilesError": "Maximum {{max}} files allowed per manual module",
+    "invalidTypeError": "Only PDF files are supported. Invalid file: {{name}}",
+    "fileTooLargeError": "File '{{name}}' exceeds maximum size of {{max}}MB",
+    "totalSizeError": "Total file size exceeds maximum limit"
+  },
+  "textContent": {
+    "title": "Enter Text Content",
+    "placeholder": "Paste your course content here...",
+    "stats": "{{words}} words, {{characters}} characters",
+    "description": "Enter the content you want to generate questions from. This could be lecture notes, course materials, or any educational text content."
+  },
+  "contentPreview": {
+    "title": "Content Preview",
+    "wordCount": "Word Count",
+    "processing": "Processing content...",
+    "processingHint": "This may take a few seconds",
+    "noContent": "No content to preview yet"
+  },
+  "navigation": {
+    "cancel": "Cancel",
+    "previous": "Previous",
+    "next": "Next",
+    "createQuiz": "Create Quiz"
+  },
+  "success": {
+    "created": "Quiz created successfully!",
+    "contentProcessed": "Content processed successfully!"
+  },
+  "errors": {
+    "missingData": "Missing required quiz data",
+    "createFailed": "Failed to create quiz",
+    "moduleNameRequired": "Module name is required",
+    "selectPdfFile": "Please select at least one PDF file",
+    "enterTextContent": "Please enter some text content",
+    "processContentFailed": "Failed to process content"
+  },
+  "common": {
+    "retrying": "Retrying...",
+    "tryAgain": "Try Again",
+    "words": "words"
+  }
+}

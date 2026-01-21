@@ -179,8 +179,9 @@ export class CanvasService {
    * Get Courses
    * Fetch Canvas courses where the current user has teacher enrollment.
    *
-   * Returns a list of courses where the authenticated user is enrolled as a teacher.
-   * This endpoint filters courses to only include those where the user can create quizzes.
+   * Uses Canvas API's enrollment_type=teacher parameter to filter courses server-side,
+   * returning only courses where the authenticated user is enrolled as a teacher.
+   * This ensures users only see courses where they can create quizzes.
    *
    * **Returns:**
    * List[CanvasCourse]: List of courses with id and name only
