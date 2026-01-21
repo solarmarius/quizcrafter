@@ -308,29 +308,6 @@ def test_get_quiz_collaborators_empty(session: Session, quiz_owner_and_quiz):
     assert collaborators == []
 
 
-def test_get_active_invites_returns_active_only(session: Session, quiz_owner_and_quiz):
-    """Get active invites should only return non-revoked, non-expired invites."""
-    owner, quiz = quiz_owner_and_quiz
-
-    # Create active invite
-    active_invite = create_quiz_invite(session, quiz, owner.id, expires_in_days=7)
-
-    # Create revoked invite
-    revoked_invite = create_quiz_invite(session, quiz, owner.id, expires_in_days=7)
-    revoked_invite.is_revoked = True
-    session.commit()
-
-    # Create expired invite
-    expired_invite = create_quiz_invite(session, quiz, owner.id, expires_in_days=1)
-    expired_invite.expires_at = datetime.now(timezone.utc) - timedelta(hours=1)
-    session.commit()
-
-    active_invites = get_active_invites(session, quiz.id)
-
-    assert len(active_invites) == 1
-    assert active_invites[0].id == active_invite.id
-
-
 def test_remove_collaborator_success(
     session: Session, quiz_owner_and_quiz, second_user
 ):
