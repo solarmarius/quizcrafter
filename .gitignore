@@ -38,3 +38,4 @@ __pycache__/
 .DS_Store
 
 deploy.sh
+generate_test_token.py

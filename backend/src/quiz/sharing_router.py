@@ -19,6 +19,7 @@ from .sharing_schemas import (
     QuizInviteResponse,
 )
 from .sharing_service import (
+    InviteAlreadyExistsError,
     accept_quiz_invite,
     build_invite_url,
     create_quiz_invite,
@@ -47,7 +48,7 @@ def create_invite(
     """
     Create a new invite link for a quiz.
 
-    Only the quiz owner can create invites.
+    Only the quiz owner can create invites. Only one active invite per quiz is allowed.
 
     **Parameters:**
         quiz_id: UUID of the quiz
@@ -55,14 +56,20 @@ def create_invite(
 
     **Returns:**
         QuizInviteResponse with the invite details and URL
+
+    **Raises:**
+        409 Conflict: If quiz already has an active invite
     """
-    invite = create_quiz_invite(
-        session=session,
-        quiz=quiz,
-        created_by_id=current_user.id,
-        expires_in_days=invite_data.expires_in_days,
-        max_uses=invite_data.max_uses,
-    )
+    try:
+        invite = create_quiz_invite(
+            session=session,
+            quiz=quiz,
+            created_by_id=current_user.id,
+            expires_in_days=invite_data.expires_in_days,
+            max_uses=invite_data.max_uses,
+        )
+    except InviteAlreadyExistsError as e:
+        raise HTTPException(status_code=409, detail=str(e))
 
     return QuizInviteResponse(
         id=invite.id,

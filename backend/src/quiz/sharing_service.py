@@ -18,6 +18,18 @@ def generate_invite_token() -> str:
     return secrets.token_urlsafe(32)  # 43 characters
 
 
+def has_active_invite(session: Session, quiz_id: UUID) -> bool:
+    """Check if quiz already has an active invite."""
+    active_invites = get_active_invites(session, quiz_id)
+    return len(active_invites) > 0
+
+
+class InviteAlreadyExistsError(Exception):
+    """Raised when trying to create an invite for a quiz that already has one."""
+
+    pass
+
+
 def create_quiz_invite(
     session: Session,
     quiz: Quiz,
@@ -37,7 +49,16 @@ def create_quiz_invite(
 
     Returns:
         Created QuizInvite instance
+
+    Raises:
+        InviteAlreadyExistsError: If quiz already has an active invite
     """
+    # Check if there's already an active invite
+    if has_active_invite(session, quiz.id):
+        raise InviteAlreadyExistsError(
+            "Quiz already has an active invite. Revoke it first to create a new one."
+        )
+
     token = generate_invite_token()
 
     expires_at = None

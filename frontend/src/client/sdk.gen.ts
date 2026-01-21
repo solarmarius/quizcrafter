@@ -1174,7 +1174,7 @@ export class QuizSharingService {
    * Create Invite
    * Create a new invite link for a quiz.
    *
-   * Only the quiz owner can create invites.
+   * Only the quiz owner can create invites. Only one active invite per quiz is allowed.
    *
    * **Parameters:**
    * quiz_id: UUID of the quiz
@@ -1182,6 +1182,9 @@ export class QuizSharingService {
    *
    * **Returns:**
    * QuizInviteResponse with the invite details and URL
+   *
+   * **Raises:**
+   * 409 Conflict: If quiz already has an active invite
    * @param data The data for the request.
    * @param data.quizId
    * @param data.requestBody

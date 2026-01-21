@@ -62,8 +62,16 @@ export function ShareQuizDialog({ quizId, quizTitle }: ShareQuizDialogProps) {
       navigator.clipboard.writeText(newInvite.invite_url)
       toaster.create({ title: t("sharing.linkCopied"), type: "info" })
     },
-    onError: () => {
-      toaster.create({ title: "Failed to create invite", type: "error" })
+    onError: (error: Error & { status?: number }) => {
+      if (error.status === 409) {
+        toaster.create({
+          title: t("sharing.inviteAlreadyExists"),
+          description: t("sharing.inviteAlreadyExistsDescription"),
+          type: "error",
+        })
+      } else {
+        toaster.create({ title: t("sharing.createInviteFailed"), type: "error" })
+      }
     },
   })
 
