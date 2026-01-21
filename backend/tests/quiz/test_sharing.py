@@ -14,7 +14,6 @@ from src.quiz.sharing_service import (
     can_access_quiz,
     create_quiz_invite,
     generate_invite_token,
-    get_active_invites,
     get_invite_by_token,
     get_quiz_collaborators,
     has_active_invite,

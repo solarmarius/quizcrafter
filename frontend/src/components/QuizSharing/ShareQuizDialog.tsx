@@ -70,7 +70,10 @@ export function ShareQuizDialog({ quizId, quizTitle }: ShareQuizDialogProps) {
           type: "error",
         })
       } else {
-        toaster.create({ title: t("sharing.createInviteFailed"), type: "error" })
+        toaster.create({
+          title: t("sharing.createInviteFailed"),
+          type: "error",
+        })
       }
     },
   })
@@ -85,7 +88,7 @@ export function ShareQuizDialog({ quizId, quizTitle }: ShareQuizDialogProps) {
       })
     },
     onError: () => {
-      toaster.create({ title: "Failed to revoke invite", type: "error" })
+      toaster.create({ title: t("sharing.revokeInviteFailed"), type: "error" })
     },
   })
 
@@ -93,13 +96,19 @@ export function ShareQuizDialog({ quizId, quizTitle }: ShareQuizDialogProps) {
     mutationFn: (collaboratorId: string) =>
       QuizSharingService.removeCollaboratorEndpoint({ quizId, collaboratorId }),
     onSuccess: () => {
-      toaster.create({ title: t("sharing.collaboratorRemoved"), type: "success" })
+      toaster.create({
+        title: t("sharing.collaboratorRemoved"),
+        type: "success",
+      })
       queryClient.invalidateQueries({
         queryKey: queryKeys.quizCollaborators(quizId),
       })
     },
     onError: () => {
-      toaster.create({ title: "Failed to remove collaborator", type: "error" })
+      toaster.create({
+        title: t("sharing.removeCollaboratorFailed"),
+        type: "error",
+      })
     },
   })
 
@@ -141,13 +150,15 @@ export function ShareQuizDialog({ quizId, quizTitle }: ShareQuizDialogProps) {
               <Spinner size="lg" />
             </VStack>
           ) : error ? (
-            <Text color="red.500">Failed to load sharing information</Text>
+            <Text color="red.500">{t("sharing.loadError")}</Text>
           ) : (
             <VStack gap={6} align="stretch">
               {/* Collaborators Section */}
               <Box>
                 <HStack justify="space-between" mb={3}>
-                  <Text fontWeight="semibold">{t("sharing.collaborators")}</Text>
+                  <Text fontWeight="semibold">
+                    {t("sharing.collaborators")}
+                  </Text>
                 </HStack>
                 {data?.collaborators && data.collaborators.length > 0 ? (
                   <VStack gap={2} align="stretch">
@@ -172,7 +183,9 @@ export function ShareQuizDialog({ quizId, quizTitle }: ShareQuizDialogProps) {
               {/* Active Invites Section */}
               <Box>
                 <HStack justify="space-between" mb={3}>
-                  <Text fontWeight="semibold">{t("sharing.activeInvites")}</Text>
+                  <Text fontWeight="semibold">
+                    {t("sharing.activeInvites")}
+                  </Text>
                   <Button
                     size="sm"
                     colorPalette="blue"
@@ -235,7 +248,7 @@ function CollaboratorItem({
       bg="bg.subtle"
     >
       <Text fontSize="sm" fontWeight="medium">
-        {collaborator.user_name || "Unknown user"}
+        {collaborator.user_name || t("sharing.unknownUser")}
       </Text>
       <IconButton
         aria-label={t("sharing.removeCollaborator")}
@@ -258,12 +271,7 @@ interface InviteItemProps {
   isRevoking: boolean
 }
 
-function InviteItem({
-  invite,
-  onCopy,
-  onRevoke,
-  isRevoking,
-}: InviteItemProps) {
+function InviteItem({ invite, onCopy, onRevoke, isRevoking }: InviteItemProps) {
   const { t } = useTranslation("quiz")
 
   const getExpirationText = () => {
@@ -278,7 +286,7 @@ function InviteItem({
 
   const getUsesText = () => {
     if (invite.max_uses === null) {
-      return `${invite.use_count} uses`
+      return t("sharing.usedCount", { count: invite.use_count })
     }
     return t("sharing.uses", { count: invite.use_count, max: invite.max_uses })
   }

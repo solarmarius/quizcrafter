@@ -169,7 +169,9 @@ function AcceptInvitePage() {
                 <Alert.Root status="error">
                   <Alert.Indicator />
                   <Alert.Content>
-                    <Alert.Title>{t("sharing.invite.invalidTitle")}</Alert.Title>
+                    <Alert.Title>
+                      {t("sharing.invite.invalidTitle")}
+                    </Alert.Title>
                     <Alert.Description>
                       {inviteInfo.message || t("sharing.invite.invalidMessage")}
                     </Alert.Description>
