@@ -432,9 +432,7 @@ async def delete_question(
 
         # Delete question and decrement quiz question count
         async with get_async_session() as session:
-            success = await service.delete_question(
-                session, question_id, current_user.id
-            )
+            success = await service.delete_question(session, question_id, quiz_id)
 
             if success:
                 # Decrement question count

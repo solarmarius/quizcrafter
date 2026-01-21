@@ -399,8 +399,7 @@ async def test_edit_log_persists_after_question_deletion(async_session):
     user = await create_user_in_async_session(async_session)
     quiz = await create_quiz_in_async_session(async_session, owner=user)
 
-    # Store IDs early to avoid session access issues
-    user_id = user.id
+    # Store quiz_id early to avoid session access issues
     quiz_id = quiz.id
 
     from src.question.models import Question, QuestionType
@@ -429,7 +428,7 @@ async def test_edit_log_persists_after_question_deletion(async_session):
     assert len(result.edit_log) == 1
 
     # Soft delete the question
-    delete_success = await delete_question(async_session, question_id, user_id)
+    delete_success = await delete_question(async_session, question_id, quiz_id)
     assert delete_success is True
 
     # Verify edit log is preserved in soft-deleted question
