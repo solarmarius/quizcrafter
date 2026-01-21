@@ -1738,11 +1738,40 @@ def validate_fill_in_blank_question(entry: dict):
                     status_code=400,
                     detail=f"item[entry][scoring_data][value][{i}][scoring_data][{field}] is required",
                 )
-            if not isinstance(nested_scoring[field], str):
-                raise HTTPException(
-                    status_code=400,
-                    detail=f"item[entry][scoring_data][value][{i}][scoring_data][{field}] must be a string",
-                )
+
+            if field == "value":
+                # value can be a string or a list of strings (for multiple acceptable answers)
+                value = nested_scoring[field]
+                if isinstance(value, str):
+                    if not value.strip():
+                        raise HTTPException(
+                            status_code=400,
+                            detail=f"item[entry][scoring_data][value][{i}][scoring_data][value] must be non-empty",
+                        )
+                elif isinstance(value, list):
+                    if not value:
+                        raise HTTPException(
+                            status_code=400,
+                            detail=f"item[entry][scoring_data][value][{i}][scoring_data][value] must be a non-empty list",
+                        )
+                    for j, item in enumerate(value):
+                        if not isinstance(item, str) or not item.strip():
+                            raise HTTPException(
+                                status_code=400,
+                                detail=f"item[entry][scoring_data][value][{i}][scoring_data][value][{j}] must be a non-empty string",
+                            )
+                else:
+                    raise HTTPException(
+                        status_code=400,
+                        detail=f"item[entry][scoring_data][value][{i}][scoring_data][value] must be a string or list of strings",
+                    )
+            else:
+                # blank_text must be a string
+                if not isinstance(nested_scoring[field], str):
+                    raise HTTPException(
+                        status_code=400,
+                        detail=f"item[entry][scoring_data][value][{i}][scoring_data][{field}] must be a string",
+                    )
 
         if "scoring_algorithm" not in score_value:
             raise HTTPException(
@@ -1754,6 +1783,7 @@ def validate_fill_in_blank_question(entry: dict):
             CanvasScoringAlgorithm.TEXT_CONTAINS_ANSWER,
             CanvasScoringAlgorithm.EQUIVALENCE,
             "TextCloseEnough",  # Keep this as string since not in our constants
+            "TextInChoices",  # Used for fill-in-blank with multiple answer choices
         ]:
             raise HTTPException(
                 status_code=400,
