@@ -13,6 +13,7 @@ from src.database import SessionDep
 from .models import Quiz
 from .schemas import QuizStatus
 from .service import get_quiz_by_id
+from .sharing_service import is_collaborator
 from .validators import (
     is_quiz_processing,
     is_quiz_ready_for_export,
@@ -325,6 +326,105 @@ async def validate_quiz_has_approved_questions(
         )
 
 
+def verify_quiz_access(
+    quiz_id: UUID,
+    current_user: CurrentUser,
+    session: SessionDep,
+) -> Quiz:
+    """
+    Verify that the current user can access the quiz (owner OR collaborator).
+
+    Use this for operations that collaborators can perform:
+    view, edit questions, generate questions.
+
+    Args:
+        quiz_id: UUID of the quiz to verify
+        current_user: Current authenticated user
+        session: Database session
+
+    Returns:
+        Quiz object if verification succeeds
+
+    Raises:
+        HTTPException: 404 if quiz not found or user doesn't have access
+    """
+    quiz = get_quiz_by_id(session, quiz_id)
+
+    if not quiz:
+        logger.warning(
+            "quiz_not_found",
+            user_id=str(current_user.id),
+            quiz_id=str(quiz_id),
+        )
+        raise HTTPException(status_code=404, detail="Quiz not found")
+
+    # Check ownership
+    if quiz.owner_id == current_user.id:
+        return quiz
+
+    # Check collaboration
+    if is_collaborator(session, quiz_id, current_user.id):
+        return quiz
+
+    logger.warning(
+        "quiz_access_denied",
+        user_id=str(current_user.id),
+        quiz_id=str(quiz_id),
+        quiz_owner_id=str(quiz.owner_id),
+    )
+    raise HTTPException(status_code=404, detail="Quiz not found")
+
+
+def verify_quiz_access_with_lock(
+    quiz_id: UUID,
+    current_user: CurrentUser,
+    session: SessionDep,
+) -> Quiz:
+    """
+    Verify quiz access (owner OR collaborator) and return quiz with row lock.
+
+    Args:
+        quiz_id: UUID of the quiz to verify and lock
+        current_user: Current authenticated user
+        session: Database session
+
+    Returns:
+        Quiz object with row lock if verification succeeds
+
+    Raises:
+        HTTPException: 404 if quiz not found or user doesn't have access
+    """
+    # Get the quiz with row lock
+    stmt = select(Quiz).where(Quiz.id == quiz_id).with_for_update()
+    quiz = session.exec(stmt).first()
+
+    if not quiz:
+        logger.warning(
+            "quiz_not_found_with_lock",
+            user_id=str(current_user.id),
+            quiz_id=str(quiz_id),
+        )
+        raise HTTPException(status_code=404, detail="Quiz not found")
+
+    # Check ownership
+    if quiz.owner_id == current_user.id:
+        return quiz
+
+    # Check collaboration
+    if is_collaborator(session, quiz_id, current_user.id):
+        return quiz
+
+    logger.warning(
+        "quiz_access_denied_with_lock",
+        user_id=str(current_user.id),
+        quiz_id=str(quiz_id),
+        quiz_owner_id=str(quiz.owner_id),
+    )
+    raise HTTPException(status_code=404, detail="Quiz not found")
+
+
 # Type aliases for common dependency combinations
 QuizOwnership = Annotated[Quiz, Depends(verify_quiz_ownership)]
 QuizOwnershipWithLock = Annotated[Quiz, Depends(verify_quiz_ownership_with_lock)]
+QuizAccess = Annotated[Quiz, Depends(verify_quiz_access)]
+QuizAccessWithLock = Annotated[Quiz, Depends(verify_quiz_access_with_lock)]

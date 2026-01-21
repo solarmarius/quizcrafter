@@ -140,25 +140,49 @@ def get_quiz_by_id(
 
 
 def get_user_quizzes(
-    session: Session, user_id: UUID, include_deleted: bool = False
+    session: Session,
+    user_id: UUID,
+    include_deleted: bool = False,
+    include_shared: bool = True,
 ) -> list[Quiz]:
     """
-    Get all quizzes for a user, filtering out soft-deleted quizzes by default.
+    Get all quizzes for a user (owned and shared), filtering out soft-deleted quizzes by default.
 
     Args:
         session: Database session
         user_id: User ID
         include_deleted: Include soft-deleted quizzes in results
+        include_shared: Include quizzes shared with the user
 
     Returns:
-        List of user's quizzes
+        List of user's owned and shared quizzes, sorted by created_at descending
     """
-    statement = select(Quiz).where(Quiz.owner_id == user_id)
-    if not include_deleted:
-        statement = statement.where(Quiz.deleted == False)  # noqa: E712
+    from .models import QuizCollaborator
 
-    statement = statement.order_by(Quiz.created_at.desc())  # type: ignore
-    return list(session.exec(statement).all())
+    # Get owned quizzes
+    owned_stmt = select(Quiz).where(Quiz.owner_id == user_id)
+    if not include_deleted:
+        owned_stmt = owned_stmt.where(Quiz.deleted == False)  # noqa: E712
+    owned_quizzes = list(session.exec(owned_stmt).all())
+
+    if not include_shared:
+        owned_quizzes.sort(key=lambda q: q.created_at or datetime.min, reverse=True)
+        return owned_quizzes
+
+    # Get shared quizzes
+    shared_stmt = (
+        select(Quiz)
+        .join(QuizCollaborator, Quiz.id == QuizCollaborator.quiz_id)  # type: ignore[arg-type]
+        .where(QuizCollaborator.user_id == user_id)
+    )
+    if not include_deleted:
+        shared_stmt = shared_stmt.where(Quiz.deleted == False)  # noqa: E712
+    shared_quizzes = list(session.exec(shared_stmt).all())
+
+    # Combine and sort by created_at (most recent first)
+    all_quizzes = owned_quizzes + shared_quizzes
+    all_quizzes.sort(key=lambda q: q.created_at or datetime.min, reverse=True)
+    return all_quizzes
 
 
 def delete_quiz(session: Session, quiz_id: UUID, user_id: UUID) -> bool:

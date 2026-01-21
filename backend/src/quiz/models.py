@@ -4,6 +4,7 @@ import uuid
 from datetime import datetime
 from typing import TYPE_CHECKING, Any, Optional
 
+import sqlalchemy as sa
 from pydantic import field_validator
 from sqlalchemy import Column, DateTime, func
 from sqlalchemy.dialects.postgresql import JSONB
@@ -16,6 +17,60 @@ if TYPE_CHECKING:
 from src.question.types import QuizLanguage
 
 from .schemas import FailureReason, QuizStatus, QuizTone
+
+
+class QuizCollaborator(SQLModel, table=True):
+    """Tracks accepted collaborators for a quiz."""
+
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    quiz_id: uuid.UUID = Field(foreign_key="quiz.id", nullable=False, index=True)
+    user_id: uuid.UUID = Field(foreign_key="user.id", nullable=False, index=True)
+    created_at: datetime | None = Field(
+        default=None,
+        sa_column=Column(
+            DateTime(timezone=True), server_default=func.now(), nullable=True
+        ),
+    )
+
+    # Relationships
+    quiz: Optional["Quiz"] = Relationship(back_populates="collaborators")
+    user: Optional["User"] = Relationship(back_populates="collaborating_quizzes")
+
+    __table_args__ = (
+        sa.UniqueConstraint("quiz_id", "user_id", name="uq_quiz_collaborator"),
+    )
+
+
+class QuizInvite(SQLModel, table=True):
+    """Invite links for quiz sharing."""
+
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    quiz_id: uuid.UUID = Field(foreign_key="quiz.id", nullable=False, index=True)
+    token: str = Field(max_length=64, index=True)
+    created_by_id: uuid.UUID = Field(foreign_key="user.id", nullable=False)
+    created_at: datetime | None = Field(
+        default=None,
+        sa_column=Column(
+            DateTime(timezone=True), server_default=func.now(), nullable=True
+        ),
+    )
+    expires_at: datetime | None = Field(
+        default=None,
+        sa_column=Column(DateTime(timezone=True), nullable=True),
+    )
+    max_uses: int | None = Field(
+        default=None, description="Maximum number of uses, null for unlimited"
+    )
+    use_count: int = Field(
+        default=0, description="Number of times invite has been used"
+    )
+    is_revoked: bool = Field(default=False, index=True)
+
+    # Relationships
+    quiz: Optional["Quiz"] = Relationship(back_populates="invites")
+    created_by: Optional["User"] = Relationship()
+
+    __table_args__ = (sa.UniqueConstraint("token", name="uq_quiz_invite_token"),)
 
 
 class Quiz(SQLModel, table=True):
@@ -98,6 +153,12 @@ class Quiz(SQLModel, table=True):
         description="Additional metadata for tracking generation details",
     )
     questions: list["Question"] = Relationship(
+        back_populates="quiz", cascade_delete=True
+    )
+    collaborators: list["QuizCollaborator"] = Relationship(
+        back_populates="quiz", cascade_delete=True
+    )
+    invites: list["QuizInvite"] = Relationship(
         back_populates="quiz", cascade_delete=True
     )
     deleted: bool = Field(

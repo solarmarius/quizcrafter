@@ -20,6 +20,7 @@ from src.exceptions import (
 from src.middleware import LoggingMiddleware
 from src.question.router import router as question_router
 from src.quiz.router import router as quiz_router
+from src.quiz.sharing_router import router as quiz_sharing_router
 
 
 def custom_generate_unique_id(route: APIRoute) -> str:
@@ -72,6 +73,7 @@ api_router.include_router(
 )  # User management endpoints without /auth prefix
 api_router.include_router(canvas_router)
 api_router.include_router(quiz_router)
+api_router.include_router(quiz_sharing_router)
 api_router.include_router(question_router)
 
 
