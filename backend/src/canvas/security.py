@@ -141,18 +141,17 @@ async def ensure_valid_canvas_token(session: Session, user: User) -> str:
         if user_expires_at <= expires_soon:
             try:
                 await refresh_canvas_token(user, session)
-            except HTTPException as e:
-                if e.status_code == 401:
-                    # Invalid canvas token - clear and force re-login
-                    clear_user_tokens(session, user)
-                    raise HTTPException(
-                        status_code=401,
-                        detail="Canvas session expired, Please re-login.",
-                    )
-                else:
-                    raise HTTPException(
-                        status_code=503,
-                        detail="Canvas temporarily unavailable. Please try again.",
-                    )
+            except AuthenticationError:
+                # Invalid canvas token - clear and force re-login
+                clear_user_tokens(session, user)
+                raise HTTPException(
+                    status_code=401,
+                    detail="Canvas session expired. Please re-login.",
+                )
+            except ExternalServiceError:
+                raise HTTPException(
+                    status_code=503,
+                    detail="Canvas temporarily unavailable. Please try again.",
+                )
 
     return get_decrypted_access_token(user)

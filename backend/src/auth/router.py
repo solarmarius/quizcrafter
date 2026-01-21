@@ -155,6 +155,7 @@ async def auth_canvas(session: SessionDep, request: Request) -> RedirectResponse
             "client_secret": settings.CANVAS_CLIENT_SECRET,
             "redirect_uri": str(settings.CANVAS_REDIRECT_URI),
             "code": code,
+            "replace_tokens": "1",  # Prevents duplicate approved integrations in Canvas
         }
 
         async with httpx.AsyncClient(follow_redirects=False) as client:
