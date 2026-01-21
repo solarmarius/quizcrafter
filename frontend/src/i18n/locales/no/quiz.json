@@ -24,7 +24,7 @@
   "failureMessages": {
     "canvas_export_error": {
       "title": "Eksport til Canvas feilet",
-      "message": "Det oppstod en feil ved eksport av quizen til Canvas. Gjennomgå eventuelle spørsmål som kan feile og prøv å eksportere igjen."
+      "message": "Det oppstod en feil ved eksport av quizen til Canvas. Prøv å eksportere igjen eller ta kontakt med oss."
     },
     "content_extraction_error": {
       "title": "Innholdshenting feilet",
@@ -66,10 +66,10 @@
     "generation": {
       "title": "Spørsmålsgenerering",
       "pending": "Venter på at innholdshenting skal fullføres",
-      "processing": "AI genererer flervalgsoppgaver fra hentet innhold...",
+      "processing": "Språkmodellen genererer spørsmål fra hentet innhold...",
       "completed": "Spørsmål generert og klare for gjennomgang",
       "partial": "Noen spørsmål ble generert - prøv igjen for gjenværende spørsmål",
-      "failed": "Spørsmålsgenerering feilet. Dette kan skyldes utilstrekkelig innhold eller AI-tjenestefeil."
+      "failed": "Spørsmålsgenerering feilet. Dette kan skyldes utilstrekkelig innhold eller feil hos tjenesten."
     },
     "export": {
       "title": "Canvas-eksport",
@@ -81,7 +81,7 @@
   },
   "table": {
     "headers": {
-      "title": "Quiz-tittel",
+      "title": "Tittel",
       "course": "Emne",
       "questions": "Spørsmål",
       "status": "Status",
@@ -109,7 +109,7 @@
   },
   "settings": {
     "language": {
-      "label": "Quiz-språk",
+      "label": "Språk",
       "description": "Velg språk for spørsmålsgenerering",
       "en": "Engelsk",
       "enDescription": "Generer spørsmål på engelsk",
@@ -205,14 +205,14 @@
     "moduleFallback": "Modul {{id}}"
   },
   "placeholders": {
-    "matchingInstructions": "Skriv inn instruksjoner for koblingsspørsmålet...",
+    "matchingInstructions": "Skriv inn spørsmålstekst...",
     "matchingQuestion": "Skriv inn spørsmål eller venstre element...",
     "matchingAnswer": "Skriv inn svar eller høyre element...",
     "matchingDistractor": "Skriv inn feil svaralternativ...",
     "matchingExplanation": "Valgfri forklaring for de riktige koblingene...",
     "trueFalseStatement": "Skriv inn din sant/usant-påstand...",
     "trueFalseExplanation": "Valgfri forklaring for riktig svar...",
-    "categorizationInstructions": "Skriv inn instruksjoner for kategoriseringsspørsmålet...",
+    "categorizationInstructions": "Skriv inn spørsmålstekst...",
     "categorizationDistractor": "Skriv inn distraktortekst...",
     "categorizationExplanation": "Valgfri forklaring for riktig kategorisering...",
     "categorizationCategory": "Skriv inn kategorinavn...",
@@ -305,7 +305,7 @@
       "remove": "Fjern",
       "answerVariations": "Svarvariasjoner",
       "answerVariationsHelper": "Skill flere variasjoner med komma",
-      "caseSensitiveCheckbox": "Skiller mellom store og små bokstaver",
+      "caseSensitiveCheckbox": "Skill mellom store og små bokstaver",
       "blankHelperText": "Bruk [blank_1], [blank_2], osv. for å markere blanke felt i spørsmålet",
       "addBlankDisabledText": "Legg til spørsmålstekst først for å aktivere smart blanke felt-oppretting",
       "nextPosition": "Neste posisjon: {{position}}",
@@ -326,7 +326,7 @@
       "removeDistractor": "Fjern distraktor",
       "distractorsDescription": "Valgfrie feilsvar som ikke matcher noe spørsmål. Maksimalt 5 tillatt.",
       "acceptedVariations": "Godkjente variasjoner",
-      "caseSensitive": "(Skiller mellom store og små bokstaver)"
+      "caseSensitive": "(Skill mellom store og små bokstaver)"
     }
   }
 }

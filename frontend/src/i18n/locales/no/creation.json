@@ -18,12 +18,12 @@
     "selected": "Valgt: {{courseName}}",
     "courseId": "Emne-ID: {{id}}",
     "unnamedCourse": "Emne uten navn",
-    "devWarning": "Under utvikling vises bare emner med visse prefikser. Kontakt oss hvis du ønsker å teste med andre emner."
+    "devWarning": "Under utvikling vises bare emner med prefikser 'INF-' og 'MIK-'. Kontakt oss hvis du ønsker å teste med andre emner."
   },
   "quizTitle": {
-    "label": "Quiz-tittel",
-    "placeholder": "Skriv inn quiz-tittel",
-    "description": "Dette er quiz-tittelen som vises i Canvas og ved navigering i quizer. Du kan endre den før du fortsetter."
+    "label": "Tittel",
+    "placeholder": "Skriv inn tittel",
+    "description": "Dette er tittelen som vises i Canvas og ved navigering i quizer. Du kan endre den før du fortsetter."
   },
   "moduleSelection": {
     "title": "Velg moduler å inkludere i quizen",

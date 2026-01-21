@@ -63,7 +63,7 @@
     "questionCount_other": "{{count}} spørsmål"
   },
   "table": {
-    "quizTitle": "Quiz-tittel",
+    "quizTitle": "Tittel",
     "course": "Emne",
     "questions": "Spørsmål",
     "status": "Status",
