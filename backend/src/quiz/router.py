@@ -25,13 +25,14 @@ from .orchestrator import (
     orchestrate_quiz_question_generation,
     safe_background_orchestration,
 )
-from .schemas import ManualModuleCreate, ManualModuleResponse, QuizCreate
+from .schemas import ManualModuleCreate, ManualModuleResponse, QuizCreate, QuizUpdate
 from .service import (
     create_quiz,
     delete_quiz,
     get_user_quizzes,
     prepare_content_extraction,
     prepare_question_generation,
+    update_quiz,
 )
 
 router = APIRouter(prefix="/quiz", tags=["quiz"])
@@ -289,6 +290,77 @@ def get_quiz(quiz: QuizOwnership) -> Quiz:
         ```
     """
     return quiz
+
+
+@router.patch("/{quiz_id}", response_model=Quiz)
+def update_quiz_endpoint(
+    quiz_id: UUID,
+    quiz_update: QuizUpdate,
+    current_user: CurrentUser,
+    session: SessionDep,
+) -> Quiz:
+    """
+    Update a quiz by its ID.
+
+    Allows partial updates to quiz properties such as title.
+    Only the quiz owner can update their own quizzes.
+
+    **Parameters:**
+        quiz_id (UUID): The UUID of the quiz to update
+        quiz_update (QuizUpdate): Fields to update (title, etc.)
+
+    **Returns:**
+        Quiz: The updated quiz object
+
+    **Authentication:**
+        Requires valid JWT token in Authorization header
+
+    **Raises:**
+        HTTPException: 404 if quiz not found or user doesn't own it
+        HTTPException: 422 if validation fails
+        HTTPException: 500 if database operation fails
+    """
+    logger.info(
+        "quiz_update_initiated",
+        user_id=str(current_user.id),
+        quiz_id=str(quiz_id),
+    )
+
+    try:
+        quiz = update_quiz(session, quiz_id, current_user.id, quiz_update)
+
+        if not quiz:
+            logger.warning(
+                "quiz_update_failed_not_found_or_unauthorized",
+                user_id=str(current_user.id),
+                quiz_id=str(quiz_id),
+            )
+            raise HTTPException(
+                status_code=404, detail=ERROR_MESSAGES["quiz_not_found"]
+            )
+
+        logger.info(
+            "quiz_update_completed",
+            user_id=str(current_user.id),
+            quiz_id=str(quiz_id),
+        )
+
+        return quiz
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(
+            "quiz_update_failed",
+            user_id=str(current_user.id),
+            quiz_id=str(quiz_id),
+            error=str(e),
+            error_type=type(e).__name__,
+            exc_info=True,
+        )
+        raise HTTPException(
+            status_code=500, detail="Failed to update quiz. Please try again."
+        )
 
 
 @router.get("/", response_model=list[Quiz])

@@ -310,6 +310,16 @@ export type QuizStatus =
 export type QuizTone = "academic" | "casual" | "encouraging" | "professional"
 
 /**
+ * Schema for updating quiz settings.
+ */
+export type QuizUpdate = {
+  title?: string | null
+  llm_model?: string | null
+  llm_temperature?: number | null
+  language?: QuizLanguage | null
+}
+
+/**
  * Public user information schema.
  */
 export type UserPublic = {
@@ -453,6 +463,13 @@ export type QuizGetQuizData = {
 }
 
 export type QuizGetQuizResponse = Quiz
+
+export type QuizUpdateQuizEndpointData = {
+  quizId: string
+  requestBody: QuizUpdate
+}
+
+export type QuizUpdateQuizEndpointResponse = Quiz
 
 export type QuizDeleteQuizEndpointData = {
   quizId: string

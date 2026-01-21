@@ -4,49 +4,51 @@ import type { CancelablePromise } from "./core/CancelablePromise"
 import { OpenAPI } from "./core/OpenAPI"
 import { request as __request } from "./core/request"
 import type {
-  AuthLoginCanvasResponse,
   AuthAuthCanvasResponse,
+  AuthLoginCanvasResponse,
   AuthLogoutCanvasResponse,
-  CanvasGetCoursesResponse,
   CanvasGetCourseModulesData,
   CanvasGetCourseModulesResponse,
+  CanvasGetCoursesResponse,
+  CanvasGetFileInfoData,
+  CanvasGetFileInfoResponse,
   CanvasGetModuleItemsData,
   CanvasGetModuleItemsResponse,
   CanvasGetPageContentData,
   CanvasGetPageContentResponse,
-  CanvasGetFileInfoData,
-  CanvasGetFileInfoResponse,
-  QuestionsGetQuizQuestionsData,
-  QuestionsGetQuizQuestionsResponse,
-  QuestionsCreateQuestionData,
-  QuestionsCreateQuestionResponse,
-  QuestionsGetQuestionData,
-  QuestionsGetQuestionResponse,
-  QuestionsUpdateQuestionData,
-  QuestionsUpdateQuestionResponse,
-  QuestionsDeleteQuestionData,
-  QuestionsDeleteQuestionResponse,
   QuestionsApproveQuestionData,
   QuestionsApproveQuestionResponse,
-  QuizGetUserQuizzesEndpointResponse,
+  QuestionsCreateQuestionData,
+  QuestionsCreateQuestionResponse,
+  QuestionsDeleteQuestionData,
+  QuestionsDeleteQuestionResponse,
+  QuestionsGetQuestionData,
+  QuestionsGetQuestionResponse,
+  QuestionsGetQuizQuestionsData,
+  QuestionsGetQuizQuestionsResponse,
+  QuestionsUpdateQuestionData,
+  QuestionsUpdateQuestionResponse,
   QuizCreateNewQuizData,
   QuizCreateNewQuizResponse,
-  QuizUploadManualModuleData,
-  QuizUploadManualModuleResponse,
-  QuizGetQuizData,
-  QuizGetQuizResponse,
   QuizDeleteQuizEndpointData,
   QuizDeleteQuizEndpointResponse,
+  QuizExportQuizToCanvasData,
+  QuizExportQuizToCanvasResponse,
+  QuizGetQuizData,
+  QuizGetQuizQuestionStatsData,
+  QuizGetQuizQuestionStatsResponse,
+  QuizGetQuizResponse,
+  QuizGetUserQuizzesEndpointResponse,
   QuizTriggerContentExtractionData,
   QuizTriggerContentExtractionResponse,
   QuizTriggerQuestionGenerationData,
   QuizTriggerQuestionGenerationResponse,
-  QuizGetQuizQuestionStatsData,
-  QuizGetQuizQuestionStatsResponse,
-  QuizExportQuizToCanvasData,
-  QuizExportQuizToCanvasResponse,
-  UsersReadUserMeResponse,
+  QuizUpdateQuizEndpointData,
+  QuizUpdateQuizEndpointResponse,
+  QuizUploadManualModuleData,
+  QuizUploadManualModuleResponse,
   UsersDeleteUserMeResponse,
+  UsersReadUserMeResponse,
   UsersUpdateUserMeData,
   UsersUpdateUserMeResponse,
   UtilsHealthCheckResponse,
@@ -866,6 +868,50 @@ export class QuizService {
       path: {
         quiz_id: data.quizId,
       },
+      errors: {
+        422: "Validation Error",
+      },
+    })
+  }
+
+  /**
+   * Update Quiz Endpoint
+   * Update a quiz by its ID.
+   *
+   * Allows partial updates to quiz properties such as title.
+   * Only the quiz owner can update their own quizzes.
+   *
+   * **Parameters:**
+   * quiz_id (UUID): The UUID of the quiz to update
+   * quiz_update (QuizUpdate): Fields to update (title, etc.)
+   *
+   * **Returns:**
+   * Quiz: The updated quiz object
+   *
+   * **Authentication:**
+   * Requires valid JWT token in Authorization header
+   *
+   * **Raises:**
+   * HTTPException: 404 if quiz not found or user doesn't own it
+   * HTTPException: 422 if validation fails
+   * HTTPException: 500 if database operation fails
+   * @param data The data for the request.
+   * @param data.quizId
+   * @param data.requestBody
+   * @returns Quiz Successful Response
+   * @throws ApiError
+   */
+  public static updateQuizEndpoint(
+    data: QuizUpdateQuizEndpointData,
+  ): CancelablePromise<QuizUpdateQuizEndpointResponse> {
+    return __request(OpenAPI, {
+      method: "PATCH",
+      url: "/quiz/{quiz_id}",
+      path: {
+        quiz_id: data.quizId,
+      },
+      body: data.requestBody,
+      mediaType: "application/json",
       errors: {
         422: "Validation Error",
       },

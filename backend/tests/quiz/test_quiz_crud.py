@@ -441,6 +441,98 @@ def has_question_type(quiz, module_id: str, question_type: str) -> bool:
     )
 
 
+def test_update_quiz_title_success(session: Session):
+    """Test successful quiz title update."""
+    from src.quiz.schemas import QuizUpdate
+    from src.quiz.service import update_quiz
+
+    user = create_user_in_session(session)
+    quiz = create_test_quiz(session, user.id, title="Original Title")
+    original_updated_at = quiz.updated_at
+
+    # Test behavior: successful title update
+    update_data = QuizUpdate(title="New Title")
+    updated_quiz = update_quiz(session, quiz.id, user.id, update_data)
+
+    assert updated_quiz is not None
+    assert updated_quiz.title == "New Title"
+    assert updated_quiz.id == quiz.id
+    assert updated_quiz.updated_at > original_updated_at
+
+
+def test_update_quiz_not_found(session: Session):
+    """Test quiz update behavior when quiz doesn't exist."""
+    from src.quiz.schemas import QuizUpdate
+    from src.quiz.service import update_quiz
+
+    user = create_user_in_session(session)
+    non_existent_id = uuid.uuid4()
+
+    # Test behavior: graceful handling of non-existent quiz
+    update_data = QuizUpdate(title="New Title")
+    result = update_quiz(session, non_existent_id, user.id, update_data)
+
+    assert result is None
+
+
+def test_update_quiz_not_owner(session: Session):
+    """Test quiz update behavior when user is not owner."""
+    from src.quiz.schemas import QuizUpdate
+    from src.quiz.service import update_quiz
+
+    owner = create_user_in_session(session, canvas_id=1)
+    other_user = create_user_in_session(session, canvas_id=2)
+    quiz = create_test_quiz(session, owner.id, title="Original Title")
+
+    # Test behavior: unauthorized update fails
+    update_data = QuizUpdate(title="Hacked Title")
+    result = update_quiz(session, quiz.id, other_user.id, update_data)
+
+    assert result is None
+
+    # Test behavior: quiz title remains unchanged
+    from src.quiz.service import get_quiz_by_id
+
+    quiz_check = get_quiz_by_id(session, quiz.id)
+    assert quiz_check.title == "Original Title"
+
+
+def test_update_quiz_partial_update(session: Session):
+    """Test quiz update with partial data (only title, not other fields)."""
+    from src.quiz.schemas import QuizUpdate
+    from src.quiz.service import update_quiz
+
+    user = create_user_in_session(session)
+    quiz = create_test_quiz(session, user.id, title="Original Title")
+    original_llm_model = quiz.llm_model
+
+    # Test behavior: partial update only changes specified fields
+    update_data = QuizUpdate(title="Updated Title")
+    updated_quiz = update_quiz(session, quiz.id, user.id, update_data)
+
+    assert updated_quiz is not None
+    assert updated_quiz.title == "Updated Title"
+    assert updated_quiz.llm_model == original_llm_model  # Unchanged
+
+
+def test_update_quiz_soft_deleted(session: Session):
+    """Test quiz update behavior when quiz is soft-deleted."""
+    from src.quiz.schemas import QuizUpdate
+    from src.quiz.service import delete_quiz, update_quiz
+
+    user = create_user_in_session(session)
+    quiz = create_test_quiz(session, user.id)
+
+    # Soft delete the quiz
+    delete_quiz(session, quiz.id, user.id)
+
+    # Test behavior: cannot update soft-deleted quiz
+    update_data = QuizUpdate(title="New Title")
+    result = update_quiz(session, quiz.id, user.id, update_data)
+
+    assert result is None
+
+
 def create_test_quiz(session: Session, owner_id: uuid.UUID, title: str = "Test Quiz"):
     """Helper to create a test quiz."""
     from src.question.types import QuestionDifficulty, QuestionType
