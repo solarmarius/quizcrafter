@@ -49,6 +49,7 @@ class QuestionResponse(BaseModel):
     created_at: datetime | None = None
     updated_at: datetime | None = None
     canvas_item_id: str | None = None
+    module_id: str | None = None
 
     class Config:
         use_enum_values = True

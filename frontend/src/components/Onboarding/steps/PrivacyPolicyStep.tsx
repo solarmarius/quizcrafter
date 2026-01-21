@@ -18,7 +18,10 @@ export const PrivacyPolicyStep = () => {
         <Text fontSize="lg" color="gray.600" lineHeight="tall" mb={4}>
           {t("onboarding.privacy.description")}
         </Text>
-        <Link to={getLocalizedRoute(LOCALIZED_ROUTES.privacyPolicy) as any} params={{}}>
+        <Link
+          to={getLocalizedRoute(LOCALIZED_ROUTES.privacyPolicy) as any}
+          params={{}}
+        >
           <Text
             color="teal.500"
             textDecoration="underline"

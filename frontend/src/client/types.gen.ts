@@ -166,6 +166,7 @@ export type QuestionResponse = {
   created_at?: string | null
   updated_at?: string | null
   canvas_item_id?: string | null
+  module_id?: string | null
 }
 
 /**

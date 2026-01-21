@@ -200,7 +200,11 @@ function QuizQuestions() {
         quiz.status === QUIZ_STATUS.PUBLISHED ||
         (quiz.status === QUIZ_STATUS.FAILED &&
           quiz.failure_reason === FAILURE_REASON.CANVAS_EXPORT_ERROR)) && (
-        <QuestionReview quizId={id} quizStatus={quiz.status} />
+        <QuestionReview
+          quizId={id}
+          quizStatus={quiz.status}
+          selectedModules={quiz.selected_modules}
+        />
       )}
 
       {/* Error Display for Failed Status (except Canvas Export Error which is handled above) */}
