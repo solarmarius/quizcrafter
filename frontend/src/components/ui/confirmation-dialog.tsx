@@ -86,6 +86,7 @@ const ConfirmationDialog = ({
       placement="center"
       open={isOpen}
       onOpenChange={({ open }) => setIsOpen(open)}
+      closeOnInteractOutside
     >
       <DialogTrigger asChild>
         <Button
