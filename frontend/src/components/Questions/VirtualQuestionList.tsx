@@ -194,6 +194,9 @@ export const VirtualQuestionList = memo(
           {virtualItems.map((virtualItem) => {
             const question = questions[virtualItem.index];
             const questionIndex = virtualItem.index;
+            const moduleName = question.module_id
+              ? selectedModules?.[String(question.module_id)]?.name
+              : undefined;
 
             // Custom ref callback to always re-measure element
             const setRef = (el: HTMLDivElement | null) => {
@@ -224,13 +227,11 @@ export const VirtualQuestionList = memo(
                         <Text fontSize="lg" fontWeight="semibold">
                           {t("questions.title", { number: questionIndex + 1 })}
                         </Text>
-                        {question.module_id &&
-                          selectedModules?.[String(question.module_id)]
-                            ?.name && (
-                            <Badge variant="subtle" colorPalette="gray">
-                              {selectedModules[String(question.module_id)].name}
-                            </Badge>
-                          )}
+                        {moduleName && (
+                          <Badge variant="subtle" colorPalette="gray">
+                            {moduleName}
+                          </Badge>
+                        )}
                         {question.is_approved && (
                           <Badge colorPalette="green" variant="subtle">
                             {t("questions.approved")}
