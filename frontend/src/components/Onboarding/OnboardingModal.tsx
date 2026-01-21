@@ -9,6 +9,7 @@ import {
   DialogRoot,
 } from "../ui/dialog"
 import { FeatureStep } from "./steps/FeatureStep"
+import { LanguagePreferenceStep } from "./steps/LanguagePreferenceStep"
 import { PrivacyPolicyStep } from "./steps/PrivacyPolicyStep"
 import { SetupStep } from "./steps/SetupStep"
 import { WelcomeStep } from "./steps/WelcomeStep"
@@ -29,7 +30,7 @@ export const OnboardingModal = ({
   onComplete,
 }: OnboardingModalProps) => {
   const { t } = useTranslation("common")
-  const totalSteps = 4
+  const totalSteps = 5
   const progressValue = (currentStep / totalSteps) * 100
 
   const renderCurrentStep = () => {
@@ -37,10 +38,12 @@ export const OnboardingModal = ({
       case 1:
         return <WelcomeStep />
       case 2:
-        return <SetupStep />
+        return <LanguagePreferenceStep />
       case 3:
-        return <FeatureStep />
+        return <SetupStep />
       case 4:
+        return <FeatureStep />
+      case 5:
         return <PrivacyPolicyStep />
       default:
         return <WelcomeStep />

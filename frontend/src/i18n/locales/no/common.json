@@ -136,6 +136,9 @@
       "tip2": "Alt innhold er referert med en modul",
       "tip3": "Beskriv eventuelle diagrammer/bilder/ligninger med ren tekst"
     },
+    "language": {
+      "title": "Velg språk"
+    },
     "privacy": {
       "title": "Personvern og databruk",
       "description": "Før du kommer i gang, ta et øyeblikk til å lese vår personvernerklæring for å forstå hvordan vi håndterer dataene dine og quiz-informasjon.",

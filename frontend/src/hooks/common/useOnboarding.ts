@@ -10,7 +10,7 @@ import { useAuth } from "../auth"
  * Automatically triggers onboarding for new users who haven't completed it.
  *
  * @returns Object containing onboarding state and control methods
- * @returns {number} returns.currentStep - Current step number (1-4)
+ * @returns {number} returns.currentStep - Current step number (1-5)
  * @returns {boolean} returns.isOpen - Whether onboarding modal is open
  * @returns {boolean} returns.isOnboardingCompleted - Whether user has completed onboarding
  * @returns {function} returns.startOnboarding - Function to start the onboarding process
@@ -40,7 +40,7 @@ import { useAuth } from "../auth"
  * }
  *
  * // Navigate through steps
- * if (currentStep < 4) {
+ * if (currentStep < 5) {
  *   nextStep()
  * }
  *
@@ -84,7 +84,7 @@ export const useOnboarding = () => {
   }
 
   const nextStep = (): void => {
-    if (currentStep < 4) {
+    if (currentStep < 5) {
       setCurrentStep(currentStep + 1)
     }
   }
