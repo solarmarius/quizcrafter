@@ -67,9 +67,11 @@ export function createPollingQueryConfig<T>(
 export const queryKeys = {
   // Quiz-related keys
   quiz: (id: string) => ["quiz", id] as const,
+  quizzes: () => ["quizzes"] as const,
   quizQuestions: (id: string) => ["quiz", id, "questions"] as const,
   quizQuestionStats: (id: string) =>
     ["quiz", id, "questions", "stats"] as const,
+  quizCollaborators: (id: string) => ["quiz", id, "collaborators"] as const,
 
   // User-related keys
   user: () => ["user"] as const,

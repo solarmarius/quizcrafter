@@ -10,8 +10,9 @@ from src.exceptions import ServiceError
 
 from .constants import ERROR_MESSAGES, SUCCESS_MESSAGES
 from .dependencies import (
+    QuizAccess,
+    QuizAccessWithLock,
     QuizOwnership,
-    QuizOwnershipWithLock,
     validate_content_extraction_ready,
     validate_export_ready,
     validate_question_generation_ready_with_partial_support,
@@ -245,7 +246,7 @@ async def upload_manual_module(
 
 
 @router.get("/{quiz_id}", response_model=Quiz)
-def get_quiz(quiz: QuizOwnership) -> Quiz:
+def get_quiz(quiz: QuizAccess) -> Quiz:
     """
     Retrieve a quiz by its ID.
 
@@ -441,7 +442,7 @@ def get_user_quizzes_endpoint(
 
 @router.post("/{quiz_id}/extract-content")
 async def trigger_content_extraction(
-    quiz: QuizOwnershipWithLock,
+    quiz: QuizAccessWithLock,
     current_user: CurrentUser,
     session: SessionDep,
     canvas_token: CanvasToken,
@@ -623,7 +624,7 @@ def delete_quiz_endpoint(
 
 @router.post("/{quiz_id}/generate-questions")
 async def trigger_question_generation(
-    quiz: QuizOwnership,
+    quiz: QuizAccess,
     current_user: CurrentUser,
     session: SessionDep,
     background_tasks: BackgroundTasks,
@@ -723,7 +724,7 @@ async def trigger_question_generation(
 
 @router.get("/{quiz_id}/questions/stats")
 async def get_quiz_question_stats(
-    quiz: QuizOwnership,
+    quiz: QuizAccess,
     current_user: CurrentUser,
     session: SessionDep,  # noqa: ARG001
 ) -> dict[str, int]:

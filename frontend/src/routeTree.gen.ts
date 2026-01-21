@@ -22,6 +22,7 @@ import { Route as LayoutPrivacyPolicyNoImport } from './routes/_layout/privacy-p
 import { Route as LayoutPrivacyPolicyImport } from './routes/_layout/privacy-policy'
 import { Route as LayoutCreateQuizImport } from './routes/_layout/create-quiz'
 import { Route as LayoutQuizIdImport } from './routes/_layout/quiz.$id'
+import { Route as LayoutInviteTokenImport } from './routes/_layout/invite.$token'
 import { Route as LayoutQuizIdIndexImport } from './routes/_layout/quiz.$id.index'
 import { Route as LayoutQuizIdQuestionsImport } from './routes/_layout/quiz.$id.questions'
 
@@ -82,6 +83,11 @@ const LayoutQuizIdRoute = LayoutQuizIdImport.update({
   getParentRoute: () => LayoutRoute,
 } as any)
 
+const LayoutInviteTokenRoute = LayoutInviteTokenImport.update({
+  path: '/invite/$token',
+  getParentRoute: () => LayoutRoute,
+} as any)
+
 const LayoutQuizIdIndexRoute = LayoutQuizIdIndexImport.update({
   path: '/',
   getParentRoute: () => LayoutQuizIdRoute,
@@ -136,6 +142,10 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LayoutIndexImport
       parentRoute: typeof LayoutImport
     }
+    '/_layout/invite/$token': {
+      preLoaderRoute: typeof LayoutInviteTokenImport
+      parentRoute: typeof LayoutImport
+    }
     '/_layout/quiz/$id': {
       preLoaderRoute: typeof LayoutQuizIdImport
       parentRoute: typeof LayoutImport
@@ -162,6 +172,7 @@ export const routeTree = rootRoute.addChildren([
     LayoutQuizzesRoute,
     LayoutSettingsRoute,
     LayoutIndexRoute,
+    LayoutInviteTokenRoute,
     LayoutQuizIdRoute.addChildren([
       LayoutQuizIdQuestionsRoute,
       LayoutQuizIdIndexRoute,

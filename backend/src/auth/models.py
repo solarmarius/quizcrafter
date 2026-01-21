@@ -10,7 +10,7 @@ from sqlalchemy import Column, DateTime, func
 from sqlmodel import Field, Relationship, SQLModel
 
 if TYPE_CHECKING:
-    from src.quiz.models import Quiz
+    from src.quiz.models import Quiz, QuizCollaborator
 
 
 class User(SQLModel, table=True):
@@ -45,3 +45,6 @@ class User(SQLModel, table=True):
         default=False, description="Whether user has completed onboarding"
     )
     quizzes: list["Quiz"] = Relationship(back_populates="owner", cascade_delete=True)
+    collaborating_quizzes: list["QuizCollaborator"] = Relationship(
+        back_populates="user", cascade_delete=True
+    )

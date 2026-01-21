@@ -59,7 +59,7 @@ async def get_quiz_questions(
 
     try:
         # Verify quiz ownership
-        await _verify_quiz_ownership(quiz_id, current_user.id)
+        await _verify_quiz_access(quiz_id, current_user.id)
 
         # Get formatted questions (handled within single session)
         async with get_async_session() as session:
@@ -121,7 +121,7 @@ async def get_question(
 
     try:
         # Verify quiz ownership
-        await _verify_quiz_ownership(quiz_id, current_user.id)
+        await _verify_quiz_access(quiz_id, current_user.id)
 
         async with get_async_session() as session:
             # Get question
@@ -183,7 +183,7 @@ async def create_question(
 
     try:
         # Verify quiz ownership
-        await _verify_quiz_ownership(quiz_id, current_user.id)
+        await _verify_quiz_access(quiz_id, current_user.id)
 
         # Ensure quiz_id matches
         if question_request.quiz_id != quiz_id:
@@ -282,7 +282,7 @@ async def update_question(
 
     try:
         # Verify quiz ownership
-        await _verify_quiz_ownership(quiz_id, current_user.id)
+        await _verify_quiz_access(quiz_id, current_user.id)
 
         async with get_async_session() as session:
             # Verify question exists and belongs to quiz
@@ -359,7 +359,7 @@ async def approve_question(
 
     try:
         # Verify quiz ownership
-        await _verify_quiz_ownership(quiz_id, current_user.id)
+        await _verify_quiz_access(quiz_id, current_user.id)
 
         async with get_async_session() as session:
             # Verify question exists and belongs to quiz
@@ -428,7 +428,7 @@ async def delete_question(
 
     try:
         # Verify quiz ownership
-        await _verify_quiz_ownership(quiz_id, current_user.id)
+        await _verify_quiz_access(quiz_id, current_user.id)
 
         # Delete question and decrement quiz question count
         async with get_async_session() as session:
@@ -469,28 +469,44 @@ async def delete_question(
         )
 
 
-async def _verify_quiz_ownership(quiz_id: UUID, user_id: UUID) -> None:
+async def _verify_quiz_access(quiz_id: UUID, user_id: UUID) -> None:
     """
-    Verify that a user owns a quiz.
+    Verify that a user can access a quiz (owner or collaborator).
 
     Args:
         quiz_id: Quiz identifier
         user_id: User identifier
 
     Raises:
-        HTTPException: If quiz not found or user doesn't own it
+        HTTPException: If quiz not found or user doesn't have access
     """
-    from src.database import get_async_session
-    from src.quiz.service import get_quiz_for_update
+    from sqlmodel import select
 
-    async with get_async_session() as session:
-        quiz = await get_quiz_for_update(session, quiz_id)
+    from src.database import get_session
+    from src.quiz.models import QuizCollaborator
+    from src.quiz.service import get_quiz_by_id
+
+    with get_session() as session:
+        quiz = get_quiz_by_id(session, quiz_id)
 
         if not quiz:
             raise HTTPException(status_code=404, detail="Quiz not found")
 
-        if quiz.owner_id != user_id:
-            raise HTTPException(status_code=404, detail="Quiz not found")
+        # Check ownership
+        if quiz.owner_id == user_id:
+            return
+
+        # Check collaboration
+        stmt = (
+            select(QuizCollaborator)
+            .where(QuizCollaborator.quiz_id == quiz_id)
+            .where(QuizCollaborator.user_id == user_id)
+        )
+        collaborator = session.exec(stmt).first()
+        if collaborator:
+            return
+
+        raise HTTPException(status_code=404, detail="Quiz not found")
 
 
 async def _decrement_question_count(session: AsyncSession, quiz_id: UUID) -> None:
