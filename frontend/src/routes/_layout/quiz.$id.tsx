@@ -7,44 +7,46 @@ import {
   Tabs,
   Text,
   VStack,
-} from "@chakra-ui/react"
-import { useQuery } from "@tanstack/react-query"
+} from "@chakra-ui/react";
+import { useQuery } from "@tanstack/react-query";
 import {
   Outlet,
   createFileRoute,
   useRouter,
   useRouterState,
-} from "@tanstack/react-router"
-import { useTranslation } from "react-i18next"
+} from "@tanstack/react-router";
+import { useTranslation } from "react-i18next";
 
-import { type Quiz, QuizService } from "@/client"
-import { ErrorState, LoadingSkeleton } from "@/components/Common"
-import DeleteQuizConfirmation from "@/components/QuizCreation/DeleteQuizConfirmation"
-import { StatusLight } from "@/components/ui/status-light"
-import { useConditionalPolling, useQuizStatusPolling } from "@/hooks/common"
-import { QUIZ_STATUS, UI_SIZES } from "@/lib/constants"
-import { queryKeys, quizQueryConfig } from "@/lib/queryConfig"
+import { type Quiz, QuizService } from "@/client";
+import { ErrorState, LoadingSkeleton } from "@/components/Common";
+import DeleteQuizConfirmation from "@/components/QuizCreation/DeleteQuizConfirmation";
+import EditQuizTitleDialog from "@/components/QuizCreation/EditQuizTitleDialog";
+import { StatusLight } from "@/components/ui/status-light";
+import { useConditionalPolling, useQuizStatusPolling } from "@/hooks/common";
+import { QUIZ_STATUS, UI_SIZES } from "@/lib/constants";
+import { queryKeys, quizQueryConfig } from "@/lib/queryConfig";
 
 export const Route = createFileRoute("/_layout/quiz/$id")({
   component: QuizLayout,
-})
+});
 
 function QuizLayout() {
-  const { t } = useTranslation("quiz")
-  const { id } = Route.useParams()
-  const router = useRouter()
-  const globalPollingInterval = useQuizStatusPolling()
+  const { t } = useTranslation("quiz");
+  const { id } = Route.useParams();
+  const router = useRouter();
+  const globalPollingInterval = useQuizStatusPolling();
 
   // Use router state to detect current route more reliably
   const pathname = useRouterState({
     select: (state) => state.location.pathname,
-  })
-  const isQuestionsRoute = pathname.endsWith("/questions")
-  const isIndexRoute = pathname === `/quiz/${id}` || pathname === `/quiz/${id}/`
+  });
+  const isQuestionsRoute = pathname.endsWith("/questions");
+  const isIndexRoute =
+    pathname === `/quiz/${id}` || pathname === `/quiz/${id}/`;
 
   // Custom polling logic for index route - stops polling for stable states
   const indexPolling = useConditionalPolling<Quiz>((data) => {
-    if (!data?.status) return true // Poll if no status yet
+    if (!data?.status) return true; // Poll if no status yet
 
     // Stop polling for stable/terminal states on index route to save resources
     const stableStates = [
@@ -52,17 +54,17 @@ function QuizLayout() {
       QUIZ_STATUS.READY_FOR_REVIEW_PARTIAL, // Quiz is stable with partial success, waiting for user retry
       QUIZ_STATUS.PUBLISHED, // Quiz is completed and exported
       QUIZ_STATUS.FAILED, // Terminal error state
-    ] as const
+    ] as const;
 
-    return !stableStates.includes(data.status as (typeof stableStates)[number])
-  }, 3000) // 3-second interval for active processing states
+    return !stableStates.includes(data.status as (typeof stableStates)[number]);
+  }, 3000); // 3-second interval for active processing states
 
   // Determine polling strategy based on route
   const getPollingInterval = () => {
-    if (isQuestionsRoute) return false // No polling on questions page
-    if (isIndexRoute) return indexPolling // Custom polling logic for index route
-    return globalPollingInterval // Default polling for other routes
-  }
+    if (isQuestionsRoute) return false; // No polling on questions page
+    if (isIndexRoute) return indexPolling; // Custom polling logic for index route
+    return globalPollingInterval; // Default polling for other routes
+  };
 
   const {
     data: quiz,
@@ -71,16 +73,16 @@ function QuizLayout() {
   } = useQuery({
     queryKey: queryKeys.quiz(id),
     queryFn: async () => {
-      const response = await QuizService.getQuiz({ quizId: id })
-      return response
+      const response = await QuizService.getQuiz({ quizId: id });
+      return response;
     },
     ...quizQueryConfig,
     refetchInterval: getPollingInterval(),
     refetchIntervalInBackground: false,
-  })
+  });
 
   if (isLoading) {
-    return <QuizLayoutSkeleton />
+    return <QuizLayoutSkeleton />;
   }
 
   if (error || !quiz) {
@@ -96,13 +98,13 @@ function QuizLayout() {
           </Card.Body>
         </Card.Root>
       </Container>
-    )
+    );
   }
 
   // Check if quiz is ready for approval
   const isQuizReadyForApproval =
     quiz.status === QUIZ_STATUS.READY_FOR_REVIEW ||
-    quiz.status === QUIZ_STATUS.READY_FOR_REVIEW_PARTIAL
+    quiz.status === QUIZ_STATUS.READY_FOR_REVIEW_PARTIAL;
 
   return (
     <Container maxW="6xl" py={8}>
@@ -117,6 +119,7 @@ function QuizLayout() {
               <StatusLight status={quiz.status || "created"} />
             </HStack>
             <HStack gap={3}>
+              <EditQuizTitleDialog quizId={id} currentTitle={quiz.title} />
               {isQuizReadyForApproval && (
                 <Button
                   colorPalette="blue"
@@ -169,7 +172,7 @@ function QuizLayout() {
         </Tabs.Root>
       </VStack>
     </Container>
-  )
+  );
 }
 
 function QuizLayoutSkeleton() {
@@ -212,5 +215,5 @@ function QuizLayoutSkeleton() {
         ))}
       </VStack>
     </Container>
-  )
+  );
 }

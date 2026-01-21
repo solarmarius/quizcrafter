@@ -11,7 +11,7 @@ from sqlmodel import Session, select
 from src.config import get_logger
 
 from .models import Quiz
-from .schemas import FailureReason, QuizCreate, QuizStatus
+from .schemas import FailureReason, QuizCreate, QuizStatus, QuizUpdate
 from .validators import (
     validate_quiz_for_content_extraction,
     validate_quiz_for_question_generation,
@@ -188,6 +188,45 @@ def delete_quiz(session: Session, quiz_id: UUID, user_id: UUID) -> bool:
         )
         return True
     return False
+
+
+def update_quiz(
+    session: Session, quiz_id: UUID, user_id: UUID, update_data: QuizUpdate
+) -> Quiz | None:
+    """
+    Update a quiz if owned by the user.
+
+    Args:
+        session: Database session
+        quiz_id: Quiz ID
+        user_id: User ID (must be owner)
+        update_data: QuizUpdate schema with fields to update
+
+    Returns:
+        Updated quiz instance or None if not found/not owner
+    """
+    quiz = get_quiz_by_id(session, quiz_id)
+    if not quiz or quiz.owner_id != user_id:
+        return None
+
+    update_dict = update_data.model_dump(exclude_unset=True)
+    for field, value in update_dict.items():
+        if value is not None:
+            setattr(quiz, field, value)
+
+    quiz.updated_at = datetime.now(timezone.utc)
+    session.add(quiz)
+    session.commit()
+    session.refresh(quiz)
+
+    logger.info(
+        "quiz_updated",
+        quiz_id=str(quiz_id),
+        user_id=str(user_id),
+        updated_fields=list(update_dict.keys()),
+    )
+
+    return quiz
 
 
 async def get_quiz_for_update(

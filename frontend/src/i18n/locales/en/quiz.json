@@ -105,7 +105,9 @@
     "viewAll": "View All Quizzes",
     "review": "Review",
     "postToCanvas": "Post to Canvas",
-    "deleteQuiz": "Delete Quiz"
+    "deleteQuiz": "Delete Quiz",
+    "editTitle": "Edit Title",
+    "cancel": "Cancel"
   },
   "settings": {
     "language": {
@@ -160,6 +162,18 @@
     "title": "Delete Quiz",
     "message": "Are you sure you want to delete the quiz \"{{quizTitle}}\"? This action cannot be undone.",
     "success": "Quiz deleted successfully"
+  },
+  "editTitle": {
+    "title": "Edit Quiz Title",
+    "canvasNote": "Changes made here will not update the quiz title in Canvas if already exported.",
+    "label": "Quiz Title",
+    "placeholder": "Enter quiz title",
+    "required": "Title is required",
+    "minLength": "Title must be at least 1 character",
+    "maxLength": "Title must be at most 255 characters",
+    "save": "Save",
+    "success": "Quiz title updated",
+    "ariaLabel": "Edit quiz title"
   },
   "detail": {
     "notFound": "Quiz Not Found",

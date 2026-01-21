@@ -105,7 +105,9 @@
     "viewAll": "Vis alle quizer",
     "review": "Gjennomgå",
     "postToCanvas": "Publiser til Canvas",
-    "deleteQuiz": "Slett quiz"
+    "deleteQuiz": "Slett quiz",
+    "editTitle": "Rediger tittel",
+    "cancel": "Avbryt"
   },
   "settings": {
     "language": {
@@ -160,6 +162,18 @@
     "title": "Slett quiz",
     "message": "Er du sikker på at du vil slette quizen «{{quizTitle}}»? Denne handlingen kan ikke angres.",
     "success": "Quiz slettet"
+  },
+  "editTitle": {
+    "title": "Rediger quiz-tittel",
+    "canvasNote": "Endringer her vil ikke oppdatere quiz-tittelen i Canvas hvis den allerede er eksportert.",
+    "label": "Quiz-tittel",
+    "placeholder": "Skriv inn quiz-tittel",
+    "required": "Tittel er påkrevd",
+    "minLength": "Tittelen må være minst 1 tegn",
+    "maxLength": "Tittelen kan maks være 255 tegn",
+    "save": "Lagre",
+    "success": "Quiz-tittel oppdatert",
+    "ariaLabel": "Rediger quiz-tittel"
   },
   "detail": {
     "notFound": "Quiz ikke funnet",
