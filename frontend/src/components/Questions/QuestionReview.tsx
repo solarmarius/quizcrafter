@@ -45,9 +45,15 @@ interface QuestionReviewProps {
   quizId: string
   /** The current status of the quiz */
   quizStatus?: QuizStatus
+  /** Module data for displaying source module names */
+  selectedModules?: Record<string, { name?: string; [key: string]: unknown }>
 }
 
-export function QuestionReview({ quizId, quizStatus }: QuestionReviewProps) {
+export function QuestionReview({
+  quizId,
+  quizStatus,
+  selectedModules,
+}: QuestionReviewProps) {
   const { t } = useTranslation("quiz")
   const [filterView, setFilterView] = useState<"pending" | "all">("pending")
   const { editingId, startEditing, cancelEditing, isEditing } =
@@ -242,6 +248,7 @@ export function QuestionReview({ quizId, quizStatus }: QuestionReviewProps) {
         isApproveLoading={approveQuestionMutation.isPending}
         isDeleteLoading={deleteQuestionMutation.isPending}
         quizStatus={quizStatus}
+        selectedModules={selectedModules}
       />
     </VStack>
   )
