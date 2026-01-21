@@ -11,6 +11,8 @@ COPY ./ /app/
 
 ARG VITE_API_URL=${VITE_API_URL}
 
+ENV NODE_OPTIONS="--max-old-space-size=3072"
+
 RUN npm run build
 
 
