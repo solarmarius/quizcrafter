@@ -21,7 +21,9 @@ import { type Quiz, QuizService } from "@/client";
 import { ErrorState, LoadingSkeleton } from "@/components/Common";
 import DeleteQuizConfirmation from "@/components/QuizCreation/DeleteQuizConfirmation";
 import EditQuizTitleDialog from "@/components/QuizCreation/EditQuizTitleDialog";
+import { ShareQuizDialog } from "@/components/QuizSharing";
 import { StatusLight } from "@/components/ui/status-light";
+import { useAuth } from "@/hooks";
 import { useConditionalPolling, useQuizStatusPolling } from "@/hooks/common";
 import { QUIZ_STATUS, UI_SIZES } from "@/lib/constants";
 import { queryKeys, quizQueryConfig } from "@/lib/queryConfig";
@@ -34,6 +36,7 @@ function QuizLayout() {
   const { t } = useTranslation("quiz");
   const { id } = Route.useParams();
   const router = useRouter();
+  const { user } = useAuth();
   const globalPollingInterval = useQuizStatusPolling();
 
   // Use router state to detect current route more reliably
@@ -106,6 +109,9 @@ function QuizLayout() {
     quiz.status === QUIZ_STATUS.READY_FOR_REVIEW ||
     quiz.status === QUIZ_STATUS.READY_FOR_REVIEW_PARTIAL;
 
+  // Check if current user is the owner
+  const isOwner = user?.id === quiz.owner_id;
+
   return (
     <Container maxW="6xl" py={8}>
       <VStack gap={6} align="stretch">
@@ -120,6 +126,9 @@ function QuizLayout() {
             </HStack>
             <HStack gap={3}>
               <EditQuizTitleDialog quizId={id} currentTitle={quiz.title} />
+              {isOwner && (
+                <ShareQuizDialog quizId={id} quizTitle={quiz.title} />
+              )}
               {isQuizReadyForApproval && (
                 <Button
                   colorPalette="blue"
@@ -134,7 +143,9 @@ function QuizLayout() {
                   {t("actions.review")}
                 </Button>
               )}
-              <DeleteQuizConfirmation quizId={id} quizTitle={quiz.title} />
+              {isOwner && (
+                <DeleteQuizConfirmation quizId={id} quizTitle={quiz.title} />
+              )}
             </HStack>
           </HStack>
         </Box>

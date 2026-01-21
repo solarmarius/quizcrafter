@@ -4,51 +4,63 @@ import type { CancelablePromise } from "./core/CancelablePromise"
 import { OpenAPI } from "./core/OpenAPI"
 import { request as __request } from "./core/request"
 import type {
-  AuthAuthCanvasResponse,
   AuthLoginCanvasResponse,
+  AuthAuthCanvasResponse,
   AuthLogoutCanvasResponse,
+  CanvasGetCoursesResponse,
   CanvasGetCourseModulesData,
   CanvasGetCourseModulesResponse,
-  CanvasGetCoursesResponse,
-  CanvasGetFileInfoData,
-  CanvasGetFileInfoResponse,
   CanvasGetModuleItemsData,
   CanvasGetModuleItemsResponse,
   CanvasGetPageContentData,
   CanvasGetPageContentResponse,
-  QuestionsApproveQuestionData,
-  QuestionsApproveQuestionResponse,
-  QuestionsCreateQuestionData,
-  QuestionsCreateQuestionResponse,
-  QuestionsDeleteQuestionData,
-  QuestionsDeleteQuestionResponse,
-  QuestionsGetQuestionData,
-  QuestionsGetQuestionResponse,
+  CanvasGetFileInfoData,
+  CanvasGetFileInfoResponse,
   QuestionsGetQuizQuestionsData,
   QuestionsGetQuizQuestionsResponse,
+  QuestionsCreateQuestionData,
+  QuestionsCreateQuestionResponse,
+  QuestionsGetQuestionData,
+  QuestionsGetQuestionResponse,
   QuestionsUpdateQuestionData,
   QuestionsUpdateQuestionResponse,
+  QuestionsDeleteQuestionData,
+  QuestionsDeleteQuestionResponse,
+  QuestionsApproveQuestionData,
+  QuestionsApproveQuestionResponse,
+  QuizGetUserQuizzesEndpointResponse,
   QuizCreateNewQuizData,
   QuizCreateNewQuizResponse,
+  QuizUploadManualModuleData,
+  QuizUploadManualModuleResponse,
+  QuizGetQuizData,
+  QuizGetQuizResponse,
+  QuizUpdateQuizEndpointData,
+  QuizUpdateQuizEndpointResponse,
   QuizDeleteQuizEndpointData,
   QuizDeleteQuizEndpointResponse,
-  QuizExportQuizToCanvasData,
-  QuizExportQuizToCanvasResponse,
-  QuizGetQuizData,
-  QuizGetQuizQuestionStatsData,
-  QuizGetQuizQuestionStatsResponse,
-  QuizGetQuizResponse,
-  QuizGetUserQuizzesEndpointResponse,
   QuizTriggerContentExtractionData,
   QuizTriggerContentExtractionResponse,
   QuizTriggerQuestionGenerationData,
   QuizTriggerQuestionGenerationResponse,
-  QuizUpdateQuizEndpointData,
-  QuizUpdateQuizEndpointResponse,
-  QuizUploadManualModuleData,
-  QuizUploadManualModuleResponse,
-  UsersDeleteUserMeResponse,
+  QuizGetQuizQuestionStatsData,
+  QuizGetQuizQuestionStatsResponse,
+  QuizExportQuizToCanvasData,
+  QuizExportQuizToCanvasResponse,
+  QuizSharingCreateInviteData,
+  QuizSharingCreateInviteResponse,
+  QuizSharingListCollaboratorsData,
+  QuizSharingListCollaboratorsResponse,
+  QuizSharingRemoveCollaboratorEndpointData,
+  QuizSharingRemoveCollaboratorEndpointResponse,
+  QuizSharingRevokeInviteEndpointData,
+  QuizSharingRevokeInviteEndpointResponse,
+  QuizSharingGetInviteInfoData,
+  QuizSharingGetInviteInfoResponse,
+  QuizSharingAcceptInviteData,
+  QuizSharingAcceptInviteResponse,
   UsersReadUserMeResponse,
+  UsersDeleteUserMeResponse,
   UsersUpdateUserMeData,
   UsersUpdateUserMeResponse,
   UtilsHealthCheckResponse,
@@ -1149,6 +1161,208 @@ export class QuizService {
       url: "/quiz/{quiz_id}/export",
       path: {
         quiz_id: data.quizId,
+      },
+      errors: {
+        422: "Validation Error",
+      },
+    })
+  }
+}
+
+export class QuizSharingService {
+  /**
+   * Create Invite
+   * Create a new invite link for a quiz.
+   *
+   * Only the quiz owner can create invites.
+   *
+   * **Parameters:**
+   * quiz_id: UUID of the quiz
+   * invite_data: Invite configuration (expires_in_days, max_uses)
+   *
+   * **Returns:**
+   * QuizInviteResponse with the invite details and URL
+   * @param data The data for the request.
+   * @param data.quizId
+   * @param data.requestBody
+   * @returns QuizInviteResponse Successful Response
+   * @throws ApiError
+   */
+  public static createInvite(
+    data: QuizSharingCreateInviteData,
+  ): CancelablePromise<QuizSharingCreateInviteResponse> {
+    return __request(OpenAPI, {
+      method: "POST",
+      url: "/quiz/{quiz_id}/invites",
+      path: {
+        quiz_id: data.quizId,
+      },
+      body: data.requestBody,
+      mediaType: "application/json",
+      errors: {
+        422: "Validation Error",
+      },
+    })
+  }
+
+  /**
+   * List Collaborators
+   * List all collaborators and active invites for a quiz.
+   *
+   * Only the quiz owner can view the full list.
+   *
+   * **Returns:**
+   * QuizCollaboratorsResponse with owner info, collaborators, and active invites
+   * @param data The data for the request.
+   * @param data.quizId
+   * @returns QuizCollaboratorsResponse Successful Response
+   * @throws ApiError
+   */
+  public static listCollaborators(
+    data: QuizSharingListCollaboratorsData,
+  ): CancelablePromise<QuizSharingListCollaboratorsResponse> {
+    return __request(OpenAPI, {
+      method: "GET",
+      url: "/quiz/{quiz_id}/collaborators",
+      path: {
+        quiz_id: data.quizId,
+      },
+      errors: {
+        422: "Validation Error",
+      },
+    })
+  }
+
+  /**
+   * Remove Collaborator Endpoint
+   * Remove a collaborator from a quiz.
+   *
+   * Only the quiz owner can remove collaborators.
+   *
+   * **Parameters:**
+   * quiz_id: UUID of the quiz
+   * collaborator_id: UUID of the QuizCollaborator record to remove
+   *
+   * **Returns:**
+   * Success message
+   * @param data The data for the request.
+   * @param data.collaboratorId
+   * @param data.quizId
+   * @returns string Successful Response
+   * @throws ApiError
+   */
+  public static removeCollaboratorEndpoint(
+    data: QuizSharingRemoveCollaboratorEndpointData,
+  ): CancelablePromise<QuizSharingRemoveCollaboratorEndpointResponse> {
+    return __request(OpenAPI, {
+      method: "DELETE",
+      url: "/quiz/{quiz_id}/collaborators/{collaborator_id}",
+      path: {
+        collaborator_id: data.collaboratorId,
+        quiz_id: data.quizId,
+      },
+      errors: {
+        422: "Validation Error",
+      },
+    })
+  }
+
+  /**
+   * Revoke Invite Endpoint
+   * Revoke an invite link.
+   *
+   * Only the quiz owner can revoke invites.
+   *
+   * **Parameters:**
+   * quiz_id: UUID of the quiz
+   * invite_id: UUID of the QuizInvite to revoke
+   *
+   * **Returns:**
+   * Success message
+   * @param data The data for the request.
+   * @param data.inviteId
+   * @param data.quizId
+   * @returns string Successful Response
+   * @throws ApiError
+   */
+  public static revokeInviteEndpoint(
+    data: QuizSharingRevokeInviteEndpointData,
+  ): CancelablePromise<QuizSharingRevokeInviteEndpointResponse> {
+    return __request(OpenAPI, {
+      method: "DELETE",
+      url: "/quiz/{quiz_id}/invites/{invite_id}",
+      path: {
+        invite_id: data.inviteId,
+        quiz_id: data.quizId,
+      },
+      errors: {
+        422: "Validation Error",
+      },
+    })
+  }
+
+  /**
+   * Get Invite Info
+   * Get information about an invite without accepting it.
+   *
+   * Used to show invite details on the accept page before the user clicks accept.
+   * Requires authentication to prevent invite enumeration.
+   *
+   * **Parameters:**
+   * token: Invite token from the URL
+   *
+   * **Returns:**
+   * InviteInfoResponse with quiz title, owner name, and validity status
+   * @param data The data for the request.
+   * @param data.token
+   * @returns InviteInfoResponse Successful Response
+   * @throws ApiError
+   */
+  public static getInviteInfo(
+    data: QuizSharingGetInviteInfoData,
+  ): CancelablePromise<QuizSharingGetInviteInfoResponse> {
+    return __request(OpenAPI, {
+      method: "GET",
+      url: "/quiz/invite/{token}",
+      path: {
+        token: data.token,
+      },
+      errors: {
+        422: "Validation Error",
+      },
+    })
+  }
+
+  /**
+   * Accept Invite
+   * Accept an invite and become a collaborator.
+   *
+   * **Parameters:**
+   * token: Invite token from the URL
+   *
+   * **Returns:**
+   * AcceptInviteResponse with success status and quiz info
+   *
+   * **Edge cases handled:**
+   * - Owner clicking their own link: Returns success with special message
+   * - Already a collaborator: Returns success without duplicate
+   * - Expired invite: Returns 410 Gone
+   * - Revoked invite: Returns 410 Gone
+   * - Max uses reached: Returns 410 Gone
+   * - Quiz deleted: Returns 404
+   * @param data The data for the request.
+   * @param data.token
+   * @returns AcceptInviteResponse Successful Response
+   * @throws ApiError
+   */
+  public static acceptInvite(
+    data: QuizSharingAcceptInviteData,
+  ): CancelablePromise<QuizSharingAcceptInviteResponse> {
+    return __request(OpenAPI, {
+      method: "POST",
+      url: "/quiz/invite/{token}/accept",
+      path: {
+        token: data.token,
       },
       errors: {
         422: "Validation Error",

@@ -4,6 +4,7 @@ Pydantic schemas for authentication module.
 
 from datetime import datetime
 from typing import Any
+from uuid import UUID
 
 from sqlmodel import Field, SQLModel
 
@@ -21,6 +22,7 @@ class UserCreate(SQLModel):
 class UserPublic(SQLModel):
     """Public user information schema."""
 
+    id: UUID
     name: str
     onboarding_completed: bool
 
