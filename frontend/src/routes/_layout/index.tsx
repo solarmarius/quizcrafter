@@ -9,7 +9,7 @@ import {
 import { Link as RouterLink, createFileRoute } from "@tanstack/react-router"
 import { useTranslation } from "react-i18next"
 
-import { ErrorState } from "@/components/Common"
+import { ErrorState, SessionExpiredState } from "@/components/Common"
 import { OnboardingModal } from "@/components/Onboarding/OnboardingModal"
 import {
   HelpPanel,
@@ -20,6 +20,7 @@ import { Button } from "@/components/ui/button"
 import { useUserQuizzes } from "@/hooks/api"
 import { useAuth } from "@/hooks/auth"
 import { useCustomToast, useOnboarding } from "@/hooks/common"
+import { isAuthError } from "@/lib/utils/errors"
 
 export const Route = createFileRoute("/_layout/")({
   component: Dashboard,
@@ -40,6 +41,10 @@ function Dashboard() {
   const { data: quizzes, isLoading, error } = useUserQuizzes()
 
   if (error) {
+    if (isAuthError(error)) {
+      return <SessionExpiredState />
+    }
+
     showErrorToast(t("errors.loadFailed"))
     return (
       <Container maxW="6xl" py={8}>
