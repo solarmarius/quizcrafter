@@ -136,6 +136,9 @@
       "tip2": "All content is being referenced with a module",
       "tip3": "Describe any diagrams/images/equations with plain text"
     },
+    "language": {
+      "title": "Choose Your Language"
+    },
     "privacy": {
       "title": "Privacy & Data Usage",
       "description": "Before getting started, please take a moment to review our privacy policy to understand how we handle your data and quiz information.",
