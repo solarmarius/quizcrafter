@@ -2,8 +2,12 @@ import { Box, Stack, Text } from "@chakra-ui/react"
 import { Link } from "@tanstack/react-router"
 import { useTranslation } from "react-i18next"
 
+import { useLocalizedRoute } from "@/hooks/common"
+import { LOCALIZED_ROUTES } from "@/lib/routes"
+
 export const PrivacyPolicyStep = () => {
   const { t } = useTranslation("common")
+  const { getLocalizedRoute } = useLocalizedRoute()
 
   return (
     <Stack gap={6} align="center" py={8} minH="300px" justify="center">
@@ -14,7 +18,7 @@ export const PrivacyPolicyStep = () => {
         <Text fontSize="lg" color="gray.600" lineHeight="tall" mb={4}>
           {t("onboarding.privacy.description")}
         </Text>
-        <Link to="/privacy-policy">
+        <Link to={getLocalizedRoute(LOCALIZED_ROUTES.privacyPolicy) as any} params={{}}>
           <Text
             color="teal.500"
             textDecoration="underline"

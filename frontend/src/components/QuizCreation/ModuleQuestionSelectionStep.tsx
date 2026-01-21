@@ -39,7 +39,7 @@ interface ModuleQuestionSelectionStepProps {
 export const ModuleQuestionSelectionStep: React.FC<
   ModuleQuestionSelectionStepProps
 > = ({ selectedModules, moduleQuestions, onModuleQuestionChange }) => {
-  const { t } = useTranslation(["creation", "quiz"])
+  const { t } = useTranslation(["creation", "quiz", "validation"])
 
   // Create translated collections inside component
   const questionTypeCollection = useMemo(
@@ -280,11 +280,28 @@ export const ModuleQuestionSelectionStep: React.FC<
                       <Alert.Root status="error" size="sm">
                         <Alert.Indicator />
                         <Alert.Description>
-                          {moduleErrors.map((error, index) => (
-                            <Text key={index} fontSize="sm">
-                              {error}
-                            </Text>
-                          ))}
+                          {moduleErrors.map((errorKey, index) => {
+                            // Handle keys with interpolation params (e.g., "validation:questionBatch.invalidCountWithIndex:1")
+                            const lastColonIndex = errorKey.lastIndexOf(":")
+                            const hasParam =
+                              lastColonIndex > errorKey.indexOf(":") // Has more than namespace colon
+                            if (hasParam) {
+                              const key = errorKey.substring(0, lastColonIndex)
+                              const param = errorKey.substring(
+                                lastColonIndex + 1,
+                              )
+                              return (
+                                <Text key={index} fontSize="sm">
+                                  {t(key as any, { index: param })}
+                                </Text>
+                              )
+                            }
+                            return (
+                              <Text key={index} fontSize="sm">
+                                {t(errorKey as any)}
+                              </Text>
+                            )
+                          })}
                         </Alert.Description>
                       </Alert.Root>
                     )}

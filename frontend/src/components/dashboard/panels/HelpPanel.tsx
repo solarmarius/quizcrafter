@@ -11,8 +11,12 @@ import {
 import { Trans, useTranslation } from "react-i18next"
 import { LuExternalLink } from "react-icons/lu"
 
+import { useLocalizedRoute } from "@/hooks/common"
+import { LOCALIZED_ROUTES } from "@/lib/routes"
+
 export function HelpPanel() {
   const { t } = useTranslation(["dashboard", "common"])
+  const { getLocalizedRoute } = useLocalizedRoute()
 
   return (
     <Card.Root>
@@ -154,7 +158,7 @@ export function HelpPanel() {
                   components={{
                     privacyLink: (
                       <Link
-                        href="/privacy-policy"
+                        href={getLocalizedRoute(LOCALIZED_ROUTES.privacyPolicy)}
                         color="blue.500"
                         textDecoration="underline"
                       />

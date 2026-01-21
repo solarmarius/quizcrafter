@@ -23,18 +23,13 @@ export const QuizTableRow = memo(function QuizTableRow({
   return (
     <Table.Row key={quiz.id}>
       <Table.Cell>
-        <VStack align="start" gap={1}>
-          <Text fontWeight="medium">{quiz.title}</Text>
-          <Text fontSize="sm" color="gray.500">
-            {t("quiz:table.modulesSelected", { count: moduleCount })}
-          </Text>
-        </VStack>
+        <Text fontWeight="medium">{quiz.title}</Text>
       </Table.Cell>
       <Table.Cell>
         <VStack align="start" gap={1}>
           <Text>{quiz.canvas_course_name}</Text>
           <Text fontSize="sm" color="gray.500">
-            ID: {quiz.canvas_course_id}
+            {t("quiz:table.modulesSelected", { count: moduleCount })}
           </Text>
         </VStack>
       </Table.Cell>

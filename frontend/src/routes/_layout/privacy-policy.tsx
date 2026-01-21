@@ -1,11 +1,24 @@
-import { Box, Container, Heading, List, Text, VStack } from "@chakra-ui/react"
-import { Link, createFileRoute } from "@tanstack/react-router"
+import { Box, Container, Heading, List, Text, VStack } from "@chakra-ui/react";
+import { Link, createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useEffect } from "react";
+import { useTranslation } from "react-i18next";
+
+import { UI_LANGUAGES } from "@/i18n";
 
 export const Route = createFileRoute("/_layout/privacy-policy")({
   component: PrivacyPolicy,
-})
+});
 
 function PrivacyPolicy() {
+  const { i18n } = useTranslation();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (i18n.language === UI_LANGUAGES.NORWEGIAN) {
+      navigate({ to: "/privacy-policy-no", replace: true });
+    }
+  }, [i18n.language, navigate]);
+
   return (
     <Container maxW="4xl" py={8}>
       <VStack gap={8} align="stretch">
@@ -14,7 +27,7 @@ function PrivacyPolicy() {
         </Heading>
 
         <Text fontSize="sm" color="gray.600" textAlign="center">
-          Last updated: {new Date().toLocaleDateString()}
+          Last updated: 21.01.2026
         </Text>
 
         <Box>
@@ -42,14 +55,14 @@ function PrivacyPolicy() {
             </Link>
           </Text>
           <Text>This Privacy Policy explains:</Text>
-          <Text pl={6} mb={4}>
+          <Box pl={6} mb={4}>
             <List.Root>
               <List.Item>What data we collect</List.Item>
               <List.Item>How we use and store it</List.Item>
               <List.Item>How we protect your data </List.Item>
               <List.Item>Your rights under GDPR</List.Item>
             </List.Root>
-          </Text>
+          </Box>
         </Box>
 
         <Box>
@@ -62,7 +75,7 @@ function PrivacyPolicy() {
           <Text mb={4}>
             Collected when you log in with your Canvas LMS account via OAuth2:
           </Text>
-          <Text pl={6} mb={4}>
+          <Box pl={6} mb={4}>
             <List.Root>
               <List.Item>
                 Personal identifiers: Name, Canvas LMS user ID (canvas_id)
@@ -78,12 +91,12 @@ function PrivacyPolicy() {
                 System metadata: Account creation and update timestamps
               </List.Item>
             </List.Root>
-          </Text>
+          </Box>
           <Heading size="md" mb={4}>
             2.2 Quiz Data
           </Heading>
           <Text mb={4}>Collected when you create quizzes:</Text>
-          <Text pl={6} mb={4}>
+          <Box pl={6} mb={4}>
             <List.Root>
               <List.Item>
                 Course data: Canvas course ID and name, selected modules
@@ -101,12 +114,12 @@ function PrivacyPolicy() {
                 extraction and export
               </List.Item>
             </List.Root>
-          </Text>
+          </Box>
           <Heading size="md" mb={4}>
             2.3 Question Data
           </Heading>
           <Text mb={4}>Generated during quiz creation:</Text>
-          <Text pl={6} mb={4}>
+          <Box pl={6} mb={4}>
             <List.Root>
               <List.Item>
                 Question content: Type, text, options, correct answers,
@@ -122,7 +135,7 @@ function PrivacyPolicy() {
                 Integration data: Canvas quiz item ID after export
               </List.Item>
             </List.Root>
-          </Text>
+          </Box>
         </Box>
 
         <Box>
@@ -130,7 +143,7 @@ function PrivacyPolicy() {
             3. How We Use Your Data
           </Heading>
           <Text mb={4}>Your data is used for:</Text>
-          <Text pl={6} mb={4}>
+          <Box pl={6} mb={4}>
             <List.Root as="ol">
               <List.Item>
                 Providing core functionality: Generating quizzes and exporting
@@ -151,7 +164,7 @@ function PrivacyPolicy() {
                 and diagnosing technical issues
               </List.Item>
             </List.Root>
-          </Text>
+          </Box>
         </Box>
 
         <Box>
@@ -160,7 +173,7 @@ function PrivacyPolicy() {
           </Heading>
           <Text mb={4}>We operate a selective data retention model:</Text>
           <Text mb={4}>When you delete your account:</Text>
-          <Text pl={6} mb={4}>
+          <Box pl={6} mb={4}>
             <List.Root>
               <List.Item>
                 Deleted immediately: All personal identifiers (name, Canvas ID),
@@ -171,9 +184,9 @@ function PrivacyPolicy() {
                 generated questions, and edit histories for research purposes.
               </List.Item>
             </List.Root>
-          </Text>
+          </Box>
           <Text mb={4}>Retention periods:</Text>
-          <Text pl={6} mb={4}>
+          <Box pl={6} mb={4}>
             <List.Root>
               <List.Item>
                 Personal data: Deleted immediately upon request/account deletion
@@ -183,7 +196,7 @@ function PrivacyPolicy() {
                 and system improvement
               </List.Item>
             </List.Root>
-          </Text>
+          </Box>
         </Box>
 
         <Box>
@@ -205,7 +218,7 @@ function PrivacyPolicy() {
             6. Data Protection Measures
           </Heading>
           <Text mb={4}>We implement data protection by design:</Text>
-          <Text pl={6} mb={4}>
+          <Box pl={6} mb={4}>
             <List.Root>
               <List.Item>
                 Encryption at rest: OAuth tokens are encrypted with an
@@ -228,7 +241,7 @@ function PrivacyPolicy() {
                 research validity
               </List.Item>
             </List.Root>
-          </Text>
+          </Box>
         </Box>
 
         <Box>
@@ -236,7 +249,7 @@ function PrivacyPolicy() {
             7. Your Rights under GDPR
           </Heading>
           <Text mb={4}>You have the rights to:</Text>
-          <Text pl={6} mb={4}>
+          <Box pl={6} mb={4}>
             <List.Root>
               <List.Item>Access your personal data</List.Item>
               <List.Item>Rectify inaccurate data</List.Item>
@@ -247,7 +260,7 @@ function PrivacyPolicy() {
                 Object to processing for non-essential purposes
               </List.Item>
             </List.Root>
-          </Text>
+          </Box>
         </Box>
 
         <Box>
@@ -277,10 +290,10 @@ function PrivacyPolicy() {
           </Heading>
           <Text>
             If you have any questions about this privacy policy, please contact
-            us at: Marius Solaas, mso270@uit.no
+            us at: Marius Solaas, marius.r.solaas@uit.no
           </Text>
         </Box>
       </VStack>
     </Container>
-  )
+  );
 }

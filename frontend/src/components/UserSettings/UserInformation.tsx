@@ -12,11 +12,17 @@ import {
 } from "@/client"
 import { FormField, FormGroup } from "@/components/forms"
 import { useAuth } from "@/hooks/auth"
-import { useCustomToast, useErrorHandler } from "@/hooks/common"
+import {
+  useCustomToast,
+  useErrorHandler,
+  useLocalizedRoute,
+} from "@/hooks/common"
+import { LOCALIZED_ROUTES } from "@/lib/routes"
 import LanguagePreference from "./LanguagePreference"
 
 const UserInformation = () => {
   const { t } = useTranslation("common")
+  const { getLocalizedRoute } = useLocalizedRoute()
   const queryClient = useQueryClient()
   const { showSuccessToast } = useCustomToast()
   const { handleError } = useErrorHandler()
@@ -130,7 +136,7 @@ const UserInformation = () => {
               components={{
                 privacyLink: (
                   <Link
-                    href="/privacy-policy"
+                    href={getLocalizedRoute(LOCALIZED_ROUTES.privacyPolicy)}
                     color="blue.500"
                     textDecoration="underline"
                   />

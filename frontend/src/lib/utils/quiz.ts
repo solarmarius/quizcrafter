@@ -2,7 +2,6 @@ import type { QuestionBatch, Quiz } from "@/client/types.gen"
 import {
   QUESTION_TYPE_LABELS,
   QUIZ_STATUS,
-  VALIDATION_MESSAGES,
   VALIDATION_RULES,
 } from "@/lib/constants"
 
@@ -364,14 +363,15 @@ export function getModuleQuestionBatchBreakdown(
 
 /**
  * Validate question batches for a module
- * Returns array of error messages (empty if valid)
+ * Returns array of i18n translation keys (empty if valid)
+ * Keys use format "validation:questionBatch.keyName" or "validation:questionBatch.keyName:param" for interpolation
  */
 export function validateModuleBatches(batches: QuestionBatch[]): string[] {
   const errors: string[] = []
 
   // Check batch count limit
   if (batches.length > VALIDATION_RULES.MAX_BATCHES_PER_MODULE) {
-    errors.push(VALIDATION_MESSAGES.MAX_BATCHES)
+    errors.push("validation:questionBatch.maxBatches")
   }
 
   // Check for duplicate question type + difficulty combinations
@@ -380,7 +380,7 @@ export function validateModuleBatches(batches: QuestionBatch[]): string[] {
   )
   const uniqueCombinations = new Set(combinations)
   if (combinations.length !== uniqueCombinations.size) {
-    errors.push(VALIDATION_MESSAGES.DUPLICATE_COMBINATIONS)
+    errors.push("validation:questionBatch.duplicateCombinations")
   }
 
   // Check individual batch counts
@@ -389,7 +389,7 @@ export function validateModuleBatches(batches: QuestionBatch[]): string[] {
       batch.count < VALIDATION_RULES.MIN_QUESTIONS_PER_BATCH ||
       batch.count > VALIDATION_RULES.MAX_QUESTIONS_PER_BATCH
     ) {
-      errors.push(`Batch ${index + 1}: ${VALIDATION_MESSAGES.INVALID_COUNT}`)
+      errors.push(`validation:questionBatch.invalidCountWithIndex:${index + 1}`)
     }
   })
 

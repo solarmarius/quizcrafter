@@ -4,6 +4,7 @@
     "duplicateTypes": "Kan ikke ha dupliserte spørsmålstyper i samme modul",
     "duplicateCombinations": "Kan ikke ha dupliserte kombinasjoner av spørsmålstype og vanskelighetsgrad",
     "invalidCount": "Antall spørsmål må være mellom 1 og 20",
+    "invalidCountWithIndex": "Gruppe {{index}}: Antall spørsmål må være mellom 1 og 20",
     "noBatches": "Hver modul må ha minst én spørsmålsgruppe"
   },
   "quiz": {
