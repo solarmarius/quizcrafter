@@ -37,6 +37,7 @@
     "networkError": "Nettverksfeil. Vennligst sjekk tilkoblingen din.",
     "sessionExpired": "Økten er utløpt",
     "sessionExpiredDescription": "Vennligst logg inn på nytt for å fortsette.",
+    "loginAgain": "Logg inn på nytt",
     "unexpected": "Det oppstod en uventet feil",
     "contactSupport": "Prøv igjen eller kontakt support hvis problemet vedvarer.",
     "loadingData": "Det oppstod en feil under lasting av data",

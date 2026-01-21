@@ -37,6 +37,7 @@
     "networkError": "Network error. Please check your connection.",
     "sessionExpired": "Session Expired",
     "sessionExpiredDescription": "Please log in again to continue.",
+    "loginAgain": "Log in again",
     "unexpected": "An unexpected error occurred",
     "contactSupport": "Please try again or contact support if the problem persists.",
     "loadingData": "An error occurred while loading data",

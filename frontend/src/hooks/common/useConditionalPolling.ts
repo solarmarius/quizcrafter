@@ -65,7 +65,12 @@ export function useConditionalPolling<T>(
  * ```
  */
 export function useQuizStatusPolling() {
-  return (query: { state: { data?: any } }) => {
+  return (query: { state: { data?: any; error?: Error | null } }) => {
+    // Stop polling if there's an error (e.g., auth error)
+    if (query?.state?.error) {
+      return false
+    }
+
     const data = query?.state?.data
     if (!data) return 2000 // Poll every 2 seconds when no data
 
@@ -118,7 +123,12 @@ export function useQuizStatusPolling() {
  * ```
  */
 export function useUserQuizzesPolling() {
-  return (query: { state: { data?: any[] } }) => {
+  return (query: { state: { data?: any[]; error?: Error | null } }) => {
+    // Stop polling if there's an error (e.g., auth error)
+    if (query?.state?.error) {
+      return false
+    }
+
     const quizzes = query?.state?.data
     if (!quizzes || !Array.isArray(quizzes)) {
       return 2000 // Poll every 2 seconds when data is missing/loading
