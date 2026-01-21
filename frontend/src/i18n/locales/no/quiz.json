@@ -335,7 +335,8 @@
       "exportedOn": "Eksportert {{date}}",
       "noQuestionsYet": "Ingen spørsmål generert ennå. Spørsmål vil vises her når genereringen er fullført.",
       "exportStarted": "Quiz-eksport til Canvas startet",
-      "readyToExport": "Klar til å eksportere til Canvas"
+      "readyToExport": "Klar til å eksportere til Canvas",
+      "ownerOnlyExport": "Bare quizeieren kan eksportere til Canvas"
     },
     "editor": {
       "questionText": "Spørsmålstekst",

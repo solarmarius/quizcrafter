@@ -10,6 +10,7 @@ import { EmptyState, ErrorState, LoadingSkeleton } from "@/components/Common"
 import { ManualQuestionDialog } from "@/components/Questions/ManualQuestionDialog"
 import { QuestionReview } from "@/components/Questions/QuestionReview"
 import { QuestionStats } from "@/components/Questions/QuestionStats"
+import { useAuth } from "@/hooks/auth"
 import { useConditionalPolling } from "@/hooks/common"
 import { FAILURE_REASON, QUIZ_STATUS } from "@/lib/constants"
 import { queryKeys, quizQueryConfig } from "@/lib/queryConfig"
@@ -88,6 +89,7 @@ function QuizQuestions() {
   const { t } = useTranslation("quiz")
   const { id } = Route.useParams()
   const queryClient = useQueryClient()
+  const { user } = useAuth()
 
   // Add dialog state management
   const [isManualQuestionDialogOpen, setIsManualQuestionDialogOpen] =
@@ -152,7 +154,7 @@ function QuizQuestions() {
         quiz.status === QUIZ_STATUS.PUBLISHED ||
         (quiz.status === QUIZ_STATUS.FAILED &&
           quiz.failure_reason === FAILURE_REASON.CANVAS_EXPORT_ERROR)) && (
-        <QuestionStats quiz={quiz} />
+        <QuestionStats quiz={quiz} isOwner={user?.id === quiz.owner_id} />
       )}
 
       {/* Canvas Export Error Banner */}

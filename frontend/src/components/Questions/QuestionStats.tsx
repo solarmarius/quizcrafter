@@ -52,10 +52,13 @@ import {
 interface QuestionStatsProps {
   /** The quiz object containing ID and export status information */
   quiz: Quiz
+  /** Whether the current user is the owner of the quiz (only owners can export) */
+  isOwner?: boolean
 }
 
 export const QuestionStats = memo(function QuestionStats({
   quiz,
+  isOwner = false,
 }: QuestionStatsProps) {
   const { t, i18n } = useTranslation("quiz")
   const { showSuccessToast } = useCustomToast()
@@ -222,7 +225,7 @@ export const QuestionStats = memo(function QuestionStats({
                   const isExporting =
                     exportMutation.isPending ||
                     quiz.status === QUIZ_STATUS.EXPORTING_TO_CANVAS
-                  const canExport = !isExported
+                  const canExport = !isExported && isOwner
 
                   if (canExport) {
                     return (
@@ -236,6 +239,14 @@ export const QuestionStats = memo(function QuestionStats({
                         <SiCanvas />
                         {t("actions.postToCanvas")}
                       </Button>
+                    )
+                  }
+
+                  if (!isExported && !isOwner) {
+                    return (
+                      <Text fontSize="sm" color="gray.600" textAlign="center">
+                        {t("questions.stats.ownerOnlyExport")}
+                      </Text>
                     )
                   }
 

@@ -335,7 +335,8 @@
       "exportedOn": "Exported on {{date}}",
       "noQuestionsYet": "No questions generated yet. Questions will appear here once generation is complete.",
       "exportStarted": "Quiz export to Canvas started successfully",
-      "readyToExport": "Ready to export to Canvas"
+      "readyToExport": "Ready to export to Canvas",
+      "ownerOnlyExport": "Only the quiz owner can export to Canvas"
     },
     "editor": {
       "questionText": "Question Text",
