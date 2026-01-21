@@ -539,21 +539,21 @@ async def test_delete_question_success(async_session):
     from src.question.service import delete_question
 
     question_id = uuid.uuid4()
-    quiz_owner_id = uuid.uuid4()
+    quiz_id = uuid.uuid4()
 
     # Mock a question for the delete query response
     mock_question = MagicMock()
     mock_question.id = question_id
     mock_question.deleted = False  # Not yet soft-deleted
 
-    # Mock the join query result
+    # Mock the query result
     mock_result = MagicMock()
     mock_result.scalar_one_or_none.return_value = mock_question
     async_session.execute = AsyncMock(return_value=mock_result)
     async_session.add = MagicMock()  # For soft delete
     async_session.commit = AsyncMock()
 
-    result = await delete_question(async_session, question_id, quiz_owner_id)
+    result = await delete_question(async_session, question_id, quiz_id)
 
     assert result is True
     # Verify soft delete was performed (not hard delete)
@@ -565,12 +565,12 @@ async def test_delete_question_success(async_session):
 
 
 @pytest.mark.asyncio
-async def test_delete_question_not_found_or_unauthorized(async_session):
-    """Test question deletion when not found or unauthorized."""
+async def test_delete_question_not_found(async_session):
+    """Test question deletion when not found."""
     from src.question.service import delete_question
 
     question_id = uuid.uuid4()
-    quiz_owner_id = uuid.uuid4()
+    quiz_id = uuid.uuid4()
 
     # Mock empty query result
     mock_result = MagicMock()
@@ -578,7 +578,7 @@ async def test_delete_question_not_found_or_unauthorized(async_session):
     async_session.execute = AsyncMock(return_value=mock_result)
     async_session.delete = MagicMock()
 
-    result = await delete_question(async_session, question_id, quiz_owner_id)
+    result = await delete_question(async_session, question_id, quiz_id)
 
     assert result is False
     async_session.delete.assert_not_called()

@@ -358,29 +358,28 @@ async def update_question(
 
 
 async def delete_question(
-    session: AsyncSession, question_id: UUID, quiz_owner_id: UUID
+    session: AsyncSession, question_id: UUID, quiz_id: UUID
 ) -> bool:
     """
-    Soft delete a question by ID (with ownership verification).
+    Soft delete a question by ID.
+
+    Authorization is handled by the router before calling this function.
 
     Args:
         session: Database session
         question_id: Question identifier
-        quiz_owner_id: Quiz owner ID for verification
+        quiz_id: Quiz ID to verify question belongs to quiz
 
     Returns:
-        True if soft deleted, False if not found or unauthorized
+        True if soft deleted, False if not found
     """
     logger.debug("question_deletion_started", question_id=str(question_id))
 
-    # Get question with quiz ownership check, including soft-deleted to prevent double deletion
-    from src.quiz.models import Quiz
-
+    # Get question and verify it belongs to the specified quiz
     result = await session.execute(
         select(Question)
-        .join(Quiz)
         .where(Question.id == question_id)
-        .where(Quiz.owner_id == quiz_owner_id)
+        .where(Question.quiz_id == quiz_id)
     )
     question = result.scalar_one_or_none()
 
