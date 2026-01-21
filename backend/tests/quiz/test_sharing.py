@@ -610,3 +610,43 @@ def test_create_invite_succeeds_after_expiration(session: Session, quiz_owner_an
     second_invite = create_quiz_invite(session, quiz, owner.id, expires_in_days=7)
 
     assert second_invite.id != first_invite.id
+
+
+# ========== Quiz Soft-Delete Cleanup Tests ==========
+
+
+def test_soft_delete_quiz_cleans_up_invites_and_collaborators(
+    session: Session, quiz_owner_and_quiz, second_user
+):
+    """Soft-deleting a quiz should delete all invites and collaborators."""
+    from sqlmodel import select
+
+    from src.quiz.service import delete_quiz
+
+    owner, quiz = quiz_owner_and_quiz
+    quiz_id = quiz.id
+
+    # Create an invite
+    invite = create_quiz_invite(session, quiz, owner.id, expires_in_days=7)
+    invite_id = invite.id
+
+    # Accept the invite to create a collaborator
+    collaborator, _ = accept_quiz_invite(session, invite, second_user.id)
+    collaborator_id = collaborator.id
+
+    # Verify invite and collaborator exist
+    assert session.get(QuizInvite, invite_id) is not None
+    assert session.get(QuizCollaborator, collaborator_id) is not None
+
+    # Soft-delete the quiz
+    result = delete_quiz(session, quiz_id, owner.id)
+    assert result is True
+
+    # Verify invite and collaborator are deleted
+    assert session.get(QuizInvite, invite_id) is None
+    assert session.get(QuizCollaborator, collaborator_id) is None
+
+    # Verify quiz still exists (soft-deleted)
+    quiz_check = session.exec(select(Quiz).where(Quiz.id == quiz_id)).first()
+    assert quiz_check is not None
+    assert quiz_check.deleted is True

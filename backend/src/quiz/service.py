@@ -4,7 +4,7 @@ from datetime import datetime, timezone
 from typing import Any
 from uuid import UUID
 
-from sqlalchemy import Integer, cast, func
+from sqlalchemy import Integer, cast, delete, func
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlmodel import Session, select
 
@@ -189,6 +189,9 @@ def delete_quiz(session: Session, quiz_id: UUID, user_id: UUID) -> bool:
     """
     Soft delete a quiz if owned by the user.
 
+    Also hard-deletes associated invites and collaborators since they serve
+    no purpose once the quiz is soft-deleted.
+
     Args:
         session: Database session
         quiz_id: Quiz ID
@@ -197,12 +200,23 @@ def delete_quiz(session: Session, quiz_id: UUID, user_id: UUID) -> bool:
     Returns:
         True if soft deleted, False if not found or not owner
     """
+    from .models import QuizCollaborator, QuizInvite
+
     # Get quiz including soft-deleted ones to prevent double deletion
     quiz = get_quiz_by_id(session, quiz_id, include_deleted=True)
     if quiz and quiz.owner_id == user_id and not quiz.deleted:
         quiz.deleted = True
         quiz.deleted_at = datetime.now(timezone.utc)
         session.add(quiz)
+
+        # Delete all invites and collaborators for this quiz
+        session.execute(
+            delete(QuizInvite).where(QuizInvite.quiz_id == quiz_id)  # type: ignore[arg-type]
+        )
+        session.execute(
+            delete(QuizCollaborator).where(QuizCollaborator.quiz_id == quiz_id)  # type: ignore[arg-type]
+        )
+
         session.commit()
 
         logger.info(
