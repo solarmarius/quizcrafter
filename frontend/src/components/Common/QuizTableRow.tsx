@@ -1,4 +1,4 @@
-import { Badge, HStack, Table, Text, VStack } from "@chakra-ui/react"
+import { Badge, HStack, Link, Table, Text, VStack } from "@chakra-ui/react"
 import { Link as RouterLink } from "@tanstack/react-router"
 import { memo } from "react"
 import { useTranslation } from "react-i18next"
@@ -23,11 +23,23 @@ export const QuizTableRow = memo(function QuizTableRow({
   return (
     <Table.Row key={quiz.id}>
       <Table.Cell>
-        <Text fontWeight="medium">{quiz.title}</Text>
+        <RouterLink to={`/quiz/${quiz.id}`} params={{ id: quiz.id! }}>
+          <Text fontWeight="medium" _hover={{ textDecoration: "underline" }}>
+            {quiz.title}
+          </Text>
+        </RouterLink>
       </Table.Cell>
       <Table.Cell>
         <VStack align="start" gap={1}>
-          <Text>{quiz.canvas_course_name}</Text>
+          <Link
+            href={`https://uit.instructure.com/courses/${quiz.canvas_course_id}`}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <Text _hover={{ textDecoration: "underline" }}>
+              {quiz.canvas_course_name}
+            </Text>
+          </Link>
           <Text fontSize="sm" color="gray.500">
             {t("quiz:table.modulesSelected", { count: moduleCount })}
           </Text>
