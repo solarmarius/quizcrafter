@@ -13,6 +13,10 @@ import { EmptyState, ErrorState, LoadingSkeleton } from "@/components/Common"
 import { useApiMutation, useEditingState } from "@/hooks/common"
 import { UI_SIZES } from "@/lib/constants"
 import { queryKeys, questionsQueryConfig } from "@/lib/queryConfig"
+import {
+  RejectionFeedbackDialog,
+  type RejectionReason,
+} from "./RejectionFeedbackDialog"
 import { VirtualQuestionList } from "./VirtualQuestionList"
 
 /**
@@ -56,6 +60,9 @@ export function QuestionReview({
 }: QuestionReviewProps) {
   const { t } = useTranslation("quiz")
   const [filterView, setFilterView] = useState<"pending" | "all">("pending")
+  const [rejectingQuestionId, setRejectingQuestionId] = useState<string | null>(
+    null,
+  )
   const { editingId, startEditing, cancelEditing, isEditing } =
     useEditingState<QuestionResponse>((question) => question.id)
 
@@ -133,12 +140,24 @@ export function QuestionReview({
     },
   )
 
-  // Delete question mutation
+  // Delete question mutation with rejection feedback
   const deleteQuestionMutation = useApiMutation(
-    async (questionId: string) => {
+    async ({
+      questionId,
+      rejectionReason,
+      rejectionFeedback,
+    }: {
+      questionId: string
+      rejectionReason: RejectionReason
+      rejectionFeedback?: string
+    }) => {
       return await QuestionsService.deleteQuestion({
         quizId,
         questionId,
+        requestBody: {
+          rejection_reason: rejectionReason,
+          rejection_feedback: rejectionFeedback,
+        },
       })
     },
     {
@@ -148,8 +167,21 @@ export function QuestionReview({
         queryKeys.quizQuestionStats(quizId),
         queryKeys.quiz(quizId), // Invalidate quiz cache to update question_count
       ],
+      onSuccess: () => {
+        setRejectingQuestionId(null)
+      },
     },
   )
+
+  // Handle rejection with feedback
+  const handleRejectQuestion = (reason: RejectionReason, feedback?: string) => {
+    if (!rejectingQuestionId) return
+    deleteQuestionMutation.mutate({
+      questionId: rejectingQuestionId,
+      rejectionReason: reason,
+      rejectionFeedback: feedback,
+    })
+  }
 
   // Create a callback that binds the question ID for the editor
   const getSaveCallback = useCallback(
@@ -243,12 +275,21 @@ export function QuestionReview({
         isEditing={isEditing}
         getSaveCallback={getSaveCallback}
         onApproveQuestion={(id) => approveQuestionMutation.mutate(id)}
-        onDeleteQuestion={(id) => deleteQuestionMutation.mutate(id)}
+        onDeleteQuestion={(id) => setRejectingQuestionId(id)}
         isUpdateLoading={updateQuestionMutation.isPending}
         isApproveLoading={approveQuestionMutation.isPending}
         isDeleteLoading={deleteQuestionMutation.isPending}
         quizStatus={quizStatus}
         selectedModules={selectedModules}
+      />
+
+      {/* Rejection Feedback Dialog */}
+      <RejectionFeedbackDialog
+        key={rejectingQuestionId ?? "closed"}
+        isOpen={rejectingQuestionId !== null}
+        onClose={() => setRejectingQuestionId(null)}
+        onReject={handleRejectQuestion}
+        isLoading={deleteQuestionMutation.isPending}
       />
     </VStack>
   )

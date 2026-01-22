@@ -344,6 +344,25 @@
     "questionApproved": "Spørsmål godkjent",
     "questionUpdated": "Spørsmål oppdatert",
     "questionRejected": "Spørsmål avvist",
+    "rejection": {
+      "dialogTitle": "Avvis spørsmål",
+      "prompt": "Hvorfor avviser du dette spørsmålet?",
+      "reasons": {
+        "incorrect_answer": "Feil svar",
+        "poor_wording": "Dårlig formulering",
+        "irrelevant_content": "Irrelevant for innholdet",
+        "duplicate_question": "Duplikatspørsmål",
+        "too_easy": "For enkelt",
+        "too_hard": "For vanskelig",
+        "quota_reached": "Har nok spørsmål",
+        "topic_coverage": "Emnet er allerede dekket",
+        "other": "Annet"
+      },
+      "feedbackLabel": "Legg til tilbakemelding (valgfritt)",
+      "feedbackPlaceholder": "Fortell oss mer om hvorfor dette spørsmålet ikke fungerer...",
+      "cancel": "Avbryt",
+      "confirm": "Avvis"
+    },
     "filter": {
       "all": "Alle",
       "approved": "Godkjente",

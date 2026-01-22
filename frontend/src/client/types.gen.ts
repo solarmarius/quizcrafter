@@ -175,6 +175,20 @@ export type QuestionCreateRequest = {
 }
 
 /**
+ * Request body for deleting a question with optional rejection feedback.
+ */
+export type QuestionDeleteRequest = {
+  /**
+   * Reason for rejecting the question
+   */
+  rejection_reason?: RejectionReason | null
+  /**
+   * Optional additional feedback
+   */
+  rejection_feedback?: string | null
+}
+
+/**
  * Question difficulty levels.
  */
 export type QuestionDifficulty = "easy" | "medium" | "hard"
@@ -197,6 +211,8 @@ export type QuestionResponse = {
   updated_at?: string | null
   canvas_item_id?: string | null
   module_id?: string | null
+  rejection_reason?: string | null
+  rejection_feedback?: string | null
 }
 
 /**
@@ -421,6 +437,20 @@ export type RegenerateBatchRequest = {
 }
 
 /**
+ * Reasons for rejecting a generated question.
+ */
+export type RejectionReason =
+  | "incorrect_answer"
+  | "poor_wording"
+  | "irrelevant_content"
+  | "duplicate_question"
+  | "too_easy"
+  | "too_hard"
+  | "quota_reached"
+  | "topic_coverage"
+  | "other"
+
+/**
  * Public user information schema.
  */
 export type UserPublic = {
@@ -533,6 +563,7 @@ export type QuestionsUpdateQuestionResponse = QuestionResponse
 export type QuestionsDeleteQuestionData = {
   questionId: string
   quizId: string
+  requestBody?: QuestionDeleteRequest | null
 }
 
 export type QuestionsDeleteQuestionResponse = {

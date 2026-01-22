@@ -54,6 +54,20 @@ class QuizLanguage(str, Enum):
     NORWEGIAN = "no"
 
 
+class RejectionReason(str, Enum):
+    """Reasons for rejecting a generated question."""
+
+    INCORRECT_ANSWER = "incorrect_answer"
+    POOR_WORDING = "poor_wording"
+    IRRELEVANT_CONTENT = "irrelevant_content"
+    DUPLICATE_QUESTION = "duplicate_question"
+    TOO_EASY = "too_easy"
+    TOO_HARD = "too_hard"
+    QUOTA_REACHED = "quota_reached"
+    TOPIC_COVERAGE = "topic_coverage"
+    OTHER = "other"
+
+
 class BaseQuestionData(BaseModel):
     """Base class for question type-specific data."""
 
@@ -198,6 +212,18 @@ class Question(SQLModel, table=True):
         default=None,
         sa_column=Column(DateTime(timezone=True), nullable=True),
         description="Timestamp when question was soft deleted",
+    )
+
+    # Rejection feedback fields (status tracked via deleted/deleted_at)
+    rejection_reason: str | None = Field(
+        default=None,
+        max_length=50,
+        description="Primary rejection reason from RejectionReason enum",
+    )
+    rejection_feedback: str | None = Field(
+        default=None,
+        max_length=500,
+        description="Optional free-text feedback explaining rejection",
     )
 
     def get_typed_data(
