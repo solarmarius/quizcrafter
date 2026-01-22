@@ -11,7 +11,13 @@ from sqlmodel import Session, select
 from src.config import get_logger
 
 from .models import Quiz
-from .schemas import FailureReason, QuizCreate, QuizStatus, QuizUpdate
+from .schemas import (
+    FailureReason,
+    QuizCreate,
+    QuizStatus,
+    QuizUpdate,
+    RegenerateBatchRequest,
+)
 from .validators import (
     validate_quiz_for_content_extraction,
     validate_quiz_for_question_generation,
@@ -421,6 +427,86 @@ def prepare_question_generation(
 
     return {
         "question_count": quiz.question_count,  # Use the pre-calculated value
+        "llm_model": quiz.llm_model,
+        "llm_temperature": quiz.llm_temperature,
+        "language": quiz.language,
+        "tone": quiz.tone,
+        "custom_instructions": quiz.custom_instructions,
+    }
+
+
+def prepare_single_batch_generation(
+    session: Session,
+    quiz_id: UUID,
+    user_id: UUID,  # noqa: ARG001
+    batch_request: RegenerateBatchRequest,
+) -> dict[str, Any]:
+    """
+    Prepare parameters for regenerating a single batch of questions.
+
+    Does NOT change quiz status since this is an additive operation that
+    should allow continued user interaction with the quiz.
+
+    Args:
+        session: Database session
+        quiz_id: Quiz ID
+        user_id: User ID (must be owner or collaborator)
+        batch_request: The batch specification to regenerate
+
+    Returns:
+        Dict with generation parameters including module content
+    """
+    quiz = get_quiz_by_id(session, quiz_id)
+    if not quiz:
+        raise ValueError(f"Quiz {quiz_id} not found")
+
+    # Get module data
+    module_data = quiz.selected_modules.get(batch_request.module_id, {})
+    source_type = module_data.get("source_type", "canvas")
+
+    # Get module content based on source type
+    if source_type == "manual":
+        # For manual modules, content is stored directly in selected_modules
+        module_content = module_data.get("content", "")
+        module_name = module_data.get(
+            "name", f"Manual Module {batch_request.module_id}"
+        )
+    else:
+        # For canvas modules, get content from extracted_content
+        extracted_content = quiz.extracted_content or {}
+        module_content = extracted_content.get(batch_request.module_id, {}).get(
+            "content", ""
+        )
+        module_name = module_data.get("name", f"Module {batch_request.module_id}")
+
+    if not module_content:
+        logger.warning(
+            "single_batch_generation_no_content",
+            quiz_id=str(quiz_id),
+            module_id=batch_request.module_id,
+            source_type=source_type,
+        )
+        raise ValueError(f"No content found for module {batch_request.module_id}")
+
+    logger.info(
+        "single_batch_generation_prepared",
+        quiz_id=str(quiz_id),
+        module_id=batch_request.module_id,
+        module_name=module_name,
+        question_type=batch_request.question_type.value,
+        count=batch_request.count,
+        difficulty=batch_request.difficulty.value,
+        content_length=len(module_content),
+    )
+
+    return {
+        "quiz_id": quiz_id,
+        "module_id": batch_request.module_id,
+        "module_name": module_name,
+        "module_content": module_content,
+        "question_type": batch_request.question_type,
+        "count": batch_request.count,
+        "difficulty": batch_request.difficulty,
         "llm_model": quiz.llm_model,
         "llm_temperature": quiz.llm_temperature,
         "language": quiz.language,

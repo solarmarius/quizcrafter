@@ -10,7 +10,7 @@ from uuid import UUID
 
 from src.config import get_logger
 from src.database import execute_in_transaction
-from src.question.types import QuizLanguage
+from src.question.types import QuestionDifficulty, QuestionType, QuizLanguage
 
 from ..constants import OPERATION_TIMEOUTS
 from ..schemas import QuizStatus
@@ -339,3 +339,152 @@ async def orchestrate_quiz_question_generation(
         isolation_level="REPEATABLE READ",
         retries=3,
     )
+
+
+@timeout_operation(OPERATION_TIMEOUTS["question_generation"])
+async def orchestrate_single_batch_regeneration(
+    quiz_id: UUID,
+    module_id: str,
+    module_name: str,
+    module_content: str,
+    question_type: QuestionType,
+    count: int,
+    difficulty: QuestionDifficulty,
+    llm_model: str,  # noqa: ARG001
+    llm_temperature: float,  # noqa: ARG001
+    language: QuizLanguage,
+    tone: str | None = None,
+    custom_instructions: str | None = None,
+) -> None:
+    """
+    Orchestrate regeneration of a single batch of questions.
+
+    This function generates questions for a specific batch and adds them to
+    existing questions without changing the quiz status.
+
+    Args:
+        quiz_id: UUID of the quiz
+        module_id: ID of the module to generate questions for
+        module_name: Name of the module
+        module_content: Content of the module
+        question_type: Type of questions to generate
+        count: Number of questions to generate
+        difficulty: Difficulty level for questions
+        llm_model: LLM model to use
+        llm_temperature: Temperature setting for LLM
+        language: Language for question generation
+        tone: Optional tone of voice for generation
+        custom_instructions: Optional custom instructions for the LLM
+    """
+    batch_key = f"{module_id}_{question_type.value}_{count}_{difficulty.value}"
+
+    logger.info(
+        "single_batch_regeneration_started",
+        quiz_id=str(quiz_id),
+        module_id=module_id,
+        batch_key=batch_key,
+        question_type=question_type.value,
+        count=count,
+        difficulty=difficulty.value,
+    )
+
+    try:
+        # Get provider and template manager
+        from src.question.providers import LLMProvider, get_llm_provider_registry
+        from src.question.templates import get_template_manager
+        from src.question.workflows.module_batch_workflow import ModuleBatchWorkflow
+
+        provider_registry = get_llm_provider_registry()
+        provider_enum = LLMProvider("openai")
+        provider = provider_registry.get_provider(provider_enum)
+        template_manager = get_template_manager()
+
+        # Create workflow for this batch
+        workflow = ModuleBatchWorkflow(
+            llm_provider=provider,
+            template_manager=template_manager,
+            language=language,
+            tone=tone,
+            custom_instructions=custom_instructions,
+        )
+
+        # Process the single batch
+        questions = await workflow.process_module(
+            module_id=module_id,
+            module_name=module_name,
+            module_content=module_content,
+            quiz_id=quiz_id,
+            question_count=count,
+            question_type=question_type,
+            difficulty=difficulty,
+        )
+
+        # Determine success based on question count
+        success = len(questions) >= count
+
+        logger.info(
+            "single_batch_regeneration_completed",
+            quiz_id=str(quiz_id),
+            batch_key=batch_key,
+            questions_generated=len(questions),
+            target_count=count,
+            success=success,
+        )
+
+        # Update generation metadata
+        async def _update_batch_metadata(
+            session: Any,
+            quiz_id: UUID,
+            batch_key: str,
+            success: bool,
+        ) -> None:
+            """Update generation metadata for single batch regeneration."""
+            from ..service import get_quiz_for_update
+
+            quiz = await get_quiz_for_update(session, quiz_id)
+            if not quiz:
+                return
+
+            # Initialize metadata if needed
+            if not quiz.generation_metadata:
+                quiz.generation_metadata = {}
+
+            # Get existing batch lists
+            existing_successful = set(
+                quiz.generation_metadata.get("successful_batches", [])
+            )
+            existing_failed = set(quiz.generation_metadata.get("failed_batches", []))
+
+            if success:
+                # Add to successful, remove from failed
+                existing_successful.add(batch_key)
+                existing_failed.discard(batch_key)
+            else:
+                # Add to failed (but keep in successful if it was there before)
+                existing_failed.add(batch_key)
+
+            # Create new metadata object
+            quiz.generation_metadata = {
+                "successful_batches": list(existing_successful),
+                "failed_batches": list(existing_failed),
+            }
+
+        await execute_in_transaction(
+            _update_batch_metadata,
+            quiz_id,
+            batch_key,
+            success,
+            isolation_level="REPEATABLE READ",
+            retries=3,
+        )
+
+    except Exception as e:
+        logger.error(
+            "single_batch_regeneration_failed",
+            quiz_id=str(quiz_id),
+            batch_key=batch_key,
+            error=str(e),
+            error_type=type(e).__name__,
+            exc_info=True,
+        )
+        raise

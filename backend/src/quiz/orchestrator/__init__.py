@@ -11,12 +11,16 @@ separation of concerns through modular architecture.
 from .content_extraction import orchestrate_content_extraction
 from .core import safe_background_orchestration
 from .export import orchestrate_quiz_export_to_canvas
-from .question_generation import orchestrate_quiz_question_generation
+from .question_generation import (
+    orchestrate_quiz_question_generation,
+    orchestrate_single_batch_regeneration,
+)
 
 __all__ = [
     # Main orchestration functions (public API)
     "orchestrate_content_extraction",
     "orchestrate_quiz_question_generation",
+    "orchestrate_single_batch_regeneration",
     "orchestrate_quiz_export_to_canvas",
     # Background task utilities
     "safe_background_orchestration",
