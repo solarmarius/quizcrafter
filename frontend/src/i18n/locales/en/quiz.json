@@ -140,7 +140,7 @@
       "placeholder": "e.g., 'Include at least one application-level question per module' or 'Focus on practical examples from the healthcare industry'",
       "charCount": "{{current}}/{{max}} characters",
       "warningTitle": "Use with Care",
-      "warningMessage": "Custom instructions may override default question generation behavior. Test with a small quiz first to ensure results meet your expectations. DO NOT write instructions that may change the format of the output (JSON).",
+      "warningMessage": "Custom instructions may override default question generation behavior. Test with a small quiz first to ensure results meet your expectations. DO NOT write instructions that may change the format of the output (JSON). Remember to write the instructions in the same language as the module content.",
       "examplesTitle": "Example Instructions:",
       "example1": "Always include one question that tests application of concepts",
       "example2": "Use scenarios relevant to nursing practice",
