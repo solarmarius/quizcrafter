@@ -299,3 +299,14 @@ class QuizOperationStatus(SQLModel):
     status: QuizStatus
     failure_reason: FailureReason | None = None
     last_updated: datetime | None = None
+
+
+class RegenerateBatchRequest(SQLModel):
+    """Request schema for regenerating a single batch of questions."""
+
+    module_id: str = Field(description="Module ID for the batch to regenerate")
+    question_type: QuestionType = Field(description="Question type to regenerate")
+    count: int = Field(
+        ge=1, le=20, description="Number of questions to generate (1-20)"
+    )
+    difficulty: QuestionDifficulty = Field(description="Difficulty level for questions")

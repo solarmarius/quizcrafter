@@ -27,6 +27,9 @@ ERROR_MESSAGES = {
     "generation_trigger_failed": "Failed to trigger question generation",
     "export_trigger_failed": "Failed to start quiz export. Please try again.",
     "stats_retrieval_failed": "Failed to retrieve question stats. Please try again.",
+    "batch_not_found": "Specified batch not found in quiz configuration",
+    "invalid_batch_for_regeneration": "Quiz must be in review state for batch regeneration",
+    "batch_regeneration_failed": "Failed to trigger batch regeneration",
 }
 
 # Success messages
@@ -34,6 +37,7 @@ SUCCESS_MESSAGES = {
     "content_extraction_started": "Content extraction started",
     "question_generation_started": "Question generation started",
     "question_generation_retry_started": "Failed batch retry started",
+    "single_batch_regeneration_started": "Batch regeneration started",
     "export_started": "Quiz export started",
     "quiz_deleted": "Quiz deleted successfully",
 }

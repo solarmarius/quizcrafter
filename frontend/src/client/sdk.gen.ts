@@ -39,6 +39,8 @@ import type {
   QuizGetQuizQuestionStatsResponse,
   QuizGetQuizResponse,
   QuizGetUserQuizzesEndpointResponse,
+  QuizRegenerateSingleBatchData,
+  QuizRegenerateSingleBatchResponse,
   QuizSharingAcceptInviteData,
   QuizSharingAcceptInviteResponse,
   QuizSharingCreateInviteData,
@@ -1071,6 +1073,52 @@ export class QuizService {
       path: {
         quiz_id: data.quizId,
       },
+      errors: {
+        422: "Validation Error",
+      },
+    })
+  }
+
+  /**
+   * Regenerate Single Batch
+   * Regenerate questions for a specific batch.
+   *
+   * This endpoint allows users to regenerate questions for a single batch
+   * (module + question type + difficulty combination) without affecting
+   * other batches. New questions are added to existing questions.
+   *
+   * **Parameters:**
+   * quiz_id (UUID): The UUID of the quiz
+   * batch_request: Batch specification including module_id, question_type,
+   * count, and difficulty
+   *
+   * **Returns:**
+   * dict: Status message indicating regeneration has been triggered
+   *
+   * **Authentication:**
+   * Requires valid JWT token in Authorization header
+   *
+   * **Raises:**
+   * HTTPException: 404 if quiz not found or user doesn't have access
+   * HTTPException: 400 if batch specification is invalid
+   * HTTPException: 409 if quiz not in valid state for regeneration
+   * @param data The data for the request.
+   * @param data.quizId
+   * @param data.requestBody
+   * @returns string Successful Response
+   * @throws ApiError
+   */
+  public static regenerateSingleBatch(
+    data: QuizRegenerateSingleBatchData,
+  ): CancelablePromise<QuizRegenerateSingleBatchResponse> {
+    return __request(OpenAPI, {
+      method: "POST",
+      url: "/quiz/{quiz_id}/regenerate-batch",
+      path: {
+        quiz_id: data.quizId,
+      },
+      body: data.requestBody,
+      mediaType: "application/json",
       errors: {
         422: "Validation Error",
       },

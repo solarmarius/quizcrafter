@@ -17,6 +17,7 @@ from .dependencies import (
     validate_export_ready,
     validate_question_generation_ready_with_partial_support,
     validate_quiz_has_approved_questions,
+    validate_single_batch_regeneration_ready,
 )
 from .manual import create_manual_module
 from .models import Quiz
@@ -24,15 +25,23 @@ from .orchestrator import (
     orchestrate_content_extraction,
     orchestrate_quiz_export_to_canvas,
     orchestrate_quiz_question_generation,
+    orchestrate_single_batch_regeneration,
     safe_background_orchestration,
 )
-from .schemas import ManualModuleCreate, ManualModuleResponse, QuizCreate, QuizUpdate
+from .schemas import (
+    ManualModuleCreate,
+    ManualModuleResponse,
+    QuizCreate,
+    QuizUpdate,
+    RegenerateBatchRequest,
+)
 from .service import (
     create_quiz,
     delete_quiz,
     get_user_quizzes,
     prepare_content_extraction,
     prepare_question_generation,
+    prepare_single_batch_generation,
     update_quiz,
 )
 
@@ -719,6 +728,109 @@ async def trigger_question_generation(
         )
         raise HTTPException(
             status_code=500, detail=ERROR_MESSAGES["generation_trigger_failed"]
+        )
+
+
+@router.post("/{quiz_id}/regenerate-batch")
+async def regenerate_single_batch(
+    quiz: QuizAccess,
+    current_user: CurrentUser,
+    session: SessionDep,
+    background_tasks: BackgroundTasks,
+    batch_request: RegenerateBatchRequest,
+) -> dict[str, str]:
+    """
+    Regenerate questions for a specific batch.
+
+    This endpoint allows users to regenerate questions for a single batch
+    (module + question type + difficulty combination) without affecting
+    other batches. New questions are added to existing questions.
+
+    **Parameters:**
+        quiz_id (UUID): The UUID of the quiz
+        batch_request: Batch specification including module_id, question_type,
+                       count, and difficulty
+
+    **Returns:**
+        dict: Status message indicating regeneration has been triggered
+
+    **Authentication:**
+        Requires valid JWT token in Authorization header
+
+    **Raises:**
+        HTTPException: 404 if quiz not found or user doesn't have access
+        HTTPException: 400 if batch specification is invalid
+        HTTPException: 409 if quiz not in valid state for regeneration
+    """
+    logger.info(
+        "single_batch_regeneration_triggered",
+        user_id=str(current_user.id),
+        quiz_id=str(quiz.id),
+        module_id=batch_request.module_id,
+        question_type=batch_request.question_type.value,
+        count=batch_request.count,
+        difficulty=batch_request.difficulty.value,
+    )
+
+    try:
+        # Validate quiz state and batch specification
+        validate_single_batch_regeneration_ready(quiz, batch_request)
+
+        # Prepare generation parameters
+        generation_params = prepare_single_batch_generation(
+            session, quiz.id, current_user.id, batch_request
+        )
+
+        # Trigger single batch regeneration in the background
+        background_tasks.add_task(
+            safe_background_orchestration,
+            orchestrate_single_batch_regeneration,
+            "single_batch_regeneration",
+            quiz.id,
+            quiz.id,
+            generation_params["module_id"],
+            generation_params["module_name"],
+            generation_params["module_content"],
+            generation_params["question_type"],
+            generation_params["count"],
+            generation_params["difficulty"],
+            generation_params["llm_model"],
+            generation_params["llm_temperature"],
+            generation_params["language"],
+            generation_params["tone"],
+            generation_params["custom_instructions"],
+        )
+
+        logger.info(
+            "single_batch_regeneration_started",
+            user_id=str(current_user.id),
+            quiz_id=str(quiz.id),
+            module_id=batch_request.module_id,
+        )
+
+        return {"message": SUCCESS_MESSAGES["single_batch_regeneration_started"]}
+
+    except HTTPException:
+        raise
+    except ValueError as e:
+        logger.warning(
+            "single_batch_regeneration_validation_failed",
+            user_id=str(current_user.id),
+            quiz_id=str(quiz.id),
+            error=str(e),
+        )
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        logger.error(
+            "single_batch_regeneration_failed",
+            user_id=str(current_user.id),
+            quiz_id=str(quiz.id),
+            error=str(e),
+            error_type=type(e).__name__,
+            exc_info=True,
+        )
+        raise HTTPException(
+            status_code=500, detail=ERROR_MESSAGES["batch_regeneration_failed"]
         )
 
 

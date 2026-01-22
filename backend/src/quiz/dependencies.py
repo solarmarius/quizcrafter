@@ -11,7 +11,7 @@ from src.config import get_logger
 from src.database import SessionDep
 
 from .models import Quiz
-from .schemas import QuizStatus
+from .schemas import QuizStatus, RegenerateBatchRequest
 from .service import get_quiz_by_id
 from .sharing_service import is_collaborator
 from .validators import (
@@ -252,6 +252,91 @@ def validate_question_generation_ready_with_partial_support(quiz: Quiz) -> str:
             current_status=quiz.status.value,
         )
         return "initial"
+
+
+def validate_single_batch_regeneration_ready(
+    quiz: Quiz, batch_request: RegenerateBatchRequest
+) -> None:
+    """
+    Validate that single batch regeneration can be triggered.
+
+    Allows regeneration from READY_FOR_REVIEW or READY_FOR_REVIEW_PARTIAL states.
+    Validates that the batch specification matches an existing batch in the quiz.
+
+    Args:
+        quiz: Quiz to validate
+        batch_request: The batch specification to regenerate
+
+    Raises:
+        HTTPException: 409 if quiz not in valid state for regeneration
+        HTTPException: 400 if batch specification doesn't match quiz configuration
+    """
+    # Check quiz is in a valid state for single batch regeneration
+    if quiz.status not in [
+        QuizStatus.READY_FOR_REVIEW,
+        QuizStatus.READY_FOR_REVIEW_PARTIAL,
+    ]:
+        logger.warning(
+            "single_batch_regeneration_invalid_state",
+            quiz_id=str(quiz.id),
+            current_status=quiz.status.value,
+        )
+        raise HTTPException(
+            status_code=409,
+            detail="Quiz must be in review state for batch regeneration",
+        )
+
+    # Verify module_id exists in quiz.selected_modules
+    selected_modules = quiz.selected_modules or {}
+    if batch_request.module_id not in selected_modules:
+        logger.warning(
+            "single_batch_regeneration_module_not_found",
+            quiz_id=str(quiz.id),
+            module_id=batch_request.module_id,
+            available_modules=list(selected_modules.keys()),
+        )
+        raise HTTPException(
+            status_code=400,
+            detail=f"Module {batch_request.module_id} not found in quiz configuration",
+        )
+
+    # Verify batch spec exists in module's question_batches
+    module_data = selected_modules[batch_request.module_id]
+    question_batches = module_data.get("question_batches", [])
+
+    batch_found = False
+    for batch in question_batches:
+        batch_type = batch.get("question_type")
+        batch_difficulty = batch.get("difficulty")
+        if (
+            batch_type == batch_request.question_type.value
+            and batch_difficulty == batch_request.difficulty.value
+        ):
+            batch_found = True
+            break
+
+    if not batch_found:
+        logger.warning(
+            "single_batch_regeneration_batch_not_found",
+            quiz_id=str(quiz.id),
+            module_id=batch_request.module_id,
+            question_type=batch_request.question_type.value,
+            difficulty=batch_request.difficulty.value,
+            available_batches=question_batches,
+        )
+        raise HTTPException(
+            status_code=400,
+            detail="Specified batch not found in quiz configuration",
+        )
+
+    logger.info(
+        "single_batch_regeneration_validated",
+        quiz_id=str(quiz.id),
+        module_id=batch_request.module_id,
+        question_type=batch_request.question_type.value,
+        count=batch_request.count,
+        difficulty=batch_request.difficulty.value,
+    )
 
 
 def validate_export_ready(quiz: Quiz) -> None:

@@ -3,7 +3,8 @@ import { memo } from "react"
 import { useTranslation } from "react-i18next"
 
 import type { Quiz } from "@/client/types.gen"
-import { QUESTION_DIFFICULTY_LABELS } from "@/lib/constants"
+import { RegenerateBatchButton } from "@/components/Questions/RegenerateBatchButton"
+import { QUESTION_DIFFICULTY_LABELS, QUIZ_STATUS } from "@/lib/constants"
 import {
   formatQuestionTypeDisplay,
   getModuleQuestionBatchBreakdown,
@@ -13,6 +14,7 @@ import {
 interface QuestionTypeBreakdownProps {
   quiz: Quiz
   variant?: "compact" | "detailed"
+  showRegenerateButtons?: boolean
 }
 
 /**
@@ -24,11 +26,19 @@ interface QuestionTypeBreakdownProps {
 export const QuestionTypeBreakdown = memo(function QuestionTypeBreakdown({
   quiz,
   variant = "detailed",
+  showRegenerateButtons = false,
 }: QuestionTypeBreakdownProps) {
   const { t } = useTranslation("quiz")
   const breakdown = getModuleQuestionTypeBreakdown(quiz)
   const batchBreakdown = getModuleQuestionBatchBreakdown(quiz)
   const moduleEntries = Object.entries(breakdown)
+
+  // Determine if quiz is in a state that allows regeneration
+  const canRegenerate =
+    showRegenerateButtons &&
+    quiz.id &&
+    (quiz.status === QUIZ_STATUS.READY_FOR_REVIEW ||
+      quiz.status === QUIZ_STATUS.READY_FOR_REVIEW_PARTIAL)
 
   if (moduleEntries.length === 0) {
     return (
@@ -96,18 +106,26 @@ export const QuestionTypeBreakdown = memo(function QuestionTypeBreakdown({
               </Text>
               <VStack align="flex-end" gap={1}>
                 {batches.map((batch, index) => (
-                  <Badge
+                  <HStack
                     key={`${batch.questionType}-${batch.difficulty}-${index}`}
-                    variant="outline"
-                    size="sm"
+                    gap={1}
                   >
-                    {formatQuestionTypeDisplay(batch.questionType)}:{" "}
-                    {batch.count} (
-                    {QUESTION_DIFFICULTY_LABELS[
-                      batch.difficulty as keyof typeof QUESTION_DIFFICULTY_LABELS
-                    ] || batch.difficulty}
-                    )
-                  </Badge>
+                    <Badge variant="outline" size="sm">
+                      {formatQuestionTypeDisplay(batch.questionType)}:{" "}
+                      {batch.count} (
+                      {QUESTION_DIFFICULTY_LABELS[
+                        batch.difficulty as keyof typeof QUESTION_DIFFICULTY_LABELS
+                      ] || batch.difficulty}
+                      )
+                    </Badge>
+                    {canRegenerate && (
+                      <RegenerateBatchButton
+                        quizId={quiz.id!}
+                        moduleId={moduleId}
+                        batch={batch}
+                      />
+                    )}
+                  </HStack>
                 ))}
               </VStack>
             </HStack>
