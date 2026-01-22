@@ -1,5 +1,5 @@
 import { Box, Button, Card, HStack, VStack } from "@chakra-ui/react"
-import { useQuery } from "@tanstack/react-query"
+import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { useCallback, useMemo, useState } from "react"
 import { useTranslation } from "react-i18next"
 
@@ -10,9 +10,14 @@ import {
   type QuizStatus,
 } from "@/client"
 import { EmptyState, ErrorState, LoadingSkeleton } from "@/components/Common"
-import { useApiMutation, useEditingState } from "@/hooks/common"
-import { UI_SIZES } from "@/lib/constants"
+import {
+  useApiMutation,
+  useEditingState,
+  useQuestionSelection,
+} from "@/hooks/common"
+import { QUIZ_STATUS, UI_SIZES } from "@/lib/constants"
 import { queryKeys, questionsQueryConfig } from "@/lib/queryConfig"
+import { BulkActionToolbar } from "./BulkActionToolbar"
 import {
   RejectionFeedbackDialog,
   type RejectionReason,
@@ -59,12 +64,25 @@ export function QuestionReview({
   selectedModules,
 }: QuestionReviewProps) {
   const { t } = useTranslation("quiz")
+  const queryClient = useQueryClient()
   const [filterView, setFilterView] = useState<"pending" | "all">("pending")
   const [rejectingQuestionId, setRejectingQuestionId] = useState<string | null>(
     null,
   )
+  const [bulkRejectOpen, setBulkRejectOpen] = useState(false)
   const { editingId, startEditing, cancelEditing, isEditing } =
     useEditingState<QuestionResponse>((question) => question.id)
+
+  // Selection state for bulk operations
+  const {
+    selectionCount,
+    isSelected,
+    toggle,
+    clearSelection,
+    getSelectedIds,
+  } = useQuestionSelection()
+
+  const isPublished = quizStatus === QUIZ_STATUS.PUBLISHED
 
   // Fetch questions with optimized caching
   const {
@@ -173,6 +191,70 @@ export function QuestionReview({
     },
   )
 
+  // Bulk approve mutation
+  const bulkApproveMutation = useApiMutation(
+    async (questionIds: string[]) => {
+      return await QuestionsService.bulkApproveQuestions({
+        quizId,
+        requestBody: { question_ids: questionIds },
+      })
+    },
+    {
+      onSuccess: () => {
+        clearSelection()
+        // Invalidate queries manually since we have a custom success message
+        queryClient.invalidateQueries({
+          queryKey: queryKeys.quizQuestions(quizId),
+        })
+        queryClient.invalidateQueries({
+          queryKey: queryKeys.quizQuestionStats(quizId),
+        })
+      },
+      successMessage: t("questions.bulk.approveSuccess", {
+        count: selectionCount,
+      }),
+    },
+  )
+
+  // Bulk delete mutation
+  const bulkDeleteMutation = useApiMutation(
+    async ({
+      questionIds,
+      rejectionReason,
+      rejectionFeedback,
+    }: {
+      questionIds: string[]
+      rejectionReason?: RejectionReason
+      rejectionFeedback?: string
+    }) => {
+      return await QuestionsService.bulkDeleteQuestions({
+        quizId,
+        requestBody: {
+          question_ids: questionIds,
+          rejection_reason: rejectionReason,
+          rejection_feedback: rejectionFeedback,
+        },
+      })
+    },
+    {
+      onSuccess: () => {
+        clearSelection()
+        setBulkRejectOpen(false)
+        // Invalidate queries manually
+        queryClient.invalidateQueries({
+          queryKey: queryKeys.quizQuestions(quizId),
+        })
+        queryClient.invalidateQueries({
+          queryKey: queryKeys.quizQuestionStats(quizId),
+        })
+        queryClient.invalidateQueries({ queryKey: queryKeys.quiz(quizId) })
+      },
+      successMessage: t("questions.bulk.rejectSuccess", {
+        count: selectionCount,
+      }),
+    },
+  )
+
   // Handle rejection with feedback
   const handleRejectQuestion = (reason: RejectionReason, feedback?: string) => {
     if (!rejectingQuestionId) return
@@ -181,6 +263,24 @@ export function QuestionReview({
       rejectionReason: reason,
       rejectionFeedback: feedback,
     })
+  }
+
+  // Handle bulk rejection with feedback
+  const handleBulkReject = (reason: RejectionReason, feedback?: string) => {
+    const ids = getSelectedIds()
+    if (ids.length === 0) return
+    bulkDeleteMutation.mutate({
+      questionIds: ids,
+      rejectionReason: reason,
+      rejectionFeedback: feedback,
+    })
+  }
+
+  // Handle bulk approve
+  const handleBulkApprove = () => {
+    const ids = getSelectedIds()
+    if (ids.length === 0) return
+    bulkApproveMutation.mutate(ids)
   }
 
   // Create a callback that binds the question ID for the editor
@@ -247,6 +347,19 @@ export function QuestionReview({
         </Button>
       </HStack>
 
+      {/* Bulk Action Toolbar - only shows when questions are selected */}
+      {!isPublished && (
+        <BulkActionToolbar
+          selectedCount={selectionCount}
+          onApproveSelected={handleBulkApprove}
+          onRejectSelected={() => setBulkRejectOpen(true)}
+          onClearSelection={clearSelection}
+          isApproving={bulkApproveMutation.isPending}
+          isRejecting={bulkDeleteMutation.isPending}
+          isPublished={isPublished}
+        />
+      )}
+
       {/* Empty state for filtered view */}
       {filteredQuestions.length === 0 && (
         <Card.Root>
@@ -281,15 +394,29 @@ export function QuestionReview({
         isDeleteLoading={deleteQuestionMutation.isPending}
         quizStatus={quizStatus}
         selectedModules={selectedModules}
+        // Selection props
+        selectionEnabled={!isPublished}
+        isSelected={isSelected}
+        onToggleSelection={toggle}
       />
 
-      {/* Rejection Feedback Dialog */}
+      {/* Single Question Rejection Feedback Dialog */}
       <RejectionFeedbackDialog
         key={rejectingQuestionId ?? "closed"}
         isOpen={rejectingQuestionId !== null}
         onClose={() => setRejectingQuestionId(null)}
         onReject={handleRejectQuestion}
         isLoading={deleteQuestionMutation.isPending}
+      />
+
+      {/* Bulk Rejection Feedback Dialog */}
+      <RejectionFeedbackDialog
+        key={bulkRejectOpen ? "bulk-open" : "bulk-closed"}
+        isOpen={bulkRejectOpen}
+        onClose={() => setBulkRejectOpen(false)}
+        onReject={handleBulkReject}
+        isLoading={bulkDeleteMutation.isPending}
+        bulkCount={selectionCount}
       />
     </VStack>
   )

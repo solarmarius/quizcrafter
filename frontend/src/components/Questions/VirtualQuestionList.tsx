@@ -1,5 +1,6 @@
 import { Badge, Card, HStack, IconButton, Text, VStack } from "@chakra-ui/react"
 import { useVirtualizer } from "@tanstack/react-virtual"
+import type React from "react"
 import { Suspense, lazy, memo, useCallback, useEffect, useRef } from "react"
 import { useTranslation } from "react-i18next"
 import { MdCheck, MdClose, MdEdit } from "react-icons/md"
@@ -9,6 +10,7 @@ import type {
   QuestionUpdateRequest,
   QuizStatus,
 } from "@/client"
+import { Checkbox } from "@/components/ui/checkbox"
 import { QUIZ_STATUS } from "@/lib/constants"
 import { LoadingSkeleton } from "../Common"
 import { QuestionDisplay } from "./display"
@@ -48,6 +50,12 @@ interface VirtualQuestionListProps {
   quizStatus?: QuizStatus
   /** Module data for displaying source module names */
   selectedModules?: Record<string, { name?: string; [key: string]: unknown }>
+  /** Whether selection mode is enabled */
+  selectionEnabled?: boolean
+  /** Function to check if a question is selected */
+  isSelected?: (id: string) => boolean
+  /** Function to toggle selection of a question */
+  onToggleSelection?: (id: string) => void
 }
 
 /**
@@ -109,6 +117,9 @@ export const VirtualQuestionList = memo(
     isDeleteLoading,
     quizStatus,
     selectedModules,
+    selectionEnabled = false,
+    isSelected,
+    onToggleSelection,
   }: VirtualQuestionListProps) => {
     const { t } = useTranslation("quiz")
     const parentRef = useRef<HTMLDivElement>(null)
@@ -217,6 +228,21 @@ export const VirtualQuestionList = memo(
                   <Card.Header>
                     <HStack justify="space-between" align="center">
                       <HStack gap={3}>
+                        {selectionEnabled &&
+                          isSelected &&
+                          onToggleSelection && (
+                            <Checkbox
+                              checked={isSelected(question.id)}
+                              colorPalette="blue"
+                              onCheckedChange={() =>
+                                onToggleSelection(question.id)
+                              }
+                              inputProps={{
+                                onClick: (e: React.MouseEvent) =>
+                                  e.stopPropagation(),
+                              }}
+                            />
+                          )}
                         <Text fontSize="lg" fontWeight="semibold">
                           {t("questions.title", { number: questionIndex + 1 })}
                         </Text>

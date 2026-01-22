@@ -380,6 +380,18 @@
       "readyToExport": "Klar til å eksportere til Canvas",
       "ownerOnlyExport": "Bare quizeieren kan eksportere til Canvas"
     },
+    "bulk": {
+      "selected": "{{count}} valgt",
+      "selectAll": "Velg alle ({{count}})",
+      "clearSelection": "Tøm",
+      "approveSelected": "Godkjenn valgte",
+      "rejectSelected": "Slett valgte",
+      "selectToStart": "Velg spørsmål for å utføre massehandlinger",
+      "approveSuccess": "{{count}} spørsmål godkjent",
+      "rejectSuccess": "{{count}} spørsmål slettet",
+      "rejectDialogTitle": "Slett {{count}} spørsmål",
+      "rejectDialogMessage": "Er du sikker på at du vil slette {{count}} spørsmål?"
+    },
     "editor": {
       "questionText": "Spørsmålstekst",
       "answerOptions": "Svaralternativer",
