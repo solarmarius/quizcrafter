@@ -731,10 +731,7 @@ async def test_generate_questions_with_custom_instructions(
             )
             MockProcessor.return_value = mock_processor_instance
 
-            (
-                result,
-                batch_status,
-            ) = await generation_service.generate_questions_for_quiz_with_batch_tracking(
+            await generation_service.generate_questions_for_quiz_with_batch_tracking(
                 quiz_id=mock_quiz.id, extracted_content=extracted_content
             )
 
