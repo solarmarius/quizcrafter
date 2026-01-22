@@ -1,23 +1,23 @@
-import { Box, Container, Heading, List, Text, VStack } from "@chakra-ui/react"
-import { Link, createFileRoute, useNavigate } from "@tanstack/react-router"
-import { useEffect } from "react"
-import { useTranslation } from "react-i18next"
+import { Box, Container, Heading, List, Text, VStack } from "@chakra-ui/react";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useEffect } from "react";
+import { useTranslation } from "react-i18next";
 
-import { UI_LANGUAGES } from "@/i18n"
+import { UI_LANGUAGES } from "@/i18n";
 
 export const Route = createFileRoute("/_layout/privacy-policy-no")({
   component: PrivacyPolicyNo,
-})
+});
 
 function PrivacyPolicyNo() {
-  const { i18n } = useTranslation()
-  const navigate = useNavigate()
+  const { i18n } = useTranslation();
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (i18n.language === UI_LANGUAGES.ENGLISH) {
-      navigate({ to: "/privacy-policy", replace: true })
+      navigate({ to: "/privacy-policy", replace: true });
     }
-  }, [i18n.language, navigate])
+  }, [i18n.language, navigate]);
 
   return (
     <Container maxW="4xl" py={8}>
@@ -27,7 +27,7 @@ function PrivacyPolicyNo() {
         </Heading>
 
         <Text fontSize="sm" color="gray.600" textAlign="center">
-          Sist oppdatert: 21.01.2026
+          Sist oppdatert: 22.01.2026
         </Text>
 
         <Box>
@@ -39,20 +39,14 @@ function PrivacyPolicyNo() {
             universitet for å hjelpe forelesere og kurskoordinatorer med å
             generere quizer basert på kursinnhold fra Canvas LMS. Applikasjonen
             forenkler opprettelsen av spørsmålsbanker for quizer og andre
-            vurderinger, samtidig som den fungerer som en forskningsplattform
-            for en prosjektoppgave om kvalitetsmålinger for norske AI-genererte
-            pedagogiske spørsmål.
+            vurderinger.
           </Text>
           <Text mb={4}>
-            Som en del av forskningen beholdes anonymiserte quiz- og
-            spørsmålsdata for analyse for å forbedre kvaliteten på AI-genererte
-            spørsmål. Detaljer om prosjektet finnes i oppgavedokumentet:{" "}
-            <Link
-              to="/project-thesis"
-              style={{ color: "#3182CE", textDecoration: "underline" }}
-            >
-              Les prosjektoppgaven
-            </Link>
+            For å kontinuerlig forbedre kvaliteten på KI-genererte spørsmål,
+            beholdes anonymiserte quiz- og spørsmålsdata for analyse. Dette
+            inkluderer sporing av godkjenning, avvisning og redigeringsmønstre
+            for spørsmål. Disse dataene kan også brukes til fremtidig akademisk
+            forskning.
           </Text>
           <Text>Denne personvernerklæringen forklarer:</Text>
           <Box pl={6} mb={4}>
@@ -156,9 +150,8 @@ function PrivacyPolicyNo() {
                 spørsmålsdata for å forbedre AI-spørsmålsgenerering
               </List.Item>
               <List.Item>
-                Akademisk forskning: Støtte prosjektoppgaven "Kvalitetsmålinger
-                for norske AI-genererte pedagogiske spørsmål" ved å måle og
-                validere AI-generert innhold mot tilbakemeldinger fra lærere
+                Kvalitetsforskning: Måle og validere AI-generert innhold mot
+                tilbakemeldinger fra lærere for å forbedre spørsmålskvaliteten
               </List.Item>
               <List.Item>
                 Sikkerhet og feilsøking: Vedlikeholde sikre OAuth-tokener og
@@ -211,7 +204,7 @@ function PrivacyPolicyNo() {
           </Text>
           <Text>
             Berettiget interesse: Oppbevaring av anonymiserte data for akademisk
-            forskning og AI-systemforbedring
+            forskning og systemforbedring
           </Text>
         </Box>
 
@@ -297,5 +290,5 @@ function PrivacyPolicyNo() {
         </Box>
       </VStack>
     </Container>
-  )
+  );
 }
