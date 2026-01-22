@@ -1,23 +1,23 @@
-import { Box, Container, Heading, List, Text, VStack } from "@chakra-ui/react"
-import { Link, createFileRoute, useNavigate } from "@tanstack/react-router"
-import { useEffect } from "react"
-import { useTranslation } from "react-i18next"
+import { Box, Container, Heading, List, Text, VStack } from "@chakra-ui/react";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useEffect } from "react";
+import { useTranslation } from "react-i18next";
 
-import { UI_LANGUAGES } from "@/i18n"
+import { UI_LANGUAGES } from "@/i18n";
 
 export const Route = createFileRoute("/_layout/privacy-policy")({
   component: PrivacyPolicy,
-})
+});
 
 function PrivacyPolicy() {
-  const { i18n } = useTranslation()
-  const navigate = useNavigate()
+  const { i18n } = useTranslation();
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (i18n.language === UI_LANGUAGES.NORWEGIAN) {
-      navigate({ to: "/privacy-policy-no", replace: true })
+      navigate({ to: "/privacy-policy-no", replace: true });
     }
-  }, [i18n.language, navigate])
+  }, [i18n.language, navigate]);
 
   return (
     <Container maxW="4xl" py={8}>
@@ -27,7 +27,7 @@ function PrivacyPolicy() {
         </Heading>
 
         <Text fontSize="sm" color="gray.600" textAlign="center">
-          Last updated: 21.01.2026
+          Last updated: 22.01.2026
         </Text>
 
         <Box>
@@ -39,20 +39,13 @@ function PrivacyPolicy() {
             of Norway to assist instructors and course coordinators in
             generating quizzes based on course content from Canvas LMS. The
             application streamlines the creation of question banks for quizzes
-            and exams while also serving as a research platform for a project
-            thesis on quality metrics for Norwegian AI-generated educational
-            questions.
+            and exams.
           </Text>
           <Text mb={4}>
-            As part of the research, anonymized quiz and question data is
-            retained for analysis to improve AI-generated question quality.
-            Details of the project can be found in the thesis document:{" "}
-            <Link
-              to="/project-thesis"
-              style={{ color: "#3182CE", textDecoration: "underline" }}
-            >
-              Read the Project Thesis
-            </Link>
+            To continuously improve AI-generated question quality, anonymized
+            quiz and question data is retained for analysis. This includes
+            tracking question approval, rejection, and edit patterns. This data
+            may also be used for future academic research purposes.
           </Text>
           <Text>This Privacy Policy explains:</Text>
           <Box pl={6} mb={4}>
@@ -154,10 +147,8 @@ function PrivacyPolicy() {
                 data to refine AI question generation
               </List.Item>
               <List.Item>
-                Academic research: Supporting the thesis project "Quality
-                metrics for Norwegian AI-generated educational questions" by
-                measuring and validating AI-generated content against teacher
-                feedback
+                Quality research: Measuring and validating AI-generated content
+                against teacher feedback to improve question quality
               </List.Item>
               <List.Item>
                 Security and troubleshooting: Maintaining secure OAuth tokens
@@ -209,7 +200,7 @@ function PrivacyPolicy() {
           </Text>
           <Text>
             Legitimate Interest: Retention of anonymized data for academic
-            research and AI system improvement
+            research and system improvement
           </Text>
         </Box>
 
@@ -295,5 +286,5 @@ function PrivacyPolicy() {
         </Box>
       </VStack>
     </Container>
-  )
+  );
 }
