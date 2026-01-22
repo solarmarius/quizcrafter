@@ -98,6 +98,11 @@ class Quiz(SQLModel, table=True):
         default=QuizTone.ACADEMIC,
         description="Tone of voice for question generation",
     )
+    custom_instructions: str | None = Field(
+        default=None,
+        max_length=500,
+        description="Custom instructions for the LLM during question generation",
+    )
     # Removed: question_type field (now per batch)
     status: QuizStatus = Field(
         default=QuizStatus.CREATED,

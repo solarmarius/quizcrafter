@@ -178,6 +178,7 @@ class QuestionGenerationService:
                     template_manager=self.template_manager,
                     language=language,
                     tone=quiz.tone.value if quiz.tone else None,
+                    custom_instructions=quiz.custom_instructions,
                 )
 
                 (
