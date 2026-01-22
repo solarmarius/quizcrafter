@@ -14,6 +14,9 @@ from src.database import get_async_session
 from . import service
 from .formatters import format_question_for_display
 from .schemas import (
+    BulkApproveRequest,
+    BulkDeleteRequest,
+    BulkOperationResponse,
     QuestionCreateRequest,
     QuestionResponse,
     QuestionUpdateRequest,
@@ -266,6 +269,143 @@ async def create_question(
         raise HTTPException(
             status_code=500, detail="Failed to create question. Please try again."
         )
+
+
+# ============================================================================
+# BULK OPERATIONS
+# NOTE: These routes MUST be defined BEFORE /{quiz_id}/{question_id} routes
+# to avoid path conflicts (FastAPI matches routes in definition order)
+# ============================================================================
+
+
+@router.put("/{quiz_id}/bulk-approve", response_model=BulkOperationResponse)
+async def bulk_approve_questions(
+    quiz_id: UUID,
+    request: BulkApproveRequest,
+    current_user: CurrentUser,
+) -> BulkOperationResponse:
+    """
+    Approve multiple questions at once.
+
+    **Parameters:**
+        quiz_id: Quiz identifier
+        request: List of question IDs to approve
+
+    **Returns:**
+        Operation result with success/failure counts
+    """
+    logger.info(
+        "bulk_approve_initiated",
+        user_id=str(current_user.id),
+        quiz_id=str(quiz_id),
+        question_count=len(request.question_ids),
+    )
+
+    try:
+        # Verify quiz ownership
+        await _verify_quiz_access(quiz_id, current_user.id)
+
+        async with get_async_session() as session:
+            result = await service.bulk_approve_questions(
+                session=session,
+                quiz_id=quiz_id,
+                question_ids=request.question_ids,
+            )
+
+        logger.info(
+            "bulk_approve_completed",
+            user_id=str(current_user.id),
+            quiz_id=str(quiz_id),
+            success_count=result["success_count"],
+            failed_count=result["failed_count"],
+        )
+
+        return BulkOperationResponse(**result)
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(
+            "bulk_approve_failed",
+            user_id=str(current_user.id),
+            quiz_id=str(quiz_id),
+            error=str(e),
+            exc_info=True,
+        )
+        raise HTTPException(
+            status_code=500, detail="Failed to approve questions. Please try again."
+        )
+
+
+@router.post("/{quiz_id}/bulk-delete", response_model=BulkOperationResponse)
+async def bulk_delete_questions(
+    quiz_id: UUID,
+    request: BulkDeleteRequest,
+    current_user: CurrentUser,
+) -> BulkOperationResponse:
+    """
+    Delete multiple questions at once with optional rejection feedback.
+
+    **Parameters:**
+        quiz_id: Quiz identifier
+        request: List of question IDs and optional rejection details
+
+    **Returns:**
+        Operation result with success/failure counts
+    """
+    rejection_reason = (
+        request.rejection_reason.value if request.rejection_reason else None
+    )
+
+    logger.info(
+        "bulk_delete_initiated",
+        user_id=str(current_user.id),
+        quiz_id=str(quiz_id),
+        question_count=len(request.question_ids),
+        rejection_reason=rejection_reason,
+    )
+
+    try:
+        # Verify quiz ownership
+        await _verify_quiz_access(quiz_id, current_user.id)
+
+        async with get_async_session() as session:
+            result = await service.bulk_delete_questions(
+                session=session,
+                quiz_id=quiz_id,
+                question_ids=request.question_ids,
+                rejection_reason=rejection_reason,
+                rejection_feedback=request.rejection_feedback,
+            )
+
+        logger.info(
+            "bulk_delete_completed",
+            user_id=str(current_user.id),
+            quiz_id=str(quiz_id),
+            success_count=result["success_count"],
+            failed_count=result["failed_count"],
+        )
+
+        return BulkOperationResponse(**result)
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(
+            "bulk_delete_failed",
+            user_id=str(current_user.id),
+            quiz_id=str(quiz_id),
+            error=str(e),
+            exc_info=True,
+        )
+        raise HTTPException(
+            status_code=500, detail="Failed to delete questions. Please try again."
+        )
+
+
+# ============================================================================
+# SINGLE QUESTION OPERATIONS
+# ============================================================================
 
 
 @router.put("/{quiz_id}/{question_id}", response_model=QuestionResponse)
