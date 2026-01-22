@@ -585,6 +585,161 @@ async def test_delete_question_not_found(async_session):
 
 
 @pytest.mark.asyncio
+async def test_delete_question_with_rejection_reason(async_session):
+    """Test question deletion with rejection reason."""
+    from src.question.service import delete_question
+
+    question_id = uuid.uuid4()
+    quiz_id = uuid.uuid4()
+
+    # Mock a question for the delete query response
+    mock_question = MagicMock()
+    mock_question.id = question_id
+    mock_question.deleted = False
+    mock_question.rejection_reason = None
+    mock_question.rejection_feedback = None
+
+    # Mock the query result
+    mock_result = MagicMock()
+    mock_result.scalar_one_or_none.return_value = mock_question
+    async_session.execute = AsyncMock(return_value=mock_result)
+    async_session.add = MagicMock()
+    async_session.commit = AsyncMock()
+
+    result = await delete_question(
+        async_session,
+        question_id,
+        quiz_id,
+        rejection_reason="incorrect_answer",
+    )
+
+    assert result is True
+    async_session.add.assert_called_once_with(mock_question)
+    async_session.commit.assert_called_once()
+    # Verify rejection fields were set
+    assert mock_question.deleted is True
+    assert mock_question.deleted_at is not None
+    assert mock_question.rejection_reason == "incorrect_answer"
+
+
+@pytest.mark.asyncio
+async def test_delete_question_with_rejection_feedback(async_session):
+    """Test question deletion with rejection reason and feedback."""
+    from src.question.service import delete_question
+
+    question_id = uuid.uuid4()
+    quiz_id = uuid.uuid4()
+
+    # Mock a question for the delete query response
+    mock_question = MagicMock()
+    mock_question.id = question_id
+    mock_question.deleted = False
+    mock_question.rejection_reason = None
+    mock_question.rejection_feedback = None
+
+    # Mock the query result
+    mock_result = MagicMock()
+    mock_result.scalar_one_or_none.return_value = mock_question
+    async_session.execute = AsyncMock(return_value=mock_result)
+    async_session.add = MagicMock()
+    async_session.commit = AsyncMock()
+
+    result = await delete_question(
+        async_session,
+        question_id,
+        quiz_id,
+        rejection_reason="poor_wording",
+        rejection_feedback="The question text is confusing and ambiguous.",
+    )
+
+    assert result is True
+    async_session.add.assert_called_once_with(mock_question)
+    async_session.commit.assert_called_once()
+    # Verify rejection fields were set
+    assert mock_question.deleted is True
+    assert mock_question.deleted_at is not None
+    assert mock_question.rejection_reason == "poor_wording"
+    assert (
+        mock_question.rejection_feedback
+        == "The question text is confusing and ambiguous."
+    )
+
+
+@pytest.mark.asyncio
+async def test_delete_question_with_quota_reached_reason(async_session):
+    """Test question deletion with quota_reached reason (not quality issue)."""
+    from src.question.service import delete_question
+
+    question_id = uuid.uuid4()
+    quiz_id = uuid.uuid4()
+
+    # Mock a question for the delete query response
+    mock_question = MagicMock()
+    mock_question.id = question_id
+    mock_question.deleted = False
+    mock_question.rejection_reason = None
+    mock_question.rejection_feedback = None
+
+    # Mock the query result
+    mock_result = MagicMock()
+    mock_result.scalar_one_or_none.return_value = mock_question
+    async_session.execute = AsyncMock(return_value=mock_result)
+    async_session.add = MagicMock()
+    async_session.commit = AsyncMock()
+
+    result = await delete_question(
+        async_session,
+        question_id,
+        quiz_id,
+        rejection_reason="quota_reached",
+    )
+
+    assert result is True
+    # Verify quota_reached reason was stored
+    assert mock_question.rejection_reason == "quota_reached"
+    # No feedback required for quota_reached
+    assert mock_question.rejection_feedback is None
+
+
+@pytest.mark.asyncio
+async def test_delete_question_feedback_without_reason(async_session):
+    """Test question deletion with feedback but no reason."""
+    from src.question.service import delete_question
+
+    question_id = uuid.uuid4()
+    quiz_id = uuid.uuid4()
+
+    # Mock a question for the delete query response
+    mock_question = MagicMock()
+    mock_question.id = question_id
+    mock_question.deleted = False
+    mock_question.rejection_reason = None
+    mock_question.rejection_feedback = None
+
+    # Mock the query result
+    mock_result = MagicMock()
+    mock_result.scalar_one_or_none.return_value = mock_question
+    async_session.execute = AsyncMock(return_value=mock_result)
+    async_session.add = MagicMock()
+    async_session.commit = AsyncMock()
+
+    # Only feedback, no reason
+    result = await delete_question(
+        async_session,
+        question_id,
+        quiz_id,
+        rejection_feedback="Just not needed.",
+    )
+
+    assert result is True
+    # Soft delete should still work
+    assert mock_question.deleted is True
+    # Reason should be None, feedback should be set
+    assert mock_question.rejection_reason is None
+    assert mock_question.rejection_feedback == "Just not needed."
+
+
+@pytest.mark.asyncio
 async def test_prepare_questions_for_export_success():
     """Test successful question export preparation."""
     from src.question.models import Question, QuestionType
@@ -1528,3 +1683,104 @@ async def test_unapprove_question_updates_timestamp(async_session):
     assert updated_question.updated_at > old_updated_at
     assert updated_question.is_approved is False
     assert updated_question.approved_at is None
+
+
+# Question Rejection Feedback Integration Tests
+
+
+@pytest.mark.asyncio
+async def test_delete_question_with_rejection_feedback_integration(async_session):
+    """Integration test for question deletion with rejection feedback using real database."""
+    from src.question.service import delete_question
+    from tests.conftest import create_question_in_async_session
+
+    # Create a question in the database
+    question = await create_question_in_async_session(async_session, is_approved=False)
+
+    # Store IDs before any operations that might detach the object
+    question_id = question.id
+    quiz_id = question.quiz_id
+
+    # Delete with rejection reason and feedback
+    result = await delete_question(
+        async_session,
+        question_id,
+        quiz_id,
+        rejection_reason="incorrect_answer",
+        rejection_feedback="The correct answer marked is actually wrong.",
+    )
+
+    assert result is True
+
+    # Verify the question was soft-deleted with rejection data
+    # Need to query directly since get_question_by_id filters out deleted questions
+    from sqlalchemy import select
+
+    from src.question.models import Question
+
+    stmt = select(Question).where(Question.id == question_id)
+    db_result = await async_session.execute(stmt)
+    deleted_question = db_result.scalar_one_or_none()
+
+    assert deleted_question is not None
+    assert deleted_question.deleted is True
+    assert deleted_question.deleted_at is not None
+    assert deleted_question.rejection_reason == "incorrect_answer"
+    assert (
+        deleted_question.rejection_feedback
+        == "The correct answer marked is actually wrong."
+    )
+
+
+@pytest.mark.asyncio
+async def test_delete_question_rejection_reasons_stored_correctly(async_session):
+    """Test that all rejection reasons are stored correctly in database."""
+    from src.question.service import delete_question
+    from tests.conftest import create_question_in_async_session
+
+    # Test various rejection reasons
+    rejection_reasons = [
+        "incorrect_answer",
+        "poor_wording",
+        "irrelevant_content",
+        "duplicate_question",
+        "too_easy",
+        "too_hard",
+        "quota_reached",
+        "topic_coverage",
+        "other",
+    ]
+
+    from sqlalchemy import select
+
+    from src.question.models import Question
+
+    for reason in rejection_reasons:
+        # Create a new question for each test
+        question = await create_question_in_async_session(
+            async_session, is_approved=False
+        )
+
+        # Store IDs before any operations
+        question_id = question.id
+        quiz_id = question.quiz_id
+
+        # Delete with the rejection reason
+        result = await delete_question(
+            async_session,
+            question_id,
+            quiz_id,
+            rejection_reason=reason,
+        )
+
+        assert result is True, f"Failed to delete question with reason: {reason}"
+
+        # Verify the reason was stored
+        stmt = select(Question).where(Question.id == question_id)
+        db_result = await async_session.execute(stmt)
+        deleted_question = db_result.scalar_one_or_none()
+
+        assert deleted_question is not None
+        assert (
+            deleted_question.rejection_reason == reason
+        ), f"Reason mismatch for: {reason}"
