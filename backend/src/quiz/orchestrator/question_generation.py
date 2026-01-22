@@ -395,6 +395,9 @@ async def orchestrate_single_batch_regeneration(
         from src.question.workflows.module_batch_workflow import ModuleBatchWorkflow
 
         provider_registry = get_llm_provider_registry()
+        # Note: LLMProvider.OPENAI is used for both regular OpenAI and Azure OpenAI.
+        # The actual backend (Azure vs OpenAI) is determined by environment config
+        # (AZURE_OPENAI_API_KEY). The llm_model parameter stores the model name only.
         provider_enum = LLMProvider("openai")
         provider = provider_registry.get_provider(provider_enum)
         template_manager = get_template_manager()

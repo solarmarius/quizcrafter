@@ -107,20 +107,35 @@ export function RegenerateBatchButton({
     return isBatchStillGenerating(batches[batchKey])
   })
   const timeoutRef = useRef<NodeJS.Timeout | null>(null)
+  // Track the timestamp we set to prevent race conditions with other tabs
+  const ourTimestampRef = useRef<number | null>(null)
 
   // Mark batch as generating in localStorage
   const markBatchGenerating = useCallback(() => {
     const batches = loadGeneratingBatches()
-    batches[batchKey] = { timestamp: Date.now() }
+    const now = Date.now()
+    ourTimestampRef.current = now
+    batches[batchKey] = { timestamp: now }
     saveGeneratingBatches(batches)
     setIsGenerating(true)
   }, [batchKey])
 
-  // Clear batch from localStorage
+  // Clear batch from localStorage (only if we own the timestamp or it expired)
   const clearBatchGenerating = useCallback(() => {
     const batches = loadGeneratingBatches()
-    delete batches[batchKey]
-    saveGeneratingBatches(batches)
+    const entry = batches[batchKey]
+
+    // Only clear if: no entry exists, we own the timestamp, or it has expired
+    // This prevents race conditions where another tab started a newer generation
+    if (
+      !entry ||
+      entry.timestamp === ourTimestampRef.current ||
+      !isBatchStillGenerating(entry)
+    ) {
+      delete batches[batchKey]
+      saveGeneratingBatches(batches)
+      ourTimestampRef.current = null
+    }
     setIsGenerating(false)
   }, [batchKey])
 
