@@ -6,6 +6,7 @@ from typing import Any
 from fastapi import HTTPException, UploadFile
 
 from src.config import get_logger
+from src.content_extraction.constants import MIN_MANUAL_TEXT_LENGTH
 from src.content_extraction.models import ProcessedContent, RawContent
 from src.content_extraction.processors import CONTENT_PROCESSORS
 from src.content_extraction.service import process_content
@@ -316,6 +317,15 @@ async def create_manual_module(
         else:
             # We already validated text_content exists above
             text_content = module_data.text_content or ""
+
+            # Validate minimum text length with specific error message
+            stripped_length = len(text_content.strip())
+            if stripped_length < MIN_MANUAL_TEXT_LENGTH:
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"Text content must be at least {MIN_MANUAL_TEXT_LENGTH} characters. You provided {stripped_length} characters.",
+                )
+
             raw_content = await process_text_content(text_content, module_data.name)
 
         # Get appropriate processor

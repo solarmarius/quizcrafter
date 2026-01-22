@@ -291,9 +291,14 @@ async def test_create_manual_module_with_text_success():
     from src.quiz.manual import create_manual_module
     from src.quiz.schemas import ManualModuleCreate
 
+    # Create content that meets minimum length requirement (500+ chars)
+    test_content = (
+        "This is test content for the manual module. " * 15
+    )  # ~675 characters
+
     module_data = ManualModuleCreate(
         name="Test Text Module",
-        text_content="This is test content for the manual module.",
+        text_content=test_content,
     )
 
     # Mock content processing
@@ -305,8 +310,8 @@ async def test_create_manual_module_with_text_success():
         mock_processors.__getitem__ = Mock(return_value=Mock())
 
         mock_processed = Mock()
-        mock_processed.content = "This is test content for the manual module."
-        mock_processed.word_count = 9
+        mock_processed.content = test_content
+        mock_processed.word_count = 135
         mock_processed.processing_metadata = {"processing_time": 0.1}
 
         mock_process_content.return_value = mock_processed
@@ -316,9 +321,8 @@ async def test_create_manual_module_with_text_success():
         # Verify result structure
         assert result.name == "Test Text Module"
         assert result.module_id.startswith("manual_")
-        assert result.word_count == 9
-        assert result.content_preview == "This is test content for the manual module."
-        assert result.full_content == "This is test content for the manual module."
+        assert result.word_count == 135
+        assert result.full_content == test_content
         assert result.processing_metadata == {"processing_time": 0.1}
 
 
@@ -408,7 +412,10 @@ async def test_create_manual_module_processing_failure():
     from src.quiz.manual import create_manual_module
     from src.quiz.schemas import ManualModuleCreate
 
-    module_data = ManualModuleCreate(name="Test Module", text_content="Test content")
+    # Use content that meets minimum length requirement (500+ chars)
+    test_content = "Test content for processing failure scenario. " * 15
+
+    module_data = ManualModuleCreate(name="Test Module", text_content=test_content)
 
     # Mock content processing failure
     with (
@@ -424,6 +431,28 @@ async def test_create_manual_module_processing_failure():
 
         assert exc_info.value.status_code == 400
         assert "Failed to process content" in exc_info.value.detail
+
+
+@pytest.mark.asyncio
+async def test_create_manual_module_text_too_short():
+    """Test manual module creation with text content that is too short."""
+    from src.content_extraction.constants import MIN_MANUAL_TEXT_LENGTH
+    from src.quiz.manual import create_manual_module
+    from src.quiz.schemas import ManualModuleCreate
+
+    # Use text shorter than minimum requirement
+    short_text = "abc"  # 3 characters
+    module_data = ManualModuleCreate(
+        name="Short Text Module",
+        text_content=short_text,
+    )
+
+    with pytest.raises(HTTPException) as exc_info:
+        await create_manual_module(module_data)
+
+    assert exc_info.value.status_code == 400
+    assert f"at least {MIN_MANUAL_TEXT_LENGTH} characters" in exc_info.value.detail
+    assert f"You provided {len(short_text)} characters" in exc_info.value.detail
 
 
 @pytest.mark.asyncio

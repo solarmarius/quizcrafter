@@ -2,7 +2,7 @@ import { Button, HStack, Input, Text, VStack } from "@chakra-ui/react"
 import { memo, useCallback, useState } from "react"
 import { useTranslation } from "react-i18next"
 
-import { QuizService } from "@/client"
+import { ApiError, QuizService } from "@/client"
 import {
   DialogBody,
   DialogCloseTrigger,
@@ -173,8 +173,15 @@ export const ManualModuleDialog = memo(function ManualModuleDialog({
       setCurrentStep("preview")
       toast.showSuccessToast(t("success.contentProcessed"))
     } catch (err) {
-      // Use translated fallback error message
-      const errorMessage = t("errors.processContentFailed")
+      // Extract error message from API response, fall back to translated message
+      let errorMessage = t("errors.processContentFailed")
+
+      if (err instanceof ApiError && err.body) {
+        const body = err.body as { detail?: string }
+        if (body.detail) {
+          errorMessage = body.detail
+        }
+      }
 
       setError(errorMessage)
       toast.showErrorToast(errorMessage)
