@@ -5,7 +5,8 @@ MAX_FILE_SIZE = 10 * 1024 * 1024  # 10MB per file
 MAX_TOTAL_CONTENT_SIZE = 50 * 1024 * 1024  # 50MB total per quiz
 MAX_PAGES_PER_MODULE = 100  # Maximum pages per module
 MAX_CONTENT_LENGTH = 500_000  # Maximum content length per page
-MIN_CONTENT_LENGTH = 50  # Minimum content length
+MIN_CONTENT_LENGTH = 50  # Minimum content length for extracted content (PDF/HTML)
+MIN_MANUAL_TEXT_LENGTH = 500  # Minimum content length for manual text input
 MAX_CONTENT_SIZE = 5 * 1024 * 1024  # 5MB per item (for validation)
 
 # Processing configuration
