@@ -233,6 +233,7 @@
   "batchRegeneration": {
     "regenerateAriaLabel": "Regenerer denne gruppen",
     "regenerateTooltip": "Generer flere spørsmål for denne gruppen",
+    "generating": "Genererer spørsmål...",
     "started": "Gruppegenerering startet"
   },
   "questionTypeBreakdown": {

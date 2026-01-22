@@ -233,6 +233,7 @@
   "batchRegeneration": {
     "regenerateAriaLabel": "Regenerate this batch",
     "regenerateTooltip": "Generate additional questions for this batch",
+    "generating": "Generating questions...",
     "started": "Batch regeneration started"
   },
   "questionTypeBreakdown": {

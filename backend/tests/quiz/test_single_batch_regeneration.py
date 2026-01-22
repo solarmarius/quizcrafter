@@ -183,7 +183,7 @@ def test_prepare_single_batch_generation_canvas_module(session: Session):
     assert result["quiz_id"] == quiz.id
     assert result["module_id"] == "456"
     assert result["module_name"] == "Test Module"
-    assert result["module_content"] == "Test module content for question generation."
+    assert "Test module content for question generation." in result["module_content"]
     assert result["question_type"] == QuestionType.MULTIPLE_CHOICE
     assert result["count"] == 5
     assert result["difficulty"] == QuestionDifficulty.MEDIUM
@@ -386,10 +386,13 @@ def create_test_quiz_with_content(
             }
         },
         extracted_content={
-            "456": {
-                "content": "Test module content for question generation.",
-                "word_count": 10,
-            }
+            "456": [
+                {
+                    "content": "Test module content for question generation.",
+                    "word_count": 10,
+                    "title": "Test Page",
+                }
+            ]
         },
     )
 

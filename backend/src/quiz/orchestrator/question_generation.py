@@ -431,14 +431,15 @@ async def orchestrate_single_batch_regeneration(
             success=success,
         )
 
-        # Update generation metadata
-        async def _update_batch_metadata(
+        # Update generation metadata and question count
+        async def _update_batch_metadata_and_count(
             session: Any,
             quiz_id: UUID,
             batch_key: str,
             success: bool,
+            questions_generated: int,
         ) -> None:
-            """Update generation metadata for single batch regeneration."""
+            """Update generation metadata and question count for single batch regeneration."""
             from ..service import get_quiz_for_update
 
             quiz = await get_quiz_for_update(session, quiz_id)
@@ -459,6 +460,14 @@ async def orchestrate_single_batch_regeneration(
                 # Add to successful, remove from failed
                 existing_successful.add(batch_key)
                 existing_failed.discard(batch_key)
+                # Increment question count for successfully regenerated questions
+                quiz.question_count = quiz.question_count + questions_generated
+                logger.info(
+                    "quiz_question_count_updated",
+                    quiz_id=str(quiz_id),
+                    questions_added=questions_generated,
+                    new_total=quiz.question_count,
+                )
             else:
                 # Add to failed (but keep in successful if it was there before)
                 existing_failed.add(batch_key)
@@ -470,10 +479,11 @@ async def orchestrate_single_batch_regeneration(
             }
 
         await execute_in_transaction(
-            _update_batch_metadata,
+            _update_batch_metadata_and_count,
             quiz_id,
             batch_key,
             success,
+            len(questions),
             isolation_level="REPEATABLE READ",
             retries=3,
         )

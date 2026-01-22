@@ -435,6 +435,29 @@ def prepare_question_generation(
     }
 
 
+def _combine_module_pages_for_regeneration(pages: list[dict[str, Any]]) -> str:
+    """Combine all pages from a module into a single content string for regeneration."""
+    content_parts = []
+
+    for page in pages:
+        if not isinstance(page, dict):
+            continue
+
+        page_content = page.get("content", "")
+        if not page_content or len(page_content.strip()) < 10:
+            continue
+
+        # Add page title as context if available
+        page_title = page.get("title", "")
+        if page_title:
+            content_parts.append(f"## {page_title}\n")
+
+        content_parts.append(page_content.strip())
+        content_parts.append("\n\n")
+
+    return "\n".join(content_parts).strip()
+
+
 def prepare_single_batch_generation(
     session: Session,
     quiz_id: UUID,
@@ -473,10 +496,15 @@ def prepare_single_batch_generation(
         )
     else:
         # For canvas modules, get content from extracted_content
+        # extracted_content stores pages as a list: {module_id: [{content: ...}, ...]}
         extracted_content = quiz.extracted_content or {}
-        module_content = extracted_content.get(batch_request.module_id, {}).get(
-            "content", ""
-        )
+        pages = extracted_content.get(batch_request.module_id, [])
+        if isinstance(pages, list):
+            # Combine all pages from the module into a single content string
+            module_content = _combine_module_pages_for_regeneration(pages)
+        else:
+            # Fallback for legacy format
+            module_content = pages.get("content", "") if isinstance(pages, dict) else ""
         module_name = module_data.get("name", f"Module {batch_request.module_id}")
 
     if not module_content:
