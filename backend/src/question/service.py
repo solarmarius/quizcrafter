@@ -358,10 +358,14 @@ async def update_question(
 
 
 async def delete_question(
-    session: AsyncSession, question_id: UUID, quiz_id: UUID
+    session: AsyncSession,
+    question_id: UUID,
+    quiz_id: UUID,
+    rejection_reason: str | None = None,
+    rejection_feedback: str | None = None,
 ) -> bool:
     """
-    Soft delete a question by ID.
+    Soft delete a question by ID with optional rejection feedback.
 
     Authorization is handled by the router before calling this function.
 
@@ -369,11 +373,17 @@ async def delete_question(
         session: Database session
         question_id: Question identifier
         quiz_id: Quiz ID to verify question belongs to quiz
+        rejection_reason: Optional reason for rejection from RejectionReason enum
+        rejection_feedback: Optional free-text feedback explaining rejection
 
     Returns:
         True if soft deleted, False if not found
     """
-    logger.debug("question_deletion_started", question_id=str(question_id))
+    logger.debug(
+        "question_deletion_started",
+        question_id=str(question_id),
+        rejection_reason=rejection_reason,
+    )
 
     # Get question and verify it belongs to the specified quiz
     result = await session.execute(
@@ -387,13 +397,21 @@ async def delete_question(
         logger.warning("question_not_found_for_deletion", question_id=str(question_id))
         return False
 
-    # Perform soft delete
+    # Perform soft delete with optional rejection feedback
     question.deleted = True
     question.deleted_at = datetime.now(timezone.utc)
+    if rejection_reason:
+        question.rejection_reason = rejection_reason
+    if rejection_feedback:
+        question.rejection_feedback = rejection_feedback
     session.add(question)
     await session.commit()
 
-    logger.info("question_soft_deleted_successfully", question_id=str(question_id))
+    logger.info(
+        "question_soft_deleted_successfully",
+        question_id=str(question_id),
+        rejection_reason=rejection_reason,
+    )
     return True
 
 

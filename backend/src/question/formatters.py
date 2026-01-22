@@ -37,6 +37,8 @@ def format_base_fields(question: Question) -> dict[str, Any]:
         "updated_at": question.updated_at.isoformat() if question.updated_at else None,
         "canvas_item_id": question.canvas_item_id,
         "module_id": question.module_id,
+        "rejection_reason": question.rejection_reason,
+        "rejection_feedback": question.rejection_feedback,
     }
 
 

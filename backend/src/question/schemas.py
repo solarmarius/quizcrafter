@@ -50,6 +50,8 @@ class QuestionResponse(BaseModel):
     updated_at: datetime | None = None
     canvas_item_id: str | None = None
     module_id: str | None = None
+    rejection_reason: str | None = None
+    rejection_feedback: str | None = None
 
     class Config:
         use_enum_values = True

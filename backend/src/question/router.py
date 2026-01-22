@@ -4,6 +4,7 @@ from typing import Any
 from uuid import UUID
 
 from fastapi import APIRouter, HTTPException, Query
+from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.auth.dependencies import CurrentUser
@@ -17,7 +18,19 @@ from .schemas import (
     QuestionResponse,
     QuestionUpdateRequest,
 )
-from .types import QuestionType
+from .types import QuestionType, RejectionReason
+
+
+class QuestionDeleteRequest(BaseModel):
+    """Request body for deleting a question with optional rejection feedback."""
+
+    rejection_reason: RejectionReason | None = Field(
+        default=None, description="Reason for rejecting the question"
+    )
+    rejection_feedback: str | None = Field(
+        default=None, max_length=500, description="Optional additional feedback"
+    )
+
 
 router = APIRouter(prefix="/questions", tags=["questions"])
 logger = get_logger("questions_v2")
@@ -408,22 +421,32 @@ async def delete_question(
     quiz_id: UUID,
     question_id: UUID,
     current_user: CurrentUser,
+    request_body: QuestionDeleteRequest | None = None,
 ) -> dict[str, str]:
     """
-    Delete a question from the quiz.
+    Delete a question from the quiz with optional rejection feedback.
 
     **Parameters:**
         quiz_id: Quiz identifier
         question_id: Question identifier
+        request_body: Optional rejection reason and feedback
 
     **Returns:**
         Confirmation message
     """
+    rejection_reason = (
+        request_body.rejection_reason.value
+        if request_body and request_body.rejection_reason
+        else None
+    )
+    rejection_feedback = request_body.rejection_feedback if request_body else None
+
     logger.info(
         "question_deletion_initiated",
         user_id=str(current_user.id),
         quiz_id=str(quiz_id),
         question_id=str(question_id),
+        rejection_reason=rejection_reason,
     )
 
     try:
@@ -432,7 +455,13 @@ async def delete_question(
 
         # Delete question and decrement quiz question count
         async with get_async_session() as session:
-            success = await service.delete_question(session, question_id, quiz_id)
+            success = await service.delete_question(
+                session,
+                question_id,
+                quiz_id,
+                rejection_reason=rejection_reason,
+                rejection_feedback=rejection_feedback,
+            )
 
             if success:
                 # Decrement question count
@@ -447,6 +476,7 @@ async def delete_question(
             user_id=str(current_user.id),
             quiz_id=str(quiz_id),
             question_id=str(question_id),
+            rejection_reason=rejection_reason,
         )
 
         return {"message": "Question deleted successfully"}
