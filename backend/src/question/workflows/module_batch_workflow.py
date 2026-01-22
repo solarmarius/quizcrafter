@@ -37,6 +37,7 @@ class ModuleBatchState(BaseModel):
     question_type: QuestionType  # Now passed per batch, not at init
     difficulty: QuestionDifficulty | None = None  # Difficulty level for this batch
     tone: str | None = None
+    custom_instructions: str | None = None  # Custom instructions for LLM
 
     # Provider configuration
     llm_provider: BaseLLMProvider
@@ -101,11 +102,13 @@ class ModuleBatchWorkflow:
         template_manager: TemplateManager | None = None,
         language: QuizLanguage = QuizLanguage.ENGLISH,
         tone: str | None = None,
+        custom_instructions: str | None = None,
     ):
         self.llm_provider = llm_provider
         self.template_manager = template_manager or get_template_manager()
         self.language = language
         self.tone = tone
+        self.custom_instructions = custom_instructions
         self.graph = self._build_graph()
 
     def _build_graph(self) -> Any:
@@ -174,6 +177,7 @@ class ModuleBatchWorkflow:
                 target_count=remaining_questions,
                 difficulty=state.difficulty,
                 language=self.language,
+                custom_instructions=self.custom_instructions,
             )
 
             # Debug: Log content being passed to template
@@ -744,6 +748,7 @@ class ModuleBatchWorkflow:
             question_type=question_type,  # Set from parameter
             difficulty=difficulty,  # Difficulty level for this batch
             tone=self.tone,
+            custom_instructions=self.custom_instructions,
             llm_provider=self.llm_provider,
             template_manager=self.template_manager,
         )
@@ -803,11 +808,13 @@ class ParallelModuleProcessor:
         template_manager: TemplateManager | None = None,
         language: QuizLanguage = QuizLanguage.ENGLISH,
         tone: str | None = None,
+        custom_instructions: str | None = None,
     ):
         self.llm_provider = llm_provider
         self.template_manager = template_manager or get_template_manager()
         self.language = language
         self.tone = tone
+        self.custom_instructions = custom_instructions
 
     async def process_all_modules_with_batches(
         self,
@@ -854,6 +861,7 @@ class ParallelModuleProcessor:
                     template_manager=self.template_manager,
                     language=self.language,
                     tone=self.tone,
+                    custom_instructions=self.custom_instructions,
                 )
 
                 # Create task for this batch

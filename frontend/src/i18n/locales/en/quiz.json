@@ -110,6 +110,10 @@
     "cancel": "Cancel"
   },
   "settings": {
+    "tabs": {
+      "basic": "Basic Settings",
+      "advanced": "Advanced"
+    },
     "language": {
       "label": "Quiz Language",
       "description": "Select the language for question generation",
@@ -129,6 +133,18 @@
       "encouragingDescription": "Use warm, supportive language with helpful hints embedded in questions",
       "professional": "Professional/Business",
       "professionalDescription": "Use clear, direct business language for workplace training"
+    },
+    "customInstructions": {
+      "label": "Custom LLM Instructions",
+      "description": "Provide additional instructions to guide the AI when generating questions for this quiz.",
+      "placeholder": "e.g., 'Include at least one application-level question per module' or 'Focus on practical examples from the healthcare industry'",
+      "charCount": "{{current}}/{{max}} characters",
+      "warningTitle": "Use with Care",
+      "warningMessage": "Custom instructions may override default question generation behavior. Test with a small quiz first to ensure results meet your expectations. DO NOT write instructions that may change the format of the output (JSON). Remember to write the instructions in the same language as the module content.",
+      "examplesTitle": "Example Instructions:",
+      "example1": "Always include one question that tests application of concepts",
+      "example2": "Use scenarios relevant to nursing practice",
+      "example3": "Avoid questions about historical dates"
     }
   },
   "questionTypes": {
@@ -187,6 +203,7 @@
     "questionCount": "Question Count",
     "language": "Language",
     "tone": "Tone",
+    "customInstructions": "Custom Instructions",
     "selectedModules": "Selected Modules",
     "noModules": "No modules selected",
     "canvasCourse": "Canvas Course",

@@ -100,6 +100,7 @@ def create_quiz(session: Session, quiz_create: QuizCreate, owner_id: UUID) -> Qu
         llm_temperature=quiz_create.llm_temperature,
         language=quiz_create.language,
         tone=quiz_create.tone,
+        custom_instructions=quiz_create.custom_instructions,
         updated_at=datetime.now(timezone.utc),
     )
 
@@ -424,6 +425,7 @@ def prepare_question_generation(
         "llm_temperature": quiz.llm_temperature,
         "language": quiz.language,
         "tone": quiz.tone,
+        "custom_instructions": quiz.custom_instructions,
     }
 
 

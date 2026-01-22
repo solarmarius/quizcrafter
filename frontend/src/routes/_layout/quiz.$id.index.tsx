@@ -154,6 +154,23 @@ function QuizInformation() {
               </Text>
               <Badge variant="outline">{QUIZ_TONE_LABELS[quiz.tone!]}</Badge>
             </HStack>
+            {quiz.custom_instructions && (
+              <Box>
+                <Text fontWeight="medium" color="gray.700" mb={2}>
+                  {t("detail.customInstructions")}
+                </Text>
+                <Text
+                  fontSize="sm"
+                  color="gray.600"
+                  bg="gray.50"
+                  p={3}
+                  borderRadius="md"
+                  fontStyle="italic"
+                >
+                  {quiz.custom_instructions}
+                </Text>
+              </Box>
+            )}
           </VStack>
         </Card.Body>
       </Card.Root>

@@ -46,6 +46,7 @@ def mock_quiz():
     quiz.status = QuizStatus.GENERATING_QUESTIONS
     quiz.language = "en"
     quiz.tone = QuizTone.ACADEMIC  # Default tone
+    quiz.custom_instructions = None  # No custom instructions by default
     quiz.selected_modules = {
         "module_1": {
             "name": "Introduction",
@@ -76,6 +77,7 @@ def mock_quiz_with_tone():
     quiz.status = QuizStatus.GENERATING_QUESTIONS
     quiz.language = "en"
     quiz.tone = QuizTone.PROFESSIONAL  # Professional tone
+    quiz.custom_instructions = None  # No custom instructions by default
     quiz.selected_modules = {
         "module_1": {
             "name": "Business Strategy",
@@ -356,6 +358,7 @@ async def test_generate_questions_for_quiz_with_batch_tracking_with_tone(
             template_manager=generation_service.template_manager,
             language=QuizLanguage.ENGLISH,
             tone=QuizTone.PROFESSIONAL.value,
+            custom_instructions=None,
         )
 
 
@@ -406,6 +409,7 @@ async def test_generate_questions_for_quiz_with_batch_tracking_tone_extraction(
             template_manager=generation_service.template_manager,
             language=QuizLanguage.ENGLISH,
             tone=QuizTone.ENCOURAGING.value,
+            custom_instructions=None,
         )
 
 
@@ -456,6 +460,7 @@ async def test_generate_questions_for_quiz_with_batch_tracking_tone_and_language
             template_manager=generation_service.template_manager,
             language=QuizLanguage.NORWEGIAN,
             tone=QuizTone.CASUAL.value,
+            custom_instructions=None,
         )
 
 
@@ -504,6 +509,7 @@ async def test_generate_questions_for_quiz_with_batch_tracking_norwegian_languag
             template_manager=generation_service.template_manager,
             language=QuizLanguage.NORWEGIAN,
             tone=QuizTone.ACADEMIC.value,  # Default tone
+            custom_instructions=None,
         )
 
 
@@ -686,6 +692,59 @@ async def test_generate_uses_quiz_question_type(generation_service, mock_quiz):
                 template_manager=generation_service.template_manager,
                 language=QuizLanguage.ENGLISH,
                 tone=QuizTone.ACADEMIC.value,  # Default tone from mock quiz
+                custom_instructions=None,
+            )
+
+
+@pytest.mark.asyncio
+async def test_generate_questions_with_custom_instructions(
+    generation_service, mock_quiz
+):
+    """Test that custom_instructions are passed through to ParallelModuleProcessor."""
+    # Set custom instructions on the quiz
+    mock_quiz.custom_instructions = "Focus on practical healthcare examples"
+    extracted_content = {
+        "module_1": "Content for module 1",
+        "module_2": "Content for module 2",
+    }
+
+    with patch(
+        "src.question.services.generation_service.get_async_session"
+    ) as mock_session_ctx:
+        mock_session = AsyncMock()
+        mock_session.get = AsyncMock(return_value=mock_quiz)
+        mock_session.commit = AsyncMock()
+        mock_session_ctx.return_value.__aenter__.return_value = mock_session
+
+        mock_provider = MagicMock()
+        generation_service.provider_registry.get_provider.return_value = mock_provider
+
+        with patch(
+            "src.question.services.generation_service.ParallelModuleProcessor"
+        ) as MockProcessor:
+            mock_processor_instance = MagicMock()
+            mock_processor_instance.process_all_modules_with_batches = AsyncMock(
+                return_value=(
+                    {"module_1": [], "module_2": []},
+                    {"successful_batches": [], "failed_batches": []},
+                )
+            )
+            MockProcessor.return_value = mock_processor_instance
+
+            await generation_service.generate_questions_for_quiz_with_batch_tracking(
+                quiz_id=mock_quiz.id, extracted_content=extracted_content
+            )
+
+            # Verify ParallelModuleProcessor was called with custom_instructions
+            from src.question.types import QuizLanguage
+            from src.quiz.schemas import QuizTone
+
+            MockProcessor.assert_called_once_with(
+                llm_provider=mock_provider,
+                template_manager=generation_service.template_manager,
+                language=QuizLanguage.ENGLISH,
+                tone=QuizTone.ACADEMIC.value,
+                custom_instructions="Focus on practical healthcare examples",
             )
 
 

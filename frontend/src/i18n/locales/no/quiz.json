@@ -110,6 +110,10 @@
     "cancel": "Avbryt"
   },
   "settings": {
+    "tabs": {
+      "basic": "Grunninnstillinger",
+      "advanced": "Avansert"
+    },
     "language": {
       "label": "Språk",
       "description": "Velg språk for spørsmålsgenerering",
@@ -129,6 +133,18 @@
       "encouragingDescription": "Bruk varmt, støttende språk med nyttige hint i spørsmålene",
       "professional": "Profesjonell/Forretningsmessig",
       "professionalDescription": "Bruk klart, direkte forretningsspråk for arbeidsplassopplæring"
+    },
+    "customInstructions": {
+      "label": "Egendefinerte instruksjoner",
+      "description": "Gi tilleggsinstruksjoner for å veilede KI-en når den genererer spørsmål for denne quizen.",
+      "placeholder": "f.eks. 'Inkluder minst ett anvendelsesspørsmål per modul' eller 'Fokuser på praktiske eksempler fra helsesektoren'",
+      "charCount": "{{current}}/{{max}} tegn",
+      "warningTitle": "Bruk med forsiktighet",
+      "warningMessage": "Egendefinerte instruksjoner kan overstyre standard oppførsel for spørsmålsgenerering. Test med en liten quiz først for å sikre at resultatene møter forventningene dine. IKKE skriv instruksjoner som kan endre formatet til spørsmålene (JSON). Husk å skrive instruksjonene på samme språk som modulinnholdet.",
+      "examplesTitle": "Eksempler på instruksjoner:",
+      "example1": "Inkluder alltid ett spørsmål som tester anvendelse av konsepter",
+      "example2": "Bruk scenarioer relevante for sykepleiepraksis",
+      "example3": "Unngå spørsmål om historiske datoer"
     }
   },
   "questionTypes": {
@@ -187,6 +203,7 @@
     "questionCount": "Antall spørsmål",
     "language": "Språk",
     "tone": "Tone",
+    "customInstructions": "Egendefinerte instruksjoner",
     "selectedModules": "Valgte moduler",
     "noModules": "Ingen moduler valgt",
     "canvasCourse": "Canvas-emne",

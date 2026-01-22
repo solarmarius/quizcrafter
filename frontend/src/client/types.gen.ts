@@ -259,6 +259,10 @@ export type Quiz = {
    */
   tone?: QuizTone
   /**
+   * Custom instructions for the LLM during question generation
+   */
+  custom_instructions?: string | null
+  /**
    * Consolidated quiz status
    */
   status?: QuizStatus
@@ -325,6 +329,10 @@ export type QuizCreate = {
   llm_temperature?: number
   language?: QuizLanguage
   tone?: QuizTone
+  /**
+   * Custom instructions for the LLM during question generation
+   */
+  custom_instructions?: string | null
 }
 
 /**

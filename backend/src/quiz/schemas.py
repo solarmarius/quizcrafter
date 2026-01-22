@@ -123,6 +123,11 @@ class QuizCreate(SQLModel):
     llm_temperature: float = Field(default=1, ge=0.0, le=2.0)
     language: QuizLanguage = Field(default=QuizLanguage.ENGLISH)
     tone: QuizTone = Field(default=QuizTone.ACADEMIC)
+    custom_instructions: str | None = Field(
+        default=None,
+        max_length=500,
+        description="Custom instructions for the LLM during question generation",
+    )
 
     @field_validator("selected_modules")
     def validate_modules(cls, v: dict[str, Any]) -> dict[str, Any]:
@@ -214,6 +219,7 @@ class QuizPublic(SQLModel):
     llm_temperature: float
     language: QuizLanguage
     tone: QuizTone
+    custom_instructions: str | None = None
     status: QuizStatus
     failure_reason: FailureReason | None = None
     last_status_update: datetime

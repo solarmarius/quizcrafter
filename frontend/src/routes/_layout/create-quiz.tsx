@@ -50,6 +50,7 @@ interface QuizFormData {
   title?: string
   language?: QuizLanguage
   tone?: QuizTone
+  customInstructions?: string
 }
 
 const TOTAL_STEPS = 4 // Course selection, Module selection, Questions per module, Quiz settings
@@ -186,6 +187,7 @@ function CreateQuiz() {
         title: formData.title,
         language: formData.language || QUIZ_LANGUAGES.ENGLISH,
         tone: formData.tone || QUIZ_TONES.ACADEMIC,
+        custom_instructions: formData.customInstructions || null,
       }
 
       const response = await QuizService.createNewQuiz({
@@ -264,11 +266,13 @@ function CreateQuiz() {
             settings={{
               language: formData.language || QUIZ_LANGUAGES.ENGLISH,
               tone: formData.tone || QUIZ_TONES.ACADEMIC,
+              customInstructions: formData.customInstructions || "",
             }}
             onSettingsChange={(settings) =>
               updateFormData({
                 language: settings.language,
                 tone: settings.tone,
+                customInstructions: settings.customInstructions,
               })
             }
           />
