@@ -1541,3 +1541,289 @@ def test_create_quiz_module_batch_distribution_mixed(session: Session):
     assert batch_distribution["manual_batch123"][1]["count"] == 4
     assert batch_distribution["manual_batch123"][2]["question_type"] == "categorization"
     assert batch_distribution["manual_batch123"][2]["count"] == 3
+
+
+# Custom Instructions Feature Tests
+
+
+def test_create_quiz_with_custom_instructions(session: Session):
+    """Test quiz creation with custom LLM instructions."""
+    from src.question.types import QuestionDifficulty, QuestionType
+    from src.quiz.schemas import ModuleSelection, QuestionBatch, QuizCreate
+    from src.quiz.service import create_quiz
+    from tests.conftest import create_user_in_session
+
+    user = create_user_in_session(session)
+
+    custom_text = "Focus on practical examples from healthcare. Include at least one application-level question."
+
+    quiz_data = QuizCreate(
+        canvas_course_id=123,
+        canvas_course_name="Custom Instructions Course",
+        selected_modules={
+            "456": ModuleSelection(
+                name="Module 1",
+                question_batches=[
+                    QuestionBatch(
+                        question_type=QuestionType.MULTIPLE_CHOICE,
+                        count=10,
+                        difficulty=QuestionDifficulty.MEDIUM,
+                    )
+                ],
+            )
+        },
+        title="Custom Instructions Quiz",
+        custom_instructions=custom_text,
+    )
+
+    quiz = create_quiz(session, quiz_data, user.id)
+
+    # Verify custom instructions are saved
+    assert quiz.custom_instructions == custom_text
+
+
+def test_create_quiz_without_custom_instructions(session: Session):
+    """Test quiz creation defaults to None for custom instructions."""
+    from src.question.types import QuestionDifficulty, QuestionType
+    from src.quiz.schemas import ModuleSelection, QuestionBatch, QuizCreate
+    from src.quiz.service import create_quiz
+    from tests.conftest import create_user_in_session
+
+    user = create_user_in_session(session)
+
+    quiz_data = QuizCreate(
+        canvas_course_id=123,
+        canvas_course_name="No Custom Instructions Course",
+        selected_modules={
+            "456": ModuleSelection(
+                name="Module 1",
+                question_batches=[
+                    QuestionBatch(
+                        question_type=QuestionType.MULTIPLE_CHOICE,
+                        count=10,
+                        difficulty=QuestionDifficulty.MEDIUM,
+                    )
+                ],
+            )
+        },
+        title="No Custom Instructions Quiz",
+        # custom_instructions not specified - should default to None
+    )
+
+    quiz = create_quiz(session, quiz_data, user.id)
+
+    # Verify custom instructions default to None
+    assert quiz.custom_instructions is None
+
+
+def test_create_quiz_with_empty_custom_instructions(session: Session):
+    """Test quiz creation with empty string for custom instructions."""
+    from src.question.types import QuestionDifficulty, QuestionType
+    from src.quiz.schemas import ModuleSelection, QuestionBatch, QuizCreate
+    from src.quiz.service import create_quiz
+    from tests.conftest import create_user_in_session
+
+    user = create_user_in_session(session)
+
+    quiz_data = QuizCreate(
+        canvas_course_id=123,
+        canvas_course_name="Empty Custom Instructions Course",
+        selected_modules={
+            "456": ModuleSelection(
+                name="Module 1",
+                question_batches=[
+                    QuestionBatch(
+                        question_type=QuestionType.MULTIPLE_CHOICE,
+                        count=10,
+                        difficulty=QuestionDifficulty.MEDIUM,
+                    )
+                ],
+            )
+        },
+        title="Empty Custom Instructions Quiz",
+        custom_instructions="",
+    )
+
+    quiz = create_quiz(session, quiz_data, user.id)
+
+    # Verify empty string is preserved
+    assert quiz.custom_instructions == ""
+
+
+def test_create_quiz_with_custom_instructions_max_length(session: Session):
+    """Test quiz creation with custom instructions at max length (500 chars)."""
+    from src.question.types import QuestionDifficulty, QuestionType
+    from src.quiz.schemas import ModuleSelection, QuestionBatch, QuizCreate
+    from src.quiz.service import create_quiz
+    from tests.conftest import create_user_in_session
+
+    user = create_user_in_session(session)
+
+    # Create a 500-character string
+    max_length_text = "A" * 500
+
+    quiz_data = QuizCreate(
+        canvas_course_id=123,
+        canvas_course_name="Max Length Custom Instructions Course",
+        selected_modules={
+            "456": ModuleSelection(
+                name="Module 1",
+                question_batches=[
+                    QuestionBatch(
+                        question_type=QuestionType.MULTIPLE_CHOICE,
+                        count=10,
+                        difficulty=QuestionDifficulty.MEDIUM,
+                    )
+                ],
+            )
+        },
+        title="Max Length Custom Instructions Quiz",
+        custom_instructions=max_length_text,
+    )
+
+    quiz = create_quiz(session, quiz_data, user.id)
+
+    # Verify max length custom instructions are saved
+    assert quiz.custom_instructions == max_length_text
+    assert len(quiz.custom_instructions) == 500
+
+
+def test_create_quiz_with_custom_instructions_and_tone(session: Session):
+    """Test quiz creation with both custom instructions and tone."""
+    from src.question.types import QuestionDifficulty, QuestionType
+    from src.quiz.schemas import ModuleSelection, QuestionBatch, QuizCreate, QuizTone
+    from src.quiz.service import create_quiz
+    from tests.conftest import create_user_in_session
+
+    user = create_user_in_session(session)
+
+    quiz_data = QuizCreate(
+        canvas_course_id=123,
+        canvas_course_name="Custom Instructions with Tone Course",
+        selected_modules={
+            "456": ModuleSelection(
+                name="Module 1",
+                question_batches=[
+                    QuestionBatch(
+                        question_type=QuestionType.MULTIPLE_CHOICE,
+                        count=10,
+                        difficulty=QuestionDifficulty.MEDIUM,
+                    )
+                ],
+            )
+        },
+        title="Custom Instructions with Tone Quiz",
+        tone=QuizTone.ENCOURAGING,
+        custom_instructions="Use nursing scenarios for all questions",
+    )
+
+    quiz = create_quiz(session, quiz_data, user.id)
+
+    # Verify both tone and custom instructions are saved
+    assert quiz.tone == QuizTone.ENCOURAGING
+    assert quiz.custom_instructions == "Use nursing scenarios for all questions"
+
+
+def test_create_quiz_with_custom_instructions_tone_and_language(session: Session):
+    """Test quiz creation with custom instructions, tone, and language."""
+    from src.question.types import QuestionDifficulty, QuestionType, QuizLanguage
+    from src.quiz.schemas import ModuleSelection, QuestionBatch, QuizCreate, QuizTone
+    from src.quiz.service import create_quiz
+    from tests.conftest import create_user_in_session
+
+    user = create_user_in_session(session)
+
+    quiz_data = QuizCreate(
+        canvas_course_id=123,
+        canvas_course_name="Full Settings Course",
+        selected_modules={
+            "456": ModuleSelection(
+                name="Modul 1",
+                question_batches=[
+                    QuestionBatch(
+                        question_type=QuestionType.MULTIPLE_CHOICE,
+                        count=10,
+                        difficulty=QuestionDifficulty.MEDIUM,
+                    )
+                ],
+            )
+        },
+        title="Full Settings Quiz",
+        language=QuizLanguage.NORWEGIAN,
+        tone=QuizTone.PROFESSIONAL,
+        custom_instructions="Bruk eksempler fra norsk helsevesen",
+    )
+
+    quiz = create_quiz(session, quiz_data, user.id)
+
+    # Verify all settings are saved
+    assert quiz.language == QuizLanguage.NORWEGIAN
+    assert quiz.tone == QuizTone.PROFESSIONAL
+    assert quiz.custom_instructions == "Bruk eksempler fra norsk helsevesen"
+
+
+def test_prepare_question_generation_includes_custom_instructions(session: Session):
+    """Test that prepare_question_generation includes custom_instructions."""
+    from src.quiz.service import prepare_question_generation
+    from tests.conftest import create_quiz_in_session
+
+    # Create quiz with custom instructions
+    selected_modules = {
+        "module_1": {
+            "name": "Introduction",
+            "question_batches": [{"question_type": "multiple_choice", "count": 30}],
+        },
+    }
+
+    quiz = create_quiz_in_session(
+        session,
+        selected_modules=selected_modules,
+        llm_model="gpt-4",
+        llm_temperature=0.8,
+        custom_instructions="Focus on application-level questions",
+    )
+
+    with patch(
+        "src.quiz.service.validate_quiz_for_question_generation"
+    ) as mock_validate:
+        mock_validate.return_value = quiz
+
+        result = prepare_question_generation(session, quiz.id, quiz.owner_id)
+
+    # Verify custom_instructions is included in generation parameters
+    assert result["custom_instructions"] == "Focus on application-level questions"
+    assert result["question_count"] == 30
+    assert result["llm_model"] == "gpt-4"
+
+
+def test_prepare_question_generation_with_none_custom_instructions(session: Session):
+    """Test that prepare_question_generation handles None custom_instructions."""
+    from src.quiz.service import prepare_question_generation
+    from tests.conftest import create_quiz_in_session
+
+    # Create quiz without custom instructions
+    selected_modules = {
+        "module_1": {
+            "name": "Introduction",
+            "question_batches": [{"question_type": "multiple_choice", "count": 20}],
+        },
+    }
+
+    quiz = create_quiz_in_session(
+        session,
+        selected_modules=selected_modules,
+        llm_model="gpt-4",
+        llm_temperature=0.7,
+        # No custom_instructions
+    )
+
+    with patch(
+        "src.quiz.service.validate_quiz_for_question_generation"
+    ) as mock_validate:
+        mock_validate.return_value = quiz
+
+        result = prepare_question_generation(session, quiz.id, quiz.owner_id)
+
+    # Verify custom_instructions is None or not present
+    assert result.get("custom_instructions") is None
+    assert result["question_count"] == 20

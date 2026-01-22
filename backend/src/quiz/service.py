@@ -425,6 +425,7 @@ def prepare_question_generation(
         "llm_temperature": quiz.llm_temperature,
         "language": quiz.language,
         "tone": quiz.tone,
+        "custom_instructions": quiz.custom_instructions,
     }
 
 
