@@ -230,6 +230,11 @@
     "retryStarted": "Ny forsøk på feilede grupper startet",
     "generationStarted": "Spørsmålsgenerering startet"
   },
+  "batchRegeneration": {
+    "regenerateAriaLabel": "Regenerer denne gruppen",
+    "regenerateTooltip": "Generer flere spørsmål for denne gruppen",
+    "started": "Gruppegenerering startet"
+  },
   "questionTypeBreakdown": {
     "batchesGeneratedByLLM": "Grupper generert av LLM",
     "noQuestionTypesConfigured": "Ingen spørsmålstyper konfigurert",

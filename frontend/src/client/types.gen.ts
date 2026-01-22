@@ -399,6 +399,28 @@ export type QuizUpdate = {
 }
 
 /**
+ * Request schema for regenerating a single batch of questions.
+ */
+export type RegenerateBatchRequest = {
+  /**
+   * Module ID for the batch to regenerate
+   */
+  module_id: string
+  /**
+   * Question type to regenerate
+   */
+  question_type: QuestionType
+  /**
+   * Number of questions to generate (1-20)
+   */
+  count: number
+  /**
+   * Difficulty level for questions
+   */
+  difficulty: QuestionDifficulty
+}
+
+/**
  * Public user information schema.
  */
 export type UserPublic = {
@@ -570,6 +592,15 @@ export type QuizTriggerQuestionGenerationData = {
 }
 
 export type QuizTriggerQuestionGenerationResponse = {
+  [key: string]: string
+}
+
+export type QuizRegenerateSingleBatchData = {
+  quizId: string
+  requestBody: RegenerateBatchRequest
+}
+
+export type QuizRegenerateSingleBatchResponse = {
   [key: string]: string
 }
 

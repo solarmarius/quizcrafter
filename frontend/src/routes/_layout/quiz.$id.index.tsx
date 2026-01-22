@@ -137,7 +137,11 @@ function QuizInformation() {
             </HStack>
             <VStack align="stretch" gap={2}>
               <Box>
-                <QuestionTypeBreakdown quiz={quiz} variant="detailed" />
+                <QuestionTypeBreakdown
+                  quiz={quiz}
+                  variant="detailed"
+                  showRegenerateButtons
+                />
               </Box>
             </VStack>
             <HStack justify="space-between">
