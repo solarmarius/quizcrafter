@@ -587,17 +587,19 @@ export class QuestionsService {
 
   /**
    * Delete Question
-   * Delete a question from the quiz.
+   * Delete a question from the quiz with optional rejection feedback.
    *
    * **Parameters:**
    * quiz_id: Quiz identifier
    * question_id: Question identifier
+   * request_body: Optional rejection reason and feedback
    *
    * **Returns:**
    * Confirmation message
    * @param data The data for the request.
    * @param data.quizId
    * @param data.questionId
+   * @param data.requestBody
    * @returns string Successful Response
    * @throws ApiError
    */
@@ -611,6 +613,8 @@ export class QuestionsService {
         quiz_id: data.quizId,
         question_id: data.questionId,
       },
+      body: data.requestBody,
+      mediaType: "application/json",
       errors: {
         422: "Validation Error",
       },

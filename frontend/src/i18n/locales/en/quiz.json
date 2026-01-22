@@ -344,6 +344,25 @@
     "questionApproved": "Question approved",
     "questionUpdated": "Question updated",
     "questionRejected": "Question rejected",
+    "rejection": {
+      "dialogTitle": "Reject Question",
+      "prompt": "Why are you rejecting this question?",
+      "reasons": {
+        "incorrect_answer": "Incorrect answer",
+        "poor_wording": "Poor wording",
+        "irrelevant_content": "Irrelevant to content",
+        "duplicate_question": "Duplicate question",
+        "too_easy": "Too easy",
+        "too_hard": "Too hard",
+        "quota_reached": "Have enough questions",
+        "topic_coverage": "Topic already covered",
+        "other": "Other"
+      },
+      "feedbackLabel": "Add additional feedback (optional)",
+      "feedbackPlaceholder": "Tell us more about why this question doesn't work...",
+      "cancel": "Cancel",
+      "confirm": "Reject"
+    },
     "filter": {
       "all": "All",
       "approved": "Approved",
