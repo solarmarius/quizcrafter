@@ -122,16 +122,20 @@ export function QuestionReview({
       }
     }
 
-    const modules = Array.from(moduleSet).map((id) => ({
-      id,
-      name: selectedModules?.[id]?.name || `Module ${id}`,
-    }))
+    const modules = Array.from(moduleSet)
+      .map((id) => ({
+        id,
+        name:
+          selectedModules?.[id]?.name ||
+          t("questionTypeBreakdown.moduleFallback", { id }),
+      }))
+      .sort((a, b) => a.name.localeCompare(b.name))
 
     return {
       availableModules: modules,
       availableQuestionTypes: Array.from(typeSet),
     }
-  }, [questions, selectedModules])
+  }, [questions, selectedModules, t])
 
   // Filter questions based on current view and calculate counts
   const { filteredQuestions, pendingCount, totalCount, filteredCount } =
