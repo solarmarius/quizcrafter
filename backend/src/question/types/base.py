@@ -33,6 +33,7 @@ class QuestionType(str, Enum):
     """
 
     MULTIPLE_CHOICE = "multiple_choice"
+    MULTIPLE_ANSWER = "multiple_answer"
     FILL_IN_BLANK = "fill_in_blank"
     MATCHING = "matching"
     CATEGORIZATION = "categorization"
