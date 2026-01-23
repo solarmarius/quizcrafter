@@ -646,3 +646,154 @@ async def unapprove_question(session: AsyncSession, question_id: UUID) -> bool:
         quiz_id=str(question.quiz_id),
     )
     return True
+
+
+async def bulk_approve_questions(
+    session: AsyncSession,
+    quiz_id: UUID,
+    question_ids: list[UUID],
+) -> dict[str, Any]:
+    """
+    Approve multiple questions in a single transaction.
+
+    Args:
+        session: Database session
+        quiz_id: Quiz identifier to verify question ownership
+        question_ids: List of question IDs to approve
+
+    Returns:
+        Dictionary with success_count, failed_count, failed_ids, and message
+    """
+    logger.info(
+        "bulk_approve_started",
+        quiz_id=str(quiz_id),
+        question_count=len(question_ids),
+    )
+
+    # Fetch all questions that match the criteria
+    result = await session.execute(
+        select(Question).where(
+            Question.id.in_(question_ids),  # type: ignore[attr-defined]
+            Question.quiz_id == quiz_id,
+            Question.deleted == False,  # noqa: E712
+        )
+    )
+    questions = list(result.scalars().all())
+
+    # Track which IDs were found
+    found_ids = {q.id for q in questions}
+    failed_ids = [qid for qid in question_ids if qid not in found_ids]
+
+    # Approve questions that aren't already approved
+    now = datetime.now(timezone.utc)
+    approved_count = 0
+    for question in questions:
+        if not question.is_approved:
+            question.is_approved = True
+            question.approved_at = now
+            question.updated_at = now
+            session.add(question)
+            approved_count += 1
+
+    await session.commit()
+
+    success_count = len(found_ids)
+    failed_count = len(failed_ids)
+
+    logger.info(
+        "bulk_approve_completed",
+        quiz_id=str(quiz_id),
+        success_count=success_count,
+        failed_count=failed_count,
+        newly_approved=approved_count,
+    )
+
+    return {
+        "success_count": success_count,
+        "failed_count": failed_count,
+        "failed_ids": failed_ids,
+        "message": f"Approved {success_count} questions"
+        + (f", {failed_count} not found" if failed_count else ""),
+    }
+
+
+async def bulk_delete_questions(
+    session: AsyncSession,
+    quiz_id: UUID,
+    question_ids: list[UUID],
+    rejection_reason: str | None = None,
+    rejection_feedback: str | None = None,
+) -> dict[str, Any]:
+    """
+    Soft-delete multiple questions in a single transaction.
+
+    Args:
+        session: Database session
+        quiz_id: Quiz identifier to verify question ownership
+        question_ids: List of question IDs to delete
+        rejection_reason: Optional reason for rejection (applies to all questions)
+        rejection_feedback: Optional free-text feedback (applies to all questions)
+
+    Returns:
+        Dictionary with success_count, failed_count, failed_ids, and message
+    """
+    logger.info(
+        "bulk_delete_started",
+        quiz_id=str(quiz_id),
+        question_count=len(question_ids),
+        rejection_reason=rejection_reason,
+    )
+
+    # Fetch all questions that match the criteria (not already deleted)
+    result = await session.execute(
+        select(Question).where(
+            Question.id.in_(question_ids),  # type: ignore[attr-defined]
+            Question.quiz_id == quiz_id,
+            Question.deleted == False,  # noqa: E712
+        )
+    )
+    questions = list(result.scalars().all())
+
+    # Track which IDs were found and not already deleted
+    found_ids = {q.id for q in questions}
+    failed_ids = [qid for qid in question_ids if qid not in found_ids]
+
+    # Soft-delete all found questions
+    now = datetime.now(timezone.utc)
+    for question in questions:
+        question.deleted = True
+        question.deleted_at = now
+        if rejection_reason:
+            question.rejection_reason = rejection_reason
+        if rejection_feedback:
+            question.rejection_feedback = rejection_feedback
+        session.add(question)
+
+    # Decrement quiz question count before committing
+    success_count = len(found_ids)
+    if success_count > 0:
+        from src.quiz.service import get_quiz_for_update
+
+        quiz = await get_quiz_for_update(session, quiz_id)
+        if quiz:
+            quiz.question_count = max(0, quiz.question_count - success_count)
+
+    await session.commit()
+
+    failed_count = len(failed_ids)
+
+    logger.info(
+        "bulk_delete_completed",
+        quiz_id=str(quiz_id),
+        success_count=success_count,
+        failed_count=failed_count,
+        rejection_reason=rejection_reason,
+    )
+
+    return {
+        "success_count": success_count,
+        "failed_count": failed_count,
+        "failed_ids": failed_ids,
+        "message": f"Deleted {success_count} questions"
+        + (f", {failed_count} not found or already deleted" if failed_count else ""),
+    }

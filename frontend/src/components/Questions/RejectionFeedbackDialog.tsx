@@ -41,6 +41,8 @@ interface RejectionFeedbackDialogProps {
   onReject: (reason: RejectionReason, feedback?: string) => void
   /** Whether the rejection is in progress */
   isLoading: boolean
+  /** Number of questions being rejected in bulk mode (undefined for single question) */
+  bulkCount?: number
 }
 
 /**
@@ -53,12 +55,15 @@ export function RejectionFeedbackDialog({
   onClose,
   onReject,
   isLoading,
+  bulkCount,
 }: RejectionFeedbackDialogProps) {
   const { t } = useTranslation("quiz")
   const [selectedReason, setSelectedReason] = useState<RejectionReason | null>(
     null,
   )
   const [feedback, setFeedback] = useState("")
+
+  const isBulkMode = bulkCount !== undefined && bulkCount > 0
 
   const handleSubmit = () => {
     if (!selectedReason) return
@@ -71,6 +76,14 @@ export function RejectionFeedbackDialog({
     setFeedback("")
     onClose()
   }
+
+  const dialogTitle = isBulkMode
+    ? t("questions.bulk.rejectDialogTitle", { count: bulkCount })
+    : t("questions.rejection.dialogTitle")
+
+  const dialogPrompt = isBulkMode
+    ? t("questions.bulk.rejectDialogMessage", { count: bulkCount })
+    : t("questions.rejection.prompt")
 
   const reasonLabels: Record<RejectionReason, string> = {
     [REJECTION_REASONS.INCORRECT_ANSWER]: t(
@@ -111,11 +124,11 @@ export function RejectionFeedbackDialog({
       <DialogContent>
         <DialogCloseTrigger disabled={isLoading} />
         <DialogHeader>
-          <DialogTitle>{t("questions.rejection.dialogTitle")}</DialogTitle>
+          <DialogTitle>{dialogTitle}</DialogTitle>
         </DialogHeader>
         <DialogBody>
           <VStack gap={4} align="stretch">
-            <Text>{t("questions.rejection.prompt")}</Text>
+            <Text>{dialogPrompt}</Text>
 
             <RadioGroup
               value={selectedReason ?? undefined}

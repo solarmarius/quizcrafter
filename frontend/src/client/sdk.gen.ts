@@ -4,65 +4,69 @@ import type { CancelablePromise } from "./core/CancelablePromise"
 import { OpenAPI } from "./core/OpenAPI"
 import { request as __request } from "./core/request"
 import type {
-  AuthAuthCanvasResponse,
   AuthLoginCanvasResponse,
+  AuthAuthCanvasResponse,
   AuthLogoutCanvasResponse,
+  CanvasGetCoursesResponse,
   CanvasGetCourseModulesData,
   CanvasGetCourseModulesResponse,
-  CanvasGetCoursesResponse,
-  CanvasGetFileInfoData,
-  CanvasGetFileInfoResponse,
   CanvasGetModuleItemsData,
   CanvasGetModuleItemsResponse,
   CanvasGetPageContentData,
   CanvasGetPageContentResponse,
-  QuestionsApproveQuestionData,
-  QuestionsApproveQuestionResponse,
-  QuestionsCreateQuestionData,
-  QuestionsCreateQuestionResponse,
-  QuestionsDeleteQuestionData,
-  QuestionsDeleteQuestionResponse,
-  QuestionsGetQuestionData,
-  QuestionsGetQuestionResponse,
+  CanvasGetFileInfoData,
+  CanvasGetFileInfoResponse,
   QuestionsGetQuizQuestionsData,
   QuestionsGetQuizQuestionsResponse,
+  QuestionsCreateQuestionData,
+  QuestionsCreateQuestionResponse,
+  QuestionsGetQuestionData,
+  QuestionsGetQuestionResponse,
   QuestionsUpdateQuestionData,
   QuestionsUpdateQuestionResponse,
+  QuestionsDeleteQuestionData,
+  QuestionsDeleteQuestionResponse,
+  QuestionsApproveQuestionData,
+  QuestionsApproveQuestionResponse,
+  QuestionsBulkApproveQuestionsData,
+  QuestionsBulkApproveQuestionsResponse,
+  QuestionsBulkDeleteQuestionsData,
+  QuestionsBulkDeleteQuestionsResponse,
+  QuizGetUserQuizzesEndpointResponse,
   QuizCreateNewQuizData,
   QuizCreateNewQuizResponse,
+  QuizUploadManualModuleData,
+  QuizUploadManualModuleResponse,
+  QuizGetQuizData,
+  QuizGetQuizResponse,
+  QuizUpdateQuizEndpointData,
+  QuizUpdateQuizEndpointResponse,
   QuizDeleteQuizEndpointData,
   QuizDeleteQuizEndpointResponse,
-  QuizExportQuizToCanvasData,
-  QuizExportQuizToCanvasResponse,
-  QuizGetQuizData,
-  QuizGetQuizQuestionStatsData,
-  QuizGetQuizQuestionStatsResponse,
-  QuizGetQuizResponse,
-  QuizGetUserQuizzesEndpointResponse,
+  QuizTriggerContentExtractionData,
+  QuizTriggerContentExtractionResponse,
+  QuizTriggerQuestionGenerationData,
+  QuizTriggerQuestionGenerationResponse,
   QuizRegenerateSingleBatchData,
   QuizRegenerateSingleBatchResponse,
-  QuizSharingAcceptInviteData,
-  QuizSharingAcceptInviteResponse,
+  QuizGetQuizQuestionStatsData,
+  QuizGetQuizQuestionStatsResponse,
+  QuizExportQuizToCanvasData,
+  QuizExportQuizToCanvasResponse,
   QuizSharingCreateInviteData,
   QuizSharingCreateInviteResponse,
-  QuizSharingGetInviteInfoData,
-  QuizSharingGetInviteInfoResponse,
   QuizSharingListCollaboratorsData,
   QuizSharingListCollaboratorsResponse,
   QuizSharingRemoveCollaboratorEndpointData,
   QuizSharingRemoveCollaboratorEndpointResponse,
   QuizSharingRevokeInviteEndpointData,
   QuizSharingRevokeInviteEndpointResponse,
-  QuizTriggerContentExtractionData,
-  QuizTriggerContentExtractionResponse,
-  QuizTriggerQuestionGenerationData,
-  QuizTriggerQuestionGenerationResponse,
-  QuizUpdateQuizEndpointData,
-  QuizUpdateQuizEndpointResponse,
-  QuizUploadManualModuleData,
-  QuizUploadManualModuleResponse,
-  UsersDeleteUserMeResponse,
+  QuizSharingGetInviteInfoData,
+  QuizSharingGetInviteInfoResponse,
+  QuizSharingAcceptInviteData,
+  QuizSharingAcceptInviteResponse,
   UsersReadUserMeResponse,
+  UsersDeleteUserMeResponse,
   UsersUpdateUserMeData,
   UsersUpdateUserMeResponse,
   UtilsHealthCheckResponse,
@@ -647,6 +651,72 @@ export class QuestionsService {
         quiz_id: data.quizId,
         question_id: data.questionId,
       },
+      errors: {
+        422: "Validation Error",
+      },
+    })
+  }
+
+  /**
+   * Bulk Approve Questions
+   * Approve multiple questions at once.
+   *
+   * **Parameters:**
+   * quiz_id: Quiz identifier
+   * request: List of question IDs to approve
+   *
+   * **Returns:**
+   * Operation result with success/failure counts
+   * @param data The data for the request.
+   * @param data.quizId
+   * @param data.requestBody
+   * @returns BulkOperationResponse Successful Response
+   * @throws ApiError
+   */
+  public static bulkApproveQuestions(
+    data: QuestionsBulkApproveQuestionsData,
+  ): CancelablePromise<QuestionsBulkApproveQuestionsResponse> {
+    return __request(OpenAPI, {
+      method: "PUT",
+      url: "/questions/{quiz_id}/bulk-approve",
+      path: {
+        quiz_id: data.quizId,
+      },
+      body: data.requestBody,
+      mediaType: "application/json",
+      errors: {
+        422: "Validation Error",
+      },
+    })
+  }
+
+  /**
+   * Bulk Delete Questions
+   * Delete multiple questions at once with optional rejection feedback.
+   *
+   * **Parameters:**
+   * quiz_id: Quiz identifier
+   * request: List of question IDs and optional rejection details
+   *
+   * **Returns:**
+   * Operation result with success/failure counts
+   * @param data The data for the request.
+   * @param data.quizId
+   * @param data.requestBody
+   * @returns BulkOperationResponse Successful Response
+   * @throws ApiError
+   */
+  public static bulkDeleteQuestions(
+    data: QuestionsBulkDeleteQuestionsData,
+  ): CancelablePromise<QuestionsBulkDeleteQuestionsResponse> {
+    return __request(OpenAPI, {
+      method: "POST",
+      url: "/questions/{quiz_id}/bulk-delete",
+      path: {
+        quiz_id: data.quizId,
+      },
+      body: data.requestBody,
+      mediaType: "application/json",
       errors: {
         422: "Validation Error",
       },

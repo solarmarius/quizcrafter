@@ -380,6 +380,18 @@
       "readyToExport": "Ready to export to Canvas",
       "ownerOnlyExport": "Only the quiz owner can export to Canvas"
     },
+    "bulk": {
+      "selected": "{{count}} selected",
+      "selectAll": "Select All ({{count}})",
+      "clearSelection": "Clear",
+      "approveSelected": "Approve Selected",
+      "rejectSelected": "Delete Selected",
+      "selectToStart": "Select questions to perform bulk actions",
+      "approveSuccess": "{{count}} questions approved",
+      "rejectSuccess": "{{count}} questions deleted",
+      "rejectDialogTitle": "Deleted {{count}} Questions",
+      "rejectDialogMessage": "Are you sure you want to delete {{count}} questions?"
+    },
     "editor": {
       "questionText": "Question Text",
       "answerOptions": "Answer Options",

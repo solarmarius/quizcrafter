@@ -30,6 +30,56 @@ export type Body_quiz_upload_manual_module = {
 }
 
 /**
+ * Schema for bulk approving multiple questions.
+ */
+export type BulkApproveRequest = {
+  /**
+   * List of question IDs to approve
+   */
+  question_ids: Array<string>
+}
+
+/**
+ * Schema for bulk deleting/rejecting multiple questions.
+ */
+export type BulkDeleteRequest = {
+  /**
+   * List of question IDs to delete
+   */
+  question_ids: Array<string>
+  /**
+   * Reason for rejection (applies to all questions)
+   */
+  rejection_reason?: RejectionReason | null
+  /**
+   * Additional feedback for rejection
+   */
+  rejection_feedback?: string | null
+}
+
+/**
+ * Response schema for bulk operations.
+ */
+export type BulkOperationResponse = {
+  /**
+   * Number of questions successfully processed
+   */
+  success_count: number
+  /**
+   * Number of questions that failed to process
+   */
+  failed_count: number
+  /**
+   * IDs of questions that failed
+   */
+  failed_ids?: Array<string>
+  /**
+   * Summary message of the operation
+   */
+  message: string
+}
+
+/**
  * Canvas course information.
  */
 export type CanvasCourse = {
@@ -576,6 +626,20 @@ export type QuestionsApproveQuestionData = {
 }
 
 export type QuestionsApproveQuestionResponse = QuestionResponse
+
+export type QuestionsBulkApproveQuestionsData = {
+  quizId: string
+  requestBody: BulkApproveRequest
+}
+
+export type QuestionsBulkApproveQuestionsResponse = BulkOperationResponse
+
+export type QuestionsBulkDeleteQuestionsData = {
+  quizId: string
+  requestBody: BulkDeleteRequest
+}
+
+export type QuestionsBulkDeleteQuestionsResponse = BulkOperationResponse
 
 export type QuizGetUserQuizzesEndpointResponse = Array<Quiz>
 
