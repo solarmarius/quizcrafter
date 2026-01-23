@@ -1935,10 +1935,10 @@ def validate_multiple_answer_question(entry: dict):
         )
 
     choices = interaction_data["choices"]
-    if not isinstance(choices, list) or len(choices) < 5:
+    if not isinstance(choices, list) or len(choices) != 5:
         raise HTTPException(
             status_code=400,
-            detail="item[entry][interaction_data][choices] must have at least 5 choices for multi-answer questions",
+            detail="item[entry][interaction_data][choices] must have exactly 5 choices for multi-answer questions",
         )
 
     # Validate each choice

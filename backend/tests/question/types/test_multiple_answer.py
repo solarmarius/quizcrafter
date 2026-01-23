@@ -655,9 +655,6 @@ def test_multiple_answer_question_type_format_for_canvas_different_answer_counts
     )
 
     question_type = MultipleAnswerQuestionType()
-    uuid_pattern = (
-        r"^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
-    )
 
     # Test 2 correct answers
     data_2 = MultipleAnswerData(
