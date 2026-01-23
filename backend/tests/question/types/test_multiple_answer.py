@@ -590,7 +590,6 @@ def test_multiple_answer_question_type_format_for_canvas():
     # Validate properties
     properties = result["properties"]
     assert properties["shuffle_rules"]["choices"]["shuffled"] is True
-    assert properties["vary_points_by_answer"] is False
 
     # Validate feedback - should be empty when no explanation
     assert result["feedback"] == {}

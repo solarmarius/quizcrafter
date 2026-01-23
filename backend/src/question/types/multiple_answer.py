@@ -172,7 +172,6 @@ class MultipleAnswerQuestionType(BaseQuestionType):
             "interaction_data": {"choices": choices},
             "properties": {
                 "shuffle_rules": {"choices": {"shuffled": True}},
-                "vary_points_by_answer": False,
             },
             "scoring_data": {"value": correct_uuids},  # Array of UUIDs for multi-answer
             "scoring_algorithm": CanvasScoringAlgorithm.ALL_OR_NOTHING,
