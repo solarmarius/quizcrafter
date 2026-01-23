@@ -4,7 +4,7 @@ import { extractQuestionData } from "@/types/questionTypes"
 import { Badge, Box, HStack, Icon, Text, VStack } from "@chakra-ui/react"
 import { memo } from "react"
 import { useTranslation } from "react-i18next"
-import { LuSquareCheck, LuSquare } from "react-icons/lu"
+import { LuSquare, LuSquareCheck } from "react-icons/lu"
 import { ExplanationBox } from "../shared/ExplanationBox"
 
 interface MultipleAnswerDisplayProps {

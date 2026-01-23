@@ -123,6 +123,14 @@ export function HelpPanel() {
                 {t("panels.help.helpfulLinks.githubRepo")}
                 <LuExternalLink />
               </Link>
+              <Link
+                href={getLocalizedRoute(LOCALIZED_ROUTES.questionTypes)}
+                fontSize="sm"
+                color="blue.600"
+                _hover={{ textDecoration: "underline" }}
+              >
+                {t("panels.help.helpfulLinks.questionTypes")}
+              </Link>
             </VStack>
           </Box>
 

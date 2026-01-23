@@ -9,4 +9,8 @@ export const LOCALIZED_ROUTES: Record<string, Record<UILanguage, string>> = {
     [UI_LANGUAGES.ENGLISH]: "/privacy-policy",
     [UI_LANGUAGES.NORWEGIAN]: "/privacy-policy-no",
   },
+  questionTypes: {
+    [UI_LANGUAGES.ENGLISH]: "/question-types",
+    [UI_LANGUAGES.NORWEGIAN]: "/question-types-no",
+  },
 }

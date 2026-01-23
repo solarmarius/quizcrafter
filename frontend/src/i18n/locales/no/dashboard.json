@@ -36,7 +36,8 @@
         "title": "Nyttige lenker",
         "canvasUit": "Canvas UiT",
         "contactDeveloper": "Kontakt utvikler",
-        "githubRepo": "GitHub-repository"
+        "githubRepo": "GitHub-repository",
+        "questionTypes": "Guide til spørsmålstypene vi støtter"
       },
       "tips": {
         "title": "Tips for beste resultater",

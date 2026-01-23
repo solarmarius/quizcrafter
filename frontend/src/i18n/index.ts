@@ -7,6 +7,7 @@ import enCommon from "./locales/en/common.json"
 import enCreation from "./locales/en/creation.json"
 import enDashboard from "./locales/en/dashboard.json"
 import enNavigation from "./locales/en/navigation.json"
+import enQuestionTypes from "./locales/en/questionTypes.json"
 import enQuiz from "./locales/en/quiz.json"
 import enValidation from "./locales/en/validation.json"
 
@@ -15,6 +16,7 @@ import noCommon from "./locales/no/common.json"
 import noCreation from "./locales/no/creation.json"
 import noDashboard from "./locales/no/dashboard.json"
 import noNavigation from "./locales/no/navigation.json"
+import noQuestionTypes from "./locales/no/questionTypes.json"
 import noQuiz from "./locales/no/quiz.json"
 import noValidation from "./locales/no/validation.json"
 
@@ -40,6 +42,7 @@ const resources = {
     creation: enCreation,
     dashboard: enDashboard,
     validation: enValidation,
+    questionTypes: enQuestionTypes,
   },
   no: {
     common: noCommon,
@@ -48,6 +51,7 @@ const resources = {
     creation: noCreation,
     dashboard: noDashboard,
     validation: noValidation,
+    questionTypes: noQuestionTypes,
   },
 }
 
@@ -58,7 +62,15 @@ i18n
     resources,
     fallbackLng: "en",
     defaultNS: "common",
-    ns: ["common", "navigation", "quiz", "creation", "dashboard", "validation"],
+    ns: [
+      "common",
+      "navigation",
+      "quiz",
+      "creation",
+      "dashboard",
+      "validation",
+      "questionTypes",
+    ],
 
     detection: {
       order: ["localStorage", "navigator"],

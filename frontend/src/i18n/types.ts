@@ -4,6 +4,7 @@ import type enCommon from "./locales/en/common.json"
 import type enCreation from "./locales/en/creation.json"
 import type enDashboard from "./locales/en/dashboard.json"
 import type enNavigation from "./locales/en/navigation.json"
+import type enQuestionTypes from "./locales/en/questionTypes.json"
 import type enQuiz from "./locales/en/quiz.json"
 import type enValidation from "./locales/en/validation.json"
 
@@ -17,6 +18,7 @@ declare module "i18next" {
       creation: typeof enCreation
       dashboard: typeof enDashboard
       validation: typeof enValidation
+      questionTypes: typeof enQuestionTypes
     }
   }
 }

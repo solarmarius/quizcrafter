@@ -1,0 +1,99 @@
+{
+  "page": {
+    "title": "Guide til spørsmåltypene i QuizCrafter",
+    "subtitle": "Laer om de ulike sporsmaltypene i QuizCrafter",
+    "intro": "QuizCrafter støtter 6 ulike spørsmaltyper, hver med spesifikke valideringsregler og Canvas scoringssystem og poeng."
+  },
+  "sections": {
+    "validation": "Valideringsregler",
+    "canvas": "Eksportering til Canvas",
+    "example": "Eksempel"
+  },
+  "types": {
+    "multipleChoice": {
+      "name": "Flervalg",
+      "description": "Et spærsmal med 4 svaralternativer (A, B, C, D) der nøyaktig ett svar er riktig.",
+      "validation": {
+        "options": "4 alternativer kreves (A, B, C, D)",
+        "optionLength": "Hvert alternativ må være mellom 1-500 tegn",
+        "correctAnswer": "Nøyaktig 1 riktig svar",
+        "questionLength": "Spørsmaltekst må være mellom 1-2000 tegn"
+      },
+      "canvas": {
+        "points": "1 poeng",
+        "scoring": "Alt-eller-ingenting"
+      }
+    },
+    "multipleAnswer": {
+      "name": "Flersvar",
+      "description": "Et spørsmal med 5 svaralternativer (A, B, C, D, E) der 2-4 svar er riktige. Studenter må velge alle riktige svar for a få ett poeng.",
+      "validation": {
+        "options": "Nøyaktig 5 alternativer påkreves (A, B, C, D, E)",
+        "optionLength": "Hvert alternativ må være mellom 1-500 tegn",
+        "correctAnswers": "2-4 riktige svar kreves",
+        "questionLength": "Spørsmaltekst må være mellom 1-2000 tegn"
+      },
+      "canvas": {
+        "points": "1 poeng",
+        "scoring": "Alt-eller-ingenting"
+      }
+    },
+    "trueFalse": {
+      "name": "Sant/Usant",
+      "description": "En enkel påstand som studenter vurderer som enten sant eller usant.",
+      "validation": {
+        "statement": "Spørsmaltekst er påstanden som skal vurderes",
+        "correctAnswer": "Svar må være sant eller usant",
+        "questionLength": "Spørsmålsteksten må være mellom 1-2000 tegn"
+      },
+      "canvas": {
+        "points": "1 poeng",
+        "scoring": "Alt-eller-ingenting"
+      }
+    },
+    "matching": {
+      "name": "Kobling",
+      "description": "Studenter kobler elementer fra venstre kolonne til tilhørende elementer i høyre kolonne. Støtter delvis poenggiving.",
+      "validation": {
+        "pairs": "3-10 koblingspar kreves",
+        "distractors": "0-5 valgfrie distraktører (ekstra feil svar)",
+        "uniqueness": "Ingen dupliserte elementer fra venstre og høyre kolonne tillatt",
+        "itemLength": "Hvert element må være mellom 1-500 tegn"
+      },
+      "canvas": {
+        "points": "1 poeng per like par",
+        "scoring": "Delvis poenggiving (1 poeng per riktig kobling)"
+      }
+    },
+    "fillInBlank": {
+      "name": "Fyll inn",
+      "description": "Spørsmal med ett eller flere tomrom som studenter må fylle ut med riktig tekst. Støtter flere akseptable svar per tomrom.",
+      "validation": {
+        "blanks": "1-10 blanke svar per spørsmal",
+        "blankFormat": "Bruk [blank_1], [blank_2] osv. i spørsmalteksten",
+        "variations": "Opptil 10 svarvariasjoner per tomrom"
+      },
+      "canvas": {
+        "points": "1 poeng per riktige blanke",
+        "scoring": "Hvert tomrom gis poeng uavhengig"
+      }
+    },
+    "categorization": {
+      "name": "Kategorisering",
+      "description": "Studenter sorterer elementer i riktige kategorier. Støtter delvis poenggivning",
+      "validation": {
+        "categories": "2-8 kategorier kreves",
+        "items": "4-20 elementer per kategori",
+        "itemsPerCategory": "Hver kategori må ha minst 1 element",
+        "distractors": "0-5 valgfrie distraktører (elementer som ikke passer i noen kategori)"
+      },
+      "canvas": {
+        "points": "1 poeng per korrekte kategorier (alle riktige elementer må være inni)",
+        "scoring": "Hver kategori gis poeng som alt-eller-ingenting"
+      }
+    }
+  },
+  "common": {
+    "learnMore": "Lær mer om spørsmålstypene vi støtter"
+  }
+}
