@@ -368,6 +368,15 @@
       "approved": "Godkjente",
       "pending": "Ventende"
     },
+    "filters": {
+      "filterButton": "Filtrer spørsmål",
+      "byModule": "Filtrer etter modul",
+      "byType": "Filtrer etter type",
+      "showing": "Viser {{count}} av {{total}}",
+      "clearAll": "Fjern filtre",
+      "noResults": "Ingen spørsmål matcher gjeldende filtre",
+      "tryDifferent": "Prøv å justere filtervalget for å se flere spørsmål."
+    },
     "stats": {
       "approved": "{{count}} av {{total}} spørsmål godkjent",
       "progress": "Fremgang",

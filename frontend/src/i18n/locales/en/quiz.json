@@ -368,6 +368,15 @@
       "approved": "Approved",
       "pending": "Pending"
     },
+    "filters": {
+      "filterButton": "Filter questions",
+      "byModule": "Filter by Module",
+      "byType": "Filter by Type",
+      "showing": "Showing {{count}} of {{total}}",
+      "clearAll": "Clear Filters",
+      "noResults": "No questions match the current filters",
+      "tryDifferent": "Try adjusting your filter selection to see more questions."
+    },
     "stats": {
       "approved": "{{count}} of {{total}} questions approved",
       "progress": "Progress",

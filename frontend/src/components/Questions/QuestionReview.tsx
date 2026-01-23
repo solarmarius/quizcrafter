@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next"
 
 import {
   type QuestionResponse,
+  type QuestionType,
   type QuestionUpdateRequest,
   QuestionsService,
   type QuizStatus,
@@ -18,6 +19,7 @@ import {
 import { QUIZ_STATUS, UI_SIZES } from "@/lib/constants"
 import { queryKeys, questionsQueryConfig } from "@/lib/queryConfig"
 import { BulkActionToolbar } from "./BulkActionToolbar"
+import { QuestionFilters } from "./QuestionFilters"
 import {
   RejectionFeedbackDialog,
   type RejectionReason,
@@ -66,6 +68,12 @@ export function QuestionReview({
   const { t } = useTranslation("quiz")
   const queryClient = useQueryClient()
   const [filterView, setFilterView] = useState<"pending" | "all">("pending")
+  const [selectedModuleIds, setSelectedModuleIds] = useState<Set<string>>(
+    new Set(),
+  )
+  const [selectedQuestionTypes, setSelectedQuestionTypes] = useState<
+    Set<QuestionType>
+  >(new Set())
   const [rejectingQuestionId, setRejectingQuestionId] = useState<string | null>(
     null,
   )
@@ -74,13 +82,8 @@ export function QuestionReview({
     useEditingState<QuestionResponse>((question) => question.id)
 
   // Selection state for bulk operations
-  const {
-    selectionCount,
-    isSelected,
-    toggle,
-    clearSelection,
-    getSelectedIds,
-  } = useQuestionSelection()
+  const { selectionCount, isSelected, toggle, clearSelection, getSelectedIds } =
+    useQuestionSelection()
 
   const isPublished = quizStatus === QUIZ_STATUS.PUBLISHED
 
@@ -101,21 +104,75 @@ export function QuestionReview({
     ...questionsQueryConfig,
   })
 
-  // Filter questions based on current view and calculate counts
-  const { filteredQuestions, pendingCount, totalCount } = useMemo(() => {
-    if (!questions) {
-      return { filteredQuestions: [], pendingCount: 0, totalCount: 0 }
+  // Derive available modules and question types from actual questions
+  const { availableModules, availableQuestionTypes } = useMemo(() => {
+    if (!questions || questions.length === 0) {
+      return { availableModules: [], availableQuestionTypes: [] }
     }
 
-    const pending = questions.filter((q) => !q.is_approved)
-    const filtered = filterView === "pending" ? pending : questions
+    const moduleSet = new Set<string>()
+    const typeSet = new Set<QuestionType>()
+
+    for (const q of questions) {
+      if (q.module_id) {
+        moduleSet.add(String(q.module_id))
+      }
+      if (q.question_type) {
+        typeSet.add(q.question_type)
+      }
+    }
+
+    const modules = Array.from(moduleSet)
+      .map((id) => ({
+        id,
+        name:
+          selectedModules?.[id]?.name ||
+          t("questionTypeBreakdown.moduleFallback", { id }),
+      }))
+      .sort((a, b) => a.name.localeCompare(b.name))
 
     return {
-      filteredQuestions: filtered,
-      pendingCount: pending.length,
-      totalCount: questions.length,
+      availableModules: modules,
+      availableQuestionTypes: Array.from(typeSet),
     }
-  }, [questions, filterView])
+  }, [questions, selectedModules, t])
+
+  // Filter questions based on current view and calculate counts
+  const { filteredQuestions, pendingCount, totalCount, filteredCount } =
+    useMemo(() => {
+      if (!questions) {
+        return {
+          filteredQuestions: [],
+          pendingCount: 0,
+          totalCount: 0,
+          filteredCount: 0,
+        }
+      }
+
+      const pending = questions.filter((q) => !q.is_approved)
+      let filtered = filterView === "pending" ? pending : questions
+
+      // Apply module filter (empty set = all modules)
+      if (selectedModuleIds.size > 0) {
+        filtered = filtered.filter(
+          (q) => q.module_id && selectedModuleIds.has(String(q.module_id)),
+        )
+      }
+
+      // Apply question type filter (empty set = all types)
+      if (selectedQuestionTypes.size > 0) {
+        filtered = filtered.filter(
+          (q) => q.question_type && selectedQuestionTypes.has(q.question_type),
+        )
+      }
+
+      return {
+        filteredQuestions: filtered,
+        pendingCount: pending.length,
+        totalCount: questions.length,
+        filteredCount: filtered.length,
+      }
+    }, [questions, filterView, selectedModuleIds, selectedQuestionTypes])
 
   // Approve question mutation
   const approveQuestionMutation = useApiMutation(
@@ -327,24 +384,38 @@ export function QuestionReview({
 
   return (
     <VStack gap={6} align="stretch">
-      {/* Filter Toggle Buttons */}
-      <HStack gap={3}>
-        <Button
-          variant={filterView === "pending" ? "solid" : "outline"}
-          colorPalette="blue"
-          size="sm"
-          onClick={() => setFilterView("pending")}
-        >
-          {t("questions.pendingApproval", { count: pendingCount })}
-        </Button>
-        <Button
-          variant={filterView === "all" ? "solid" : "outline"}
-          colorPalette="blue"
-          size="sm"
-          onClick={() => setFilterView("all")}
-        >
-          {t("questions.allQuestions", { count: totalCount })}
-        </Button>
+      {/* Filter Toggle Buttons and Filter Dropdown */}
+      <HStack gap={3} justify="space-between">
+        <HStack gap={3}>
+          <Button
+            variant={filterView === "pending" ? "solid" : "outline"}
+            colorPalette="blue"
+            size="sm"
+            onClick={() => setFilterView("pending")}
+          >
+            {t("questions.pendingApproval", { count: pendingCount })}
+          </Button>
+          <Button
+            variant={filterView === "all" ? "solid" : "outline"}
+            colorPalette="blue"
+            size="sm"
+            onClick={() => setFilterView("all")}
+          >
+            {t("questions.allQuestions", { count: totalCount })}
+          </Button>
+        </HStack>
+
+        {/* Module and Question Type Filters */}
+        <QuestionFilters
+          availableModules={availableModules}
+          selectedModuleIds={selectedModuleIds}
+          onModuleFilterChange={setSelectedModuleIds}
+          availableQuestionTypes={availableQuestionTypes}
+          selectedQuestionTypes={selectedQuestionTypes}
+          onQuestionTypeFilterChange={setSelectedQuestionTypes}
+          totalCount={filterView === "pending" ? pendingCount : totalCount}
+          filteredCount={filteredCount}
+        />
       </HStack>
 
       {/* Bulk Action Toolbar - only shows when questions are selected */}
@@ -366,14 +437,18 @@ export function QuestionReview({
           <Card.Body>
             <EmptyState
               title={
-                filterView === "pending"
-                  ? t("questions.noPending")
-                  : t("questions.noQuestionsFound")
+                selectedModuleIds.size > 0 || selectedQuestionTypes.size > 0
+                  ? t("questions.filters.noResults")
+                  : filterView === "pending"
+                    ? t("questions.noPending")
+                    : t("questions.noQuestionsFound")
               }
               description={
-                filterView === "pending"
-                  ? t("questions.allApprovedSwitch")
-                  : t("questions.noMatchFilter")
+                selectedModuleIds.size > 0 || selectedQuestionTypes.size > 0
+                  ? t("questions.filters.tryDifferent")
+                  : filterView === "pending"
+                    ? t("questions.allApprovedSwitch")
+                    : t("questions.noMatchFilter")
               }
             />
           </Card.Body>
