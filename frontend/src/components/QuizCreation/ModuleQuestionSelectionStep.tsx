@@ -7,23 +7,27 @@ import {
   HStack,
   Heading,
   Input,
+  Link,
   Select,
   Text,
   VStack,
   createListCollection,
 } from "@chakra-ui/react"
+import { Link as RouterLink } from "@tanstack/react-router"
 import type React from "react"
 import { useMemo, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { IoAdd, IoClose } from "react-icons/io5"
 
 import type { QuestionBatch, QuestionDifficulty, QuestionType } from "@/client"
+import { useLocalizedRoute } from "@/hooks/common"
 import {
   QUESTION_BATCH_DEFAULTS,
   QUESTION_DIFFICULTIES,
   VALIDATION_MESSAGES,
   VALIDATION_RULES,
 } from "@/lib/constants"
+import { LOCALIZED_ROUTES } from "@/lib/routes"
 import {
   calculateModuleQuestions,
   calculateTotalQuestionsFromBatches,
@@ -40,6 +44,7 @@ export const ModuleQuestionSelectionStep: React.FC<
   ModuleQuestionSelectionStepProps
 > = ({ selectedModules, moduleQuestions, onModuleQuestionChange }) => {
   const { t } = useTranslation(["creation", "quiz", "validation"])
+  const { getLocalizedRoute } = useLocalizedRoute()
 
   // Create translated collections inside component
   const questionTypeCollection = useMemo(
@@ -477,6 +482,19 @@ export const ModuleQuestionSelectionStep: React.FC<
           <Text fontSize="sm" color="gray.600">
             {t("questionConfig.tip")}
           </Text>
+          <Link
+            asChild
+            color="teal.500"
+            fontSize="sm"
+            mt={2}
+            display="inline-block"
+          >
+            <RouterLink
+              to={getLocalizedRoute(LOCALIZED_ROUTES.questionTypes) as "/question-types"}
+            >
+              {t("questionConfig.learnMoreQuestionTypes")}
+            </RouterLink>
+          </Link>
         </Box>
       </VStack>
     </Box>

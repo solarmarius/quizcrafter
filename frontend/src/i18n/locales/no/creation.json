@@ -64,7 +64,8 @@
     "noBatches": "Ingen spørsmålsgrupper konfigurert",
     "noBatchesHint": "Klikk «Legg til gruppe» for å komme i gang",
     "noModulesSelected": "Ingen moduler valgt. Gå tilbake for å velge moduler først.",
-    "tip": "Tips: Bland forskjellige spørsmålstyper og vanskelighetsgrader for å lage omfattende vurderinger. Hver modul kan ha opptil 4 forskjellige spørsmålsgrupper med 1-20 spørsmål hver."
+    "tip": "Tips: Bland forskjellige spørsmålstyper og vanskelighetsgrader for å lage omfattende vurderinger. Hver modul kan ha opptil 4 forskjellige spørsmålsgrupper med 1-20 spørsmål hver.",
+    "learnMoreQuestionTypes": "Lær mer om spørsmålstypene vi støtter"
   },
   "manualModule": {
     "title": "Legg til manuell modul",

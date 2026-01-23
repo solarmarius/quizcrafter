@@ -64,7 +64,8 @@
     "noBatches": "No question batches configured",
     "noBatchesHint": "Click \"Add Batch\" to get started",
     "noModulesSelected": "No modules selected. Go back to select modules first.",
-    "tip": "Tip: Mix different question types and difficulty levels to create comprehensive assessments. Each module can have up to 4 different question batches with 1-20 questions each."
+    "tip": "Tip: Mix different question types and difficulty levels to create comprehensive assessments. Each module can have up to 4 different question batches with 1-20 questions each.",
+    "learnMoreQuestionTypes": "Learn more about question types"
   },
   "manualModule": {
     "title": "Add Manual Module",

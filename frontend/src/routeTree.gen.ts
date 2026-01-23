@@ -17,6 +17,8 @@ import { Route as LayoutIndexImport } from './routes/_layout/index'
 import { Route as LoginSuccessImport } from './routes/login/success'
 import { Route as LayoutSettingsImport } from './routes/_layout/settings'
 import { Route as LayoutQuizzesImport } from './routes/_layout/quizzes'
+import { Route as LayoutQuestionTypesNoImport } from './routes/_layout/question-types-no'
+import { Route as LayoutQuestionTypesImport } from './routes/_layout/question-types'
 import { Route as LayoutPrivacyPolicyNoImport } from './routes/_layout/privacy-policy-no'
 import { Route as LayoutPrivacyPolicyImport } from './routes/_layout/privacy-policy'
 import { Route as LayoutCreateQuizImport } from './routes/_layout/create-quiz'
@@ -54,6 +56,16 @@ const LayoutSettingsRoute = LayoutSettingsImport.update({
 
 const LayoutQuizzesRoute = LayoutQuizzesImport.update({
   path: '/quizzes',
+  getParentRoute: () => LayoutRoute,
+} as any)
+
+const LayoutQuestionTypesNoRoute = LayoutQuestionTypesNoImport.update({
+  path: '/question-types-no',
+  getParentRoute: () => LayoutRoute,
+} as any)
+
+const LayoutQuestionTypesRoute = LayoutQuestionTypesImport.update({
+  path: '/question-types',
   getParentRoute: () => LayoutRoute,
 } as any)
 
@@ -116,6 +128,14 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LayoutPrivacyPolicyNoImport
       parentRoute: typeof LayoutImport
     }
+    '/_layout/question-types': {
+      preLoaderRoute: typeof LayoutQuestionTypesImport
+      parentRoute: typeof LayoutImport
+    }
+    '/_layout/question-types-no': {
+      preLoaderRoute: typeof LayoutQuestionTypesNoImport
+      parentRoute: typeof LayoutImport
+    }
     '/_layout/quizzes': {
       preLoaderRoute: typeof LayoutQuizzesImport
       parentRoute: typeof LayoutImport
@@ -158,6 +178,8 @@ export const routeTree = rootRoute.addChildren([
     LayoutCreateQuizRoute,
     LayoutPrivacyPolicyRoute,
     LayoutPrivacyPolicyNoRoute,
+    LayoutQuestionTypesRoute,
+    LayoutQuestionTypesNoRoute,
     LayoutQuizzesRoute,
     LayoutSettingsRoute,
     LayoutIndexRoute,

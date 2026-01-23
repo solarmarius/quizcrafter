@@ -1,23 +1,23 @@
-import { Box, Container, Heading, List, Text, VStack } from "@chakra-ui/react";
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect } from "react";
-import { useTranslation } from "react-i18next";
+import { Box, Container, Heading, List, Text, VStack } from "@chakra-ui/react"
+import { createFileRoute, useNavigate } from "@tanstack/react-router"
+import { useEffect } from "react"
+import { useTranslation } from "react-i18next"
 
-import { UI_LANGUAGES } from "@/i18n";
+import { UI_LANGUAGES } from "@/i18n"
 
 export const Route = createFileRoute("/_layout/privacy-policy-no")({
   component: PrivacyPolicyNo,
-});
+})
 
 function PrivacyPolicyNo() {
-  const { i18n } = useTranslation();
-  const navigate = useNavigate();
+  const { i18n } = useTranslation()
+  const navigate = useNavigate()
 
   useEffect(() => {
     if (i18n.language === UI_LANGUAGES.ENGLISH) {
-      navigate({ to: "/privacy-policy", replace: true });
+      navigate({ to: "/privacy-policy", replace: true })
     }
-  }, [i18n.language, navigate]);
+  }, [i18n.language, navigate])
 
   return (
     <Container maxW="4xl" py={8}>
@@ -290,5 +290,5 @@ function PrivacyPolicyNo() {
         </Box>
       </VStack>
     </Container>
-  );
+  )
 }
