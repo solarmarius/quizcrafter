@@ -2036,14 +2036,6 @@ def validate_multiple_answer_question(entry: dict):
                     detail="item[entry][properties][shuffle_rules][choices][shuffled] must be a boolean",
                 )
 
-        if "vary_points_by_answer" in properties and not isinstance(
-            properties["vary_points_by_answer"], bool
-        ):
-            raise HTTPException(
-                status_code=400,
-                detail="item[entry][properties][vary_points_by_answer] must be a boolean",
-            )
-
     # Validate scoring algorithm - must be AllOrNothing for multi-answer
     if entry["scoring_algorithm"] != CanvasScoringAlgorithm.ALL_OR_NOTHING:
         raise HTTPException(
