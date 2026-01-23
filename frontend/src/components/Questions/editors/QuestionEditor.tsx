@@ -6,6 +6,7 @@ import { CategorizationEditor } from "./CategorizationEditor"
 import { FillInBlankEditor } from "./FillInBlankEditor"
 import { MCQEditor } from "./MCQEditor"
 import { MatchingEditor } from "./MatchingEditor"
+import { MultipleAnswerEditor } from "./MultipleAnswerEditor"
 import { TrueFalseEditor } from "./TrueFalseEditor"
 import { UnsupportedEditor } from "./UnsupportedEditor"
 
@@ -32,6 +33,8 @@ export const QuestionEditor = memo(function QuestionEditor({
   switch (question.question_type) {
     case QUESTION_TYPES.MULTIPLE_CHOICE:
       return <MCQEditor {...commonProps} />
+    case QUESTION_TYPES.MULTIPLE_ANSWER:
+      return <MultipleAnswerEditor {...commonProps} />
     case QUESTION_TYPES.FILL_IN_BLANK:
       return <FillInBlankEditor {...commonProps} />
     case QUESTION_TYPES.MATCHING:

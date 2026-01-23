@@ -6,6 +6,7 @@ import { CategorizationDisplay } from "./CategorizationDisplay"
 import { FillInBlankDisplay } from "./FillInBlankDisplay"
 import { MCQDisplay } from "./MCQDisplay"
 import { MatchingDisplay } from "./MatchingDisplay"
+import { MultipleAnswerDisplay } from "./MultipleAnswerDisplay"
 import { TrueFalseDisplay } from "./TrueFalseDisplay"
 import { UnsupportedDisplay } from "./UnsupportedDisplay"
 
@@ -27,6 +28,8 @@ export const QuestionDisplay = memo(function QuestionDisplay({
   switch (question.question_type) {
     case QUESTION_TYPES.MULTIPLE_CHOICE:
       return <MCQDisplay {...commonProps} />
+    case QUESTION_TYPES.MULTIPLE_ANSWER:
+      return <MultipleAnswerDisplay {...commonProps} />
     case QUESTION_TYPES.FILL_IN_BLANK:
       return <FillInBlankDisplay {...commonProps} />
     case QUESTION_TYPES.MATCHING:

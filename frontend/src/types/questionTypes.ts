@@ -21,6 +21,18 @@ export interface MCQData {
   explanation?: string | null
 }
 
+// Multiple Answer Question Data (select all that apply)
+export interface MultipleAnswerData {
+  question_text: string
+  option_a: string
+  option_b: string
+  option_c: string
+  option_d: string
+  option_e: string
+  correct_answers: ("A" | "B" | "C" | "D" | "E")[]
+  explanation?: string | null
+}
+
 // Fill in the Blank Question Data
 export interface FillInBlankData {
   question_text: string
@@ -73,6 +85,7 @@ export interface TrueFalseData {
 // Discriminated union for all question data types
 export type QuestionData =
   | ({ type: "multiple_choice" } & MCQData)
+  | ({ type: "multiple_answer" } & MultipleAnswerData)
   | ({ type: "fill_in_blank" } & FillInBlankData)
   | ({ type: "matching" } & MatchingData)
   | ({ type: "categorization" } & CategorizationData)
@@ -85,15 +98,17 @@ export interface TypedQuestionResponse<T extends QuestionType = QuestionType> {
   question_type: T
   question_data: T extends "multiple_choice"
     ? MCQData
-    : T extends "fill_in_blank"
-      ? FillInBlankData
-      : T extends "matching"
-        ? MatchingData
-        : T extends "categorization"
-          ? CategorizationData
-          : T extends "true_false"
-            ? TrueFalseData
-            : never
+    : T extends "multiple_answer"
+      ? MultipleAnswerData
+      : T extends "fill_in_blank"
+        ? FillInBlankData
+        : T extends "matching"
+          ? MatchingData
+          : T extends "categorization"
+            ? CategorizationData
+            : T extends "true_false"
+              ? TrueFalseData
+              : never
   difficulty?: QuestionDifficulty | null
   tags?: string[] | null
   is_approved: boolean
@@ -105,6 +120,8 @@ export interface TypedQuestionResponse<T extends QuestionType = QuestionType> {
 
 // Specific typed question response types
 export type MCQQuestionResponse = TypedQuestionResponse<"multiple_choice">
+export type MultipleAnswerQuestionResponse =
+  TypedQuestionResponse<"multiple_answer">
 export type FillInBlankQuestionResponse = TypedQuestionResponse<"fill_in_blank">
 export type MatchingQuestionResponse = TypedQuestionResponse<"matching">
 export type CategorizationQuestionResponse =
@@ -127,6 +144,55 @@ export function isMCQData(data: unknown): data is MCQData {
     typeof obj.correct_answer === "string" &&
     ["A", "B", "C", "D"].includes(obj.correct_answer)
   )
+}
+
+export function isMultipleAnswerData(
+  data: unknown,
+): data is MultipleAnswerData {
+  if (typeof data !== "object" || data === null) {
+    return false
+  }
+
+  const obj = data as Record<string, unknown>
+
+  // Validate required fields
+  if (
+    typeof obj.question_text !== "string" ||
+    typeof obj.option_a !== "string" ||
+    typeof obj.option_b !== "string" ||
+    typeof obj.option_c !== "string" ||
+    typeof obj.option_d !== "string" ||
+    typeof obj.option_e !== "string"
+  ) {
+    return false
+  }
+
+  // Validate correct_answers array
+  if (!Array.isArray(obj.correct_answers)) {
+    return false
+  }
+
+  // Must have 2-4 correct answers
+  if (obj.correct_answers.length < 2 || obj.correct_answers.length > 4) {
+    return false
+  }
+
+  // All answers must be valid letters A-E
+  const validLetters = ["A", "B", "C", "D", "E"]
+  for (const answer of obj.correct_answers) {
+    if (typeof answer !== "string" || !validLetters.includes(answer)) {
+      return false
+    }
+  }
+
+  // Validate optional explanation
+  if (obj.explanation !== undefined && obj.explanation !== null) {
+    if (typeof obj.explanation !== "string") {
+      return false
+    }
+  }
+
+  return true
 }
 
 export function isFillInBlankData(data: unknown): data is FillInBlankData {
@@ -339,6 +405,11 @@ export function extractQuestionData<T extends QuestionType>(
     case "multiple_choice":
       if (!isMCQData(data)) {
         throw new Error("Invalid MCQ question data structure")
+      }
+      return data as unknown as TypedQuestionResponse<T>["question_data"]
+    case "multiple_answer":
+      if (!isMultipleAnswerData(data)) {
+        throw new Error("Invalid Multiple Answer question data structure")
       }
       return data as unknown as TypedQuestionResponse<T>["question_data"]
     case "fill_in_blank":

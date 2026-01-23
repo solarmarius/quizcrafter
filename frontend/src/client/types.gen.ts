@@ -277,6 +277,7 @@ export type QuestionResponse = {
  */
 export type QuestionType =
   | "multiple_choice"
+  | "multiple_answer"
   | "fill_in_blank"
   | "matching"
   | "categorization"
@@ -620,13 +621,6 @@ export type QuestionsDeleteQuestionResponse = {
   [key: string]: string
 }
 
-export type QuestionsApproveQuestionData = {
-  questionId: string
-  quizId: string
-}
-
-export type QuestionsApproveQuestionResponse = QuestionResponse
-
 export type QuestionsBulkApproveQuestionsData = {
   quizId: string
   requestBody: BulkApproveRequest
@@ -640,6 +634,13 @@ export type QuestionsBulkDeleteQuestionsData = {
 }
 
 export type QuestionsBulkDeleteQuestionsResponse = BulkOperationResponse
+
+export type QuestionsApproveQuestionData = {
+  questionId: string
+  quizId: string
+}
+
+export type QuestionsApproveQuestionResponse = QuestionResponse
 
 export type QuizGetUserQuizzesEndpointResponse = Array<Quiz>
 

@@ -82,6 +82,7 @@
   },
   "editors": {
     "mcqLoadError": "Error loading MCQ question data",
+    "multipleAnswerLoadError": "Error loading Multiple Answer question data",
     "fillInBlankLoadError": "Error loading Fill in Blank question data",
     "editorError": "Editor Error",
     "unsupportedType": "Unsupported Question Type",

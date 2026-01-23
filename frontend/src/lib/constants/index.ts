@@ -26,6 +26,7 @@ export const STORAGE_KEYS = {
 
 export const QUESTION_TYPES = {
   MULTIPLE_CHOICE: "multiple_choice",
+  MULTIPLE_ANSWER: "multiple_answer",
   FILL_IN_BLANK: "fill_in_blank",
   MATCHING: "matching",
   CATEGORIZATION: "categorization",
@@ -34,6 +35,7 @@ export const QUESTION_TYPES = {
 
 export const QUESTION_TYPE_LABELS = {
   multiple_choice: "Multiple Choice",
+  multiple_answer: "Multiple Answer",
   fill_in_blank: "Fill in the Blank",
   matching: "Matching",
   categorization: "Categorization",
