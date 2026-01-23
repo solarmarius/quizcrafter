@@ -92,6 +92,7 @@ export function createEmptyStats(): QuestionStats {
     approval_rate: 0,
     by_question_type: {
       multiple_choice: { total: 0, approved: 0, approval_rate: 0 },
+      multiple_answer: { total: 0, approved: 0, approval_rate: 0 },
       fill_in_blank: { total: 0, approved: 0, approval_rate: 0 },
       matching: { total: 0, approved: 0, approval_rate: 0 },
       categorization: { total: 0, approved: 0, approval_rate: 0 },
@@ -121,6 +122,7 @@ export function mergeLegacyStats(
           legacyStats.multiple_choice_approved || approved,
         ),
       },
+      multiple_answer: { total: 0, approved: 0, approval_rate: 0 },
       fill_in_blank: { total: 0, approved: 0, approval_rate: 0 },
       matching: { total: 0, approved: 0, approval_rate: 0 },
       categorization: { total: 0, approved: 0, approval_rate: 0 },

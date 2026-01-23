@@ -64,6 +64,7 @@ interface VirtualQuestionListProps {
 const QUESTION_HEIGHT_ESTIMATES = {
   display: {
     multiple_choice: 250,
+    multiple_answer: 300,
     matching: 400,
     fill_in_blank: 300,
     categorization: 450,
@@ -71,6 +72,7 @@ const QUESTION_HEIGHT_ESTIMATES = {
   },
   edit: {
     multiple_choice: 700,
+    multiple_answer: 850,
     matching: 1200,
     fill_in_blank: 800,
     categorization: 1000,

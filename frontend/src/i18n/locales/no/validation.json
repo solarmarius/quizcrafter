@@ -82,6 +82,7 @@
   },
   "editors": {
     "mcqLoadError": "Feil ved lasting av flervalgsspørsmål",
+    "multipleAnswerLoadError": "Feil ved lasting av flersvarsspørsmål",
     "fillInBlankLoadError": "Feil ved lasting av fyll-inn-spørsmål",
     "editorError": "Redigeringsfeil",
     "unsupportedType": "Ustøttet spørsmålstype",

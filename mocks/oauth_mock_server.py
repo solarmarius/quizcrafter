@@ -28,12 +28,14 @@ class CanvasScoringAlgorithm:
     EQUIVALENCE = "Equivalence"
     TEXT_CONTAINS_ANSWER = "TextContainsAnswer"
     PARTIAL_DEEP = "PartialDeep"
+    ALL_OR_NOTHING = "AllOrNothing"
 
 
 class CanvasInteractionType:
     """Canvas New Quizzes API interaction types."""
 
     CHOICE = "choice"
+    MULTI_ANSWER = "multi-answer"
     RICH_FILL_BLANK = "rich-fill-blank"
 
 
@@ -1921,6 +1923,135 @@ def validate_multiple_choice_question(entry: dict):
         )
 
 
+def validate_multiple_answer_question(entry: dict):
+    """Validate multiple answer question specific fields (select all that apply)."""
+    interaction_data = entry["interaction_data"]
+    scoring_data = entry["scoring_data"]
+
+    # Validate interaction_data structure (same as MCQ)
+    if "choices" not in interaction_data:
+        raise HTTPException(
+            status_code=400, detail="item[entry][interaction_data][choices] is required"
+        )
+
+    choices = interaction_data["choices"]
+    if not isinstance(choices, list) or len(choices) != 5:
+        raise HTTPException(
+            status_code=400,
+            detail="item[entry][interaction_data][choices] must have exactly 5 choices for multi-answer questions",
+        )
+
+    # Validate each choice
+    choice_ids = set()
+    for i, choice in enumerate(choices):
+        if not isinstance(choice, dict):
+            raise HTTPException(
+                status_code=400,
+                detail=f"item[entry][interaction_data][choices][{i}] must be an object",
+            )
+
+        required_choice_fields = ["id", "position", "item_body"]
+        for field in required_choice_fields:
+            if field not in choice:
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"item[entry][interaction_data][choices][{i}][{field}] is required",
+                )
+
+        choice_id = choice["id"]
+        if not isinstance(choice_id, str) or not choice_id.strip():
+            raise HTTPException(
+                status_code=400,
+                detail=f"item[entry][interaction_data][choices][{i}][id] must be a non-empty string",
+            )
+
+        if choice_id in choice_ids:
+            raise HTTPException(
+                status_code=400,
+                detail=f"item[entry][interaction_data][choices][{i}][id] must be unique",
+            )
+        choice_ids.add(choice_id)
+
+        if not isinstance(choice["position"], int) or choice["position"] <= 0:
+            raise HTTPException(
+                status_code=400,
+                detail=f"item[entry][interaction_data][choices][{i}][position] must be a positive integer",
+            )
+
+        if not isinstance(choice["item_body"], str) or not choice["item_body"].strip():
+            raise HTTPException(
+                status_code=400,
+                detail=f"item[entry][interaction_data][choices][{i}][item_body] must be a non-empty string",
+            )
+
+    # Validate scoring_data structure - must be an array for multi-answer
+    if "value" not in scoring_data:
+        raise HTTPException(
+            status_code=400, detail="item[entry][scoring_data][value] is required"
+        )
+
+    correct_choices = scoring_data["value"]
+    if not isinstance(correct_choices, list):
+        raise HTTPException(
+            status_code=400,
+            detail="item[entry][scoring_data][value] must be an array for multi-answer questions",
+        )
+
+    if len(correct_choices) < 2 or len(correct_choices) > 4:
+        raise HTTPException(
+            status_code=400,
+            detail="item[entry][scoring_data][value] must contain 2-4 correct answer IDs for multi-answer questions",
+        )
+
+    # Validate all correct choice IDs exist in choices
+    for j, choice_id in enumerate(correct_choices):
+        if not isinstance(choice_id, str) or choice_id not in choice_ids:
+            raise HTTPException(
+                status_code=400,
+                detail=f"item[entry][scoring_data][value][{j}] must reference a valid choice ID",
+            )
+
+    # Validate properties structure (same as MCQ)
+    properties = entry.get("properties", {})
+    if "shuffle_rules" in properties:
+        shuffle_rules = properties["shuffle_rules"]
+        if not isinstance(shuffle_rules, dict):
+            raise HTTPException(
+                status_code=400,
+                detail="item[entry][properties][shuffle_rules] must be an object",
+            )
+
+        if "choices" in shuffle_rules:
+            if not isinstance(shuffle_rules["choices"], dict):
+                raise HTTPException(
+                    status_code=400,
+                    detail="item[entry][properties][shuffle_rules][choices] must be an object",
+                )
+
+            if "shuffled" in shuffle_rules["choices"] and not isinstance(
+                shuffle_rules["choices"]["shuffled"], bool
+            ):
+                raise HTTPException(
+                    status_code=400,
+                    detail="item[entry][properties][shuffle_rules][choices][shuffled] must be a boolean",
+                )
+
+        if "vary_points_by_answer" in properties and not isinstance(
+            properties["vary_points_by_answer"], bool
+        ):
+            raise HTTPException(
+                status_code=400,
+                detail="item[entry][properties][vary_points_by_answer] must be a boolean",
+            )
+
+    # Validate scoring algorithm - must be AllOrNothing for multi-answer
+    if entry["scoring_algorithm"] != CanvasScoringAlgorithm.ALL_OR_NOTHING:
+        raise HTTPException(
+            status_code=400,
+            detail=f"item[entry][scoring_algorithm] must be '{CanvasScoringAlgorithm.ALL_OR_NOTHING}' for multi-answer questions",
+        )
+
+
 def validate_matching_question(entry: dict):
     """Validate matching question specific fields based on real Canvas API structure."""
     interaction_data = entry["interaction_data"]
@@ -2484,6 +2615,8 @@ async def create_quiz_item(
         validate_fill_in_blank_question(entry)
     elif interaction_type == "choice":
         validate_multiple_choice_question(entry)
+    elif interaction_type == "multi-answer":
+        validate_multiple_answer_question(entry)
     elif interaction_type == "matching":
         validate_matching_question(entry)
     elif interaction_type == "categorization":
@@ -2493,7 +2626,7 @@ async def create_quiz_item(
     else:
         raise HTTPException(
             status_code=400,
-            detail=f"Unsupported interaction_type_slug: {interaction_type}. Supported types: 'choice', 'rich-fill-blank', 'matching', 'categorization', 'true-false'",
+            detail=f"Unsupported interaction_type_slug: {interaction_type}. Supported types: 'choice', 'multi-answer', 'rich-fill-blank', 'matching', 'categorization', 'true-false'",
         )
 
     # Create the quiz item with complete Canvas structure

@@ -54,7 +54,8 @@ class CanvasScoringAlgorithm:
 class CanvasInteractionType:
     """Canvas New Quizzes API interaction types."""
 
-    CHOICE = "choice"  # Multiple choice questions
+    CHOICE = "choice"  # Multiple choice questions (single answer)
+    MULTI_ANSWER = "multi-answer"  # Multiple answer questions (select all)
     RICH_FILL_BLANK = "rich-fill-blank"  # Fill-in-blank questions
     MATCHING = "matching"  # Matching questions
     CATEGORIZATION = "categorization"  # Categorization questions

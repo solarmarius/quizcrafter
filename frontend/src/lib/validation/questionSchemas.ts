@@ -33,6 +33,26 @@ export const mcqSchema = z.object({
 
 export type MCQFormData = z.infer<typeof mcqSchema>
 
+// Multiple Answer Question Schema (select all that apply)
+export const multipleAnswerSchema = z.object({
+  questionText: nonEmptyString,
+  optionA: nonEmptyString,
+  optionB: nonEmptyString,
+  optionC: nonEmptyString,
+  optionD: nonEmptyString,
+  optionE: nonEmptyString,
+  correctAnswers: z
+    .array(z.enum(["A", "B", "C", "D", "E"]))
+    .min(2, "Select at least 2 correct answers")
+    .max(4, "Select at most 4 correct answers")
+    .refine((answers) => new Set(answers).size === answers.length, {
+      message: "Duplicate answers are not allowed",
+    }),
+  explanation: optionalString,
+})
+
+export type MultipleAnswerFormData = z.infer<typeof multipleAnswerSchema>
+
 // Enhanced Fill in the Blank Question Schema with comprehensive validation
 export const fillInBlankSchema = z
   .object({
@@ -404,6 +424,8 @@ export function getSchemaByType(questionType: QuestionType): z.ZodSchema<any> {
   switch (questionType) {
     case QUESTION_TYPES.MULTIPLE_CHOICE:
       return mcqSchema
+    case QUESTION_TYPES.MULTIPLE_ANSWER:
+      return multipleAnswerSchema
     case QUESTION_TYPES.FILL_IN_BLANK:
       return fillInBlankSchema
     case QUESTION_TYPES.MATCHING:
@@ -421,15 +443,17 @@ export function getSchemaByType(questionType: QuestionType): z.ZodSchema<any> {
 export type FormDataByType<T extends QuestionType> =
   T extends typeof QUESTION_TYPES.MULTIPLE_CHOICE
     ? MCQFormData
-    : T extends typeof QUESTION_TYPES.FILL_IN_BLANK
-      ? FillInBlankFormData
-      : T extends typeof QUESTION_TYPES.MATCHING
-        ? MatchingFormData
-        : T extends typeof QUESTION_TYPES.CATEGORIZATION
-          ? CategorizationFormData
-          : T extends typeof QUESTION_TYPES.TRUE_FALSE
-            ? TrueFalseFormData
-            : never
+    : T extends typeof QUESTION_TYPES.MULTIPLE_ANSWER
+      ? MultipleAnswerFormData
+      : T extends typeof QUESTION_TYPES.FILL_IN_BLANK
+        ? FillInBlankFormData
+        : T extends typeof QUESTION_TYPES.MATCHING
+          ? MatchingFormData
+          : T extends typeof QUESTION_TYPES.CATEGORIZATION
+            ? CategorizationFormData
+            : T extends typeof QUESTION_TYPES.TRUE_FALSE
+              ? TrueFalseFormData
+              : never
 
 // Common validation messages
 export const validationMessages = {
@@ -462,4 +486,7 @@ export const validationMessages = {
     "At least 2 categories required, maximum 8 categories allowed.",
   distractorsHelp:
     "Optional incorrect items that don't belong to any category. Maximum 5 allowed.",
+  minCorrectAnswers: "Select at least 2 correct answers",
+  maxCorrectAnswers: "Select at most 4 correct answers",
+  selectAllThatApply: "Select all that apply",
 }

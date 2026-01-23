@@ -51,6 +51,10 @@ export const ModuleQuestionSelectionStep: React.FC<
             label: t("quiz:questionTypes.multiple_choice"),
           },
           {
+            value: "multiple_answer" as QuestionType,
+            label: t("quiz:questionTypes.multiple_answer"),
+          },
+          {
             value: "fill_in_blank" as QuestionType,
             label: t("quiz:questionTypes.fill_in_blank"),
           },

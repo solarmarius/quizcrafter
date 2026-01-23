@@ -537,6 +537,7 @@ def calculate_total_points_for_questions(question_data: list[dict[str, Any]]) ->
             # Map string to QuestionType enum
             question_type_map = {
                 "multiple_choice": QuestionType.MULTIPLE_CHOICE,
+                "multiple_answer": QuestionType.MULTIPLE_ANSWER,
                 "fill_in_blank": QuestionType.FILL_IN_BLANK,
                 "matching": QuestionType.MATCHING,
                 "categorization": QuestionType.CATEGORIZATION,

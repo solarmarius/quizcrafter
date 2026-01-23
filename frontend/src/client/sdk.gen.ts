@@ -26,12 +26,12 @@ import type {
   QuestionsUpdateQuestionResponse,
   QuestionsDeleteQuestionData,
   QuestionsDeleteQuestionResponse,
-  QuestionsApproveQuestionData,
-  QuestionsApproveQuestionResponse,
   QuestionsBulkApproveQuestionsData,
   QuestionsBulkApproveQuestionsResponse,
   QuestionsBulkDeleteQuestionsData,
   QuestionsBulkDeleteQuestionsResponse,
+  QuestionsApproveQuestionData,
+  QuestionsApproveQuestionResponse,
   QuizGetUserQuizzesEndpointResponse,
   QuizCreateNewQuizData,
   QuizCreateNewQuizResponse,
@@ -626,38 +626,6 @@ export class QuestionsService {
   }
 
   /**
-   * Approve Question
-   * Approve a question for inclusion in the final quiz.
-   *
-   * **Parameters:**
-   * quiz_id: Quiz identifier
-   * question_id: Question identifier
-   *
-   * **Returns:**
-   * Approved question with formatted display data
-   * @param data The data for the request.
-   * @param data.quizId
-   * @param data.questionId
-   * @returns QuestionResponse Successful Response
-   * @throws ApiError
-   */
-  public static approveQuestion(
-    data: QuestionsApproveQuestionData,
-  ): CancelablePromise<QuestionsApproveQuestionResponse> {
-    return __request(OpenAPI, {
-      method: "PUT",
-      url: "/questions/{quiz_id}/{question_id}/approve",
-      path: {
-        quiz_id: data.quizId,
-        question_id: data.questionId,
-      },
-      errors: {
-        422: "Validation Error",
-      },
-    })
-  }
-
-  /**
    * Bulk Approve Questions
    * Approve multiple questions at once.
    *
@@ -717,6 +685,38 @@ export class QuestionsService {
       },
       body: data.requestBody,
       mediaType: "application/json",
+      errors: {
+        422: "Validation Error",
+      },
+    })
+  }
+
+  /**
+   * Approve Question
+   * Approve a question for inclusion in the final quiz.
+   *
+   * **Parameters:**
+   * quiz_id: Quiz identifier
+   * question_id: Question identifier
+   *
+   * **Returns:**
+   * Approved question with formatted display data
+   * @param data The data for the request.
+   * @param data.quizId
+   * @param data.questionId
+   * @returns QuestionResponse Successful Response
+   * @throws ApiError
+   */
+  public static approveQuestion(
+    data: QuestionsApproveQuestionData,
+  ): CancelablePromise<QuestionsApproveQuestionResponse> {
+    return __request(OpenAPI, {
+      method: "PUT",
+      url: "/questions/{quiz_id}/{question_id}/approve",
+      path: {
+        quiz_id: data.quizId,
+        question_id: data.questionId,
+      },
       errors: {
         422: "Validation Error",
       },
