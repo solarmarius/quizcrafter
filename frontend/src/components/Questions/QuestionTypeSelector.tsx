@@ -45,6 +45,7 @@ export const QuestionTypeSelector = memo(function QuestionTypeSelector({
   // Define question types with icons, using translated labels and descriptions
   const questionTypeOptions = [
     { type: QUESTION_TYPES.MULTIPLE_CHOICE, icon: "📝" },
+    { type: QUESTION_TYPES.MULTIPLE_ANSWER, icon: "☑️" },
     { type: QUESTION_TYPES.TRUE_FALSE, icon: "✓✗" },
     { type: QUESTION_TYPES.FILL_IN_BLANK, icon: "📄" },
     { type: QUESTION_TYPES.MATCHING, icon: "🔗" },

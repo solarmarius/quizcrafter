@@ -108,6 +108,18 @@ function getDefaultQuestionData(questionType: string): Record<string, any> {
         explanation: null,
       }
 
+    case QUESTION_TYPES.MULTIPLE_ANSWER:
+      return {
+        question_text: "",
+        option_a: "",
+        option_b: "",
+        option_c: "",
+        option_d: "",
+        option_e: "",
+        correct_answers: ["A", "B"],
+        explanation: null,
+      }
+
     case QUESTION_TYPES.TRUE_FALSE:
       return {
         question_text: "",
