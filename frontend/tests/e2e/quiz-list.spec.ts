@@ -1,10 +1,10 @@
-import { test, expect } from "@playwright/test"
+import { expect, test } from "@playwright/test"
 import { mockUserMe, mockUserQuizzes } from "../fixtures/api-mocking"
 import {
-  mockUser,
-  mockQuizList,
   mockEmptyQuizList,
+  mockQuizList,
   mockQuizReadyForReview,
+  mockUser,
 } from "../mocks"
 
 test.describe("Quiz List", () => {
@@ -30,7 +30,7 @@ test.describe("Quiz List", () => {
 
     // Should display course names (use first() since multiple quizzes have same course)
     await expect(
-      page.getByText(mockQuizReadyForReview.canvas_course_name).first()
+      page.getByText(mockQuizReadyForReview.canvas_course_name).first(),
     ).toBeVisible()
   })
 
@@ -47,7 +47,7 @@ test.describe("Quiz List", () => {
 
     // Should display create quiz link in the empty state
     await expect(
-      page.getByRole("link", { name: "Create Your First Quiz" })
+      page.getByRole("link", { name: "Create Your First Quiz" }),
     ).toBeVisible()
   })
 })

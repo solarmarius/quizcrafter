@@ -1,18 +1,18 @@
-import { test, expect } from "@playwright/test"
+import { expect, test } from "@playwright/test"
 import {
-  mockUserMe,
-  mockUserQuizzes,
   mockQuizDetail,
   mockQuizQuestions,
   mockQuizStats,
+  mockUserMe,
+  mockUserQuizzes,
 } from "../fixtures/api-mocking"
 import {
-  mockUser,
-  mockQuizList,
-  mockQuizReadyForReview,
-  mockQuizPublished,
   mockQuestionsList,
+  mockQuizList,
+  mockQuizPublished,
+  mockQuizReadyForReview,
   mockQuizStats as mockStats,
+  mockUser,
 } from "../mocks"
 
 test.describe("Quiz Detail", () => {
@@ -20,7 +20,11 @@ test.describe("Quiz Detail", () => {
     // Set up API mocks
     await mockUserMe(page, mockUser)
     await mockUserQuizzes(page, mockQuizList)
-    await mockQuizDetail(page, mockQuizReadyForReview.id!, mockQuizReadyForReview)
+    await mockQuizDetail(
+      page,
+      mockQuizReadyForReview.id!,
+      mockQuizReadyForReview,
+    )
     await mockQuizQuestions(page, mockQuizReadyForReview.id!, mockQuestionsList)
     await mockQuizStats(page, mockQuizReadyForReview.id!, mockStats)
 
@@ -32,7 +36,7 @@ test.describe("Quiz Detail", () => {
 
     // Should display course name
     await expect(
-      page.getByText(mockQuizReadyForReview.canvas_course_name)
+      page.getByText(mockQuizReadyForReview.canvas_course_name),
     ).toBeVisible()
 
     // Should display status indicator

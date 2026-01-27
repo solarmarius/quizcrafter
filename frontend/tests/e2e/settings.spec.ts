@@ -1,6 +1,6 @@
-import { test, expect } from "@playwright/test"
+import { expect, test } from "@playwright/test"
 import { mockUserMe, mockUserQuizzes } from "../fixtures/api-mocking"
-import { mockUser, mockEmptyQuizList } from "../mocks"
+import { mockEmptyQuizList, mockUser } from "../mocks"
 
 test.describe("Settings", () => {
   test("displays user settings with profile information", async ({ page }) => {

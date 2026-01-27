@@ -1,6 +1,6 @@
-import { test as setup, expect } from "@playwright/test"
+import { expect, test as setup } from "@playwright/test"
 import { mockUserMe, mockUserQuizzes } from "./fixtures/api-mocking"
-import { mockUser, mockEmptyQuizList } from "./mocks"
+import { mockEmptyQuizList, mockUser } from "./mocks"
 
 const MOCK_JWT_TOKEN =
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LXVzZXItdXVpZC0xMjM0IiwibmFtZSI6IlRlc3QgVXNlciIsImlhdCI6MTcwNTMyMjQwMH0.mock_signature"

@@ -1,17 +1,17 @@
-import { test, expect } from "@playwright/test"
+import { expect, test } from "@playwright/test"
 import {
-  mockUserMe,
-  mockUserQuizzes,
   mockQuizDetail,
   mockQuizQuestions,
   mockQuizStats,
+  mockUserMe,
+  mockUserQuizzes,
 } from "../fixtures/api-mocking"
 import {
-  mockUser,
+  mockQuestionsList,
   mockQuizList,
   mockQuizReadyForReview,
-  mockQuestionsList,
   mockQuizStats as mockStats,
+  mockUser,
 } from "../mocks"
 
 test.describe("Navigation", () => {
@@ -41,7 +41,11 @@ test.describe("Navigation", () => {
     // Set up API mocks
     await mockUserMe(page, mockUser)
     await mockUserQuizzes(page, mockQuizList)
-    await mockQuizDetail(page, mockQuizReadyForReview.id!, mockQuizReadyForReview)
+    await mockQuizDetail(
+      page,
+      mockQuizReadyForReview.id!,
+      mockQuizReadyForReview,
+    )
     await mockQuizQuestions(page, mockQuizReadyForReview.id!, mockQuestionsList)
     await mockQuizStats(page, mockQuizReadyForReview.id!, mockStats)
 
@@ -49,7 +53,9 @@ test.describe("Navigation", () => {
     await page.goto(`/quiz/${mockQuizReadyForReview.id}`)
 
     // Should be on Quiz Information tab by default
-    await expect(page.getByRole("tab", { name: "Quiz Information" })).toBeVisible()
+    await expect(
+      page.getByRole("tab", { name: "Quiz Information" }),
+    ).toBeVisible()
 
     // Click on Questions tab
     await page.getByRole("tab", { name: "Questions" }).click()

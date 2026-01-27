@@ -1,18 +1,18 @@
-import type { Page } from "@playwright/test"
 import type {
-  UserPublic,
-  Quiz,
-  QuestionResponse,
+  BulkOperationResponse,
   CanvasCourse,
   CanvasModule,
-  BulkOperationResponse,
   ManualModuleResponse,
+  QuestionResponse,
+  Quiz,
+  UserPublic,
 } from "@/client/types.gen"
+import type { Page } from "@playwright/test"
 
 // API routes don't have a prefix - they're at the root level
-// The BASE URL is http://localhost:8000
-// Use explicit host pattern for reliable matching
-const API_BASE = "**/localhost:8000"
+// The BASE URL is http://localhost:8000 (local) or http://backend:8000 (CI)
+// Use glob pattern that matches either localhost or backend on port 8000
+const API_BASE = "**://*:8000"
 
 /**
  * Mock GET /users/me endpoint
@@ -72,7 +72,7 @@ export async function mockQuizDetail(page: Page, quizId: string, quiz: Quiz) {
 export async function mockQuizQuestions(
   page: Page,
   quizId: string,
-  questions: QuestionResponse[]
+  questions: QuestionResponse[],
 ) {
   // Match with or without query parameters
   await page.route(`${API_BASE}/questions/${quizId}**`, async (route) => {
@@ -94,19 +94,22 @@ export async function mockQuizQuestions(
 export async function mockQuizStats(
   page: Page,
   quizId: string,
-  stats: { total: number; approved: number; pending?: number }
+  stats: { total: number; approved: number; pending?: number },
 ) {
-  await page.route(`${API_BASE}/quiz/${quizId}/questions/stats`, async (route) => {
-    if (route.request().method() === "GET") {
-      await route.fulfill({
-        status: 200,
-        contentType: "application/json",
-        body: JSON.stringify(stats),
-      })
-    } else {
-      await route.continue()
-    }
-  })
+  await page.route(
+    `${API_BASE}/quiz/${quizId}/questions/stats`,
+    async (route) => {
+      if (route.request().method() === "GET") {
+        await route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify(stats),
+        })
+      } else {
+        await route.continue()
+      }
+    },
+  )
 }
 
 /**
@@ -132,7 +135,7 @@ export async function mockCanvasCourses(page: Page, courses: CanvasCourse[]) {
 export async function mockCanvasModules(
   page: Page,
   courseId: number,
-  modules: CanvasModule[]
+  modules: CanvasModule[],
 ) {
   await page.route(
     `${API_BASE}/canvas/courses/${courseId}/modules`,
@@ -146,7 +149,7 @@ export async function mockCanvasModules(
       } else {
         await route.continue()
       }
-    }
+    },
   )
 }
 
@@ -173,7 +176,7 @@ export async function mockCreateQuiz(page: Page, responseQuiz: Quiz) {
 export async function mockApproveQuestion(
   page: Page,
   quizId: string,
-  approvedQuestion: QuestionResponse
+  approvedQuestion: QuestionResponse,
 ) {
   await page.route(
     `${API_BASE}/questions/${quizId}/*/approve`,
@@ -187,7 +190,7 @@ export async function mockApproveQuestion(
       } else {
         await route.continue()
       }
-    }
+    },
   )
 }
 
@@ -214,7 +217,7 @@ export async function mockDeleteQuestion(page: Page, quizId: string) {
 export async function mockBulkApprove(
   page: Page,
   quizId: string,
-  response: BulkOperationResponse
+  response: BulkOperationResponse,
 ) {
   await page.route(
     `${API_BASE}/questions/${quizId}/bulk-approve`,
@@ -228,7 +231,7 @@ export async function mockBulkApprove(
       } else {
         await route.continue()
       }
-    }
+    },
   )
 }
 
@@ -258,7 +261,7 @@ export async function mockExportQuiz(page: Page, quizId: string) {
 export async function mockCreateQuestion(
   page: Page,
   quizId: string,
-  responseQuestion: QuestionResponse
+  responseQuestion: QuestionResponse,
 ) {
   await page.route(`${API_BASE}/questions/${quizId}`, async (route) => {
     if (route.request().method() === "POST") {
@@ -306,7 +309,7 @@ export async function mockExtractContent(page: Page, quizId: string) {
       } else {
         await route.continue()
       }
-    }
+    },
   )
 }
 
@@ -326,7 +329,7 @@ export async function mockGenerateQuestions(page: Page, quizId: string) {
       } else {
         await route.continue()
       }
-    }
+    },
   )
 }
 
@@ -335,7 +338,7 @@ export async function mockGenerateQuestions(page: Page, quizId: string) {
  */
 export async function mockUploadManualModule(
   page: Page,
-  response: ManualModuleResponse
+  response: ManualModuleResponse,
 ) {
   await page.route(`${API_BASE}/quiz/manual-modules/upload`, async (route) => {
     if (route.request().method() === "POST") {

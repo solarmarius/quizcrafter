@@ -1,7 +1,5 @@
-import { test, expect } from "@playwright/test"
+import { expect, test } from "@playwright/test"
 import {
-  mockUserMe,
-  mockUserQuizzes,
   mockCanvasCourses,
   mockCanvasModules,
   mockCreateQuiz,
@@ -9,13 +7,15 @@ import {
   mockQuizQuestions,
   mockQuizStats,
   mockUploadManualModule,
+  mockUserMe,
+  mockUserQuizzes,
 } from "../fixtures/api-mocking"
 import {
-  mockUser,
-  mockEmptyQuizList,
   mockCourses,
+  mockEmptyQuizList,
   mockModules,
   mockQuizCreated,
+  mockUser,
 } from "../mocks"
 
 test.describe("Quiz Creation", () => {
@@ -140,7 +140,7 @@ test.describe("Quiz Creation", () => {
     const mockManualModuleResponse = {
       module_id: "manual-module-uuid-123",
       name: manualModuleName,
-      content_preview: manualModuleContent.substring(0, 200) + "...",
+      content_preview: `${manualModuleContent.substring(0, 200)}...`,
       full_content: manualModuleContent,
       word_count: manualModuleContent.split(/\s+/).length,
     }
@@ -196,7 +196,7 @@ test.describe("Quiz Creation", () => {
     await expect(page.getByText("Content Preview")).toBeVisible()
     // Verify content preview contains beginning of the text
     await expect(
-      page.getByText(/This is a comprehensive test content/i)
+      page.getByText(/This is a comprehensive test content/i),
     ).toBeVisible()
 
     // Click "Add Module" to confirm
@@ -209,7 +209,7 @@ test.describe("Quiz Creation", () => {
 
     // Verify the manual module card appears with the module name
     const manualModuleCard = page.getByTestId(
-      `manual-module-card-${mockManualModuleResponse.module_id}`
+      `manual-module-card-${mockManualModuleResponse.module_id}`,
     )
     await expect(manualModuleCard).toBeVisible()
     await expect(manualModuleCard.getByText(manualModuleName)).toBeVisible()
@@ -235,7 +235,10 @@ test.describe("Quiz Creation", () => {
     await mockCreateQuiz(page, quizWithInstructions)
     await mockQuizDetail(page, quizWithInstructions.id!, quizWithInstructions)
     await mockQuizQuestions(page, quizWithInstructions.id!, [])
-    await mockQuizStats(page, quizWithInstructions.id!, { total: 0, approved: 0 })
+    await mockQuizStats(page, quizWithInstructions.id!, {
+      total: 0,
+      approved: 0,
+    })
 
     // Mock modules for all courses
     for (const course of mockCourses) {

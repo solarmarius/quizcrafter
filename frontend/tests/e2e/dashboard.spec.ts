@@ -1,11 +1,11 @@
-import { test, expect } from "@playwright/test"
+import { expect, test } from "@playwright/test"
 import { mockUserMe, mockUserQuizzes } from "../fixtures/api-mocking"
 import {
-  mockUser,
-  mockQuizList,
   mockEmptyQuizList,
-  mockQuizReadyForReview,
   mockQuizGenerating,
+  mockQuizList,
+  mockQuizReadyForReview,
+  mockUser,
 } from "../mocks"
 
 test.describe("Dashboard", () => {
@@ -25,7 +25,7 @@ test.describe("Dashboard", () => {
 
     // Should display Create New Quiz button
     await expect(
-      page.getByRole("link", { name: /create new quiz/i })
+      page.getByRole("link", { name: /create new quiz/i }),
     ).toBeVisible()
 
     // Should display Help and Resources section
@@ -55,7 +55,9 @@ test.describe("Dashboard", () => {
 
     // Should show count badges (1 for review, 1 generating)
     // The counts appear as badges next to the panel titles
-    const reviewPanel = page.locator("text=Quizzes Needing Review").locator("..")
+    const reviewPanel = page
+      .locator("text=Quizzes Needing Review")
+      .locator("..")
     await expect(reviewPanel.getByText("1")).toBeVisible()
 
     const generatingPanel = page

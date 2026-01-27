@@ -51,9 +51,13 @@ jobs:
       - uses: actions/setup-node@v6
         with:
           node-version: lts/*
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
       - uses: actions/setup-python@v6
         with:
           python-version: "3.10"
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
       - name: Setup tmate session
         uses: mxschmitt/action-tmate@v3
         if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.debug_enabled == 'true' }}
@@ -97,8 +101,12 @@ jobs:
       - run: uv run bash scripts/generate-client.sh
         env:
           VIRTUAL_ENV: backend/.venv
-      - run: docker compose build
-      - run: docker compose down -v --remove-orphans
+      - name: Build images with cache
+        run: docker compose build
+        env:
+          DOCKER_BUILDKIT: 1
+          COMPOSE_DOCKER_CLI_BUILD: 1
+          BUILDKIT_INLINE_CACHE: 1
       - name: Run Playwright tests
         run: docker compose run --rm playwright npx playwright test --fail-on-flaky-tests --trace=retain-on-failure --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }}
       - run: docker compose down -v --remove-orphans

@@ -1,21 +1,21 @@
-import { test, expect } from "@playwright/test"
+import { expect, test } from "@playwright/test"
 import {
-  mockUserMe,
-  mockUserQuizzes,
+  mockBulkApprove,
+  mockCreateQuestion,
+  mockExportQuiz,
   mockQuizDetail,
   mockQuizQuestions,
   mockQuizStats,
-  mockBulkApprove,
-  mockExportQuiz,
-  mockCreateQuestion,
+  mockUserMe,
+  mockUserQuizzes,
 } from "../fixtures/api-mocking"
 import {
-  mockUser,
+  mockMultipleChoiceQuestion,
+  mockQuestionsList,
   mockQuizList,
   mockQuizReadyForReview,
-  mockQuestionsList,
   mockQuizStats as mockStats,
-  mockMultipleChoiceQuestion,
+  mockUser,
 } from "../mocks"
 
 test.describe("Question Review", () => {
@@ -23,7 +23,11 @@ test.describe("Question Review", () => {
     // Set up API mocks
     await mockUserMe(page, mockUser)
     await mockUserQuizzes(page, mockQuizList)
-    await mockQuizDetail(page, mockQuizReadyForReview.id!, mockQuizReadyForReview)
+    await mockQuizDetail(
+      page,
+      mockQuizReadyForReview.id!,
+      mockQuizReadyForReview,
+    )
     await mockQuizQuestions(page, mockQuizReadyForReview.id!, mockQuestionsList)
     await mockQuizStats(page, mockQuizReadyForReview.id!, mockStats)
 
@@ -41,7 +45,7 @@ test.describe("Question Review", () => {
 
     // Should display Add Question button
     await expect(
-      page.getByRole("button", { name: /add question/i })
+      page.getByRole("button", { name: /add question/i }),
     ).toBeVisible()
   })
 
@@ -49,7 +53,11 @@ test.describe("Question Review", () => {
     // Set up API mocks
     await mockUserMe(page, mockUser)
     await mockUserQuizzes(page, mockQuizList)
-    await mockQuizDetail(page, mockQuizReadyForReview.id!, mockQuizReadyForReview)
+    await mockQuizDetail(
+      page,
+      mockQuizReadyForReview.id!,
+      mockQuizReadyForReview,
+    )
     await mockQuizQuestions(page, mockQuizReadyForReview.id!, mockQuestionsList)
     await mockQuizStats(page, mockQuizReadyForReview.id!, mockStats)
 
@@ -61,7 +69,7 @@ test.describe("Question Review", () => {
 
     // Should display stats (e.g., "5 of 10" from mockStats)
     await expect(
-      page.getByText(`${mockStats.approved} of ${mockStats.total}`)
+      page.getByText(`${mockStats.approved} of ${mockStats.total}`),
     ).toBeVisible()
   })
 
@@ -81,7 +89,11 @@ test.describe("Question Review", () => {
     // Set up API mocks
     await mockUserMe(page, mockUser)
     await mockUserQuizzes(page, mockQuizList)
-    await mockQuizDetail(page, mockQuizReadyForReview.id!, mockQuizReadyForReview)
+    await mockQuizDetail(
+      page,
+      mockQuizReadyForReview.id!,
+      mockQuizReadyForReview,
+    )
     await mockQuizQuestions(page, mockQuizReadyForReview.id!, approvedQuestions)
     await mockQuizStats(page, mockQuizReadyForReview.id!, allApprovedStats)
     await mockBulkApprove(page, mockQuizReadyForReview.id!, {
@@ -126,7 +138,11 @@ test.describe("Question Review", () => {
     // Set up API mocks
     await mockUserMe(page, mockUser)
     await mockUserQuizzes(page, mockQuizList)
-    await mockQuizDetail(page, mockQuizReadyForReview.id!, mockQuizReadyForReview)
+    await mockQuizDetail(
+      page,
+      mockQuizReadyForReview.id!,
+      mockQuizReadyForReview,
+    )
     await mockQuizQuestions(page, mockQuizReadyForReview.id!, mockQuestionsList)
     await mockQuizStats(page, mockQuizReadyForReview.id!, mockStats)
     await mockCreateQuestion(page, mockQuizReadyForReview.id!, newQuestion)
@@ -150,7 +166,10 @@ test.describe("Question Review", () => {
 
     // Fill out the form using locators relative to labels
     const dialog = page.locator('[role="dialog"]')
-    await dialog.locator("textarea").first().fill("What is the capital of France?")
+    await dialog
+      .locator("textarea")
+      .first()
+      .fill("What is the capital of France?")
     await dialog.getByRole("textbox").nth(1).fill("London") // Option A
     await dialog.getByRole("textbox").nth(2).fill("Paris") // Option B
     await dialog.getByRole("textbox").nth(3).fill("Berlin") // Option C

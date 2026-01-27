@@ -1,6 +1,6 @@
-import { test, expect } from "@playwright/test"
+import { expect, test } from "@playwright/test"
 import { mockUserMe, mockUserQuizzes } from "../fixtures/api-mocking"
-import { mockUser, mockEmptyQuizList } from "../mocks"
+import { mockEmptyQuizList, mockUser } from "../mocks"
 
 test.describe("Authentication", () => {
   test("displays login page for unauthenticated users", async ({ browser }) => {
@@ -18,7 +18,7 @@ test.describe("Authentication", () => {
 
     // Should display the Canvas login button
     await expect(
-      page.getByRole("button", { name: /continue with canvas/i })
+      page.getByRole("button", { name: /continue with canvas/i }),
     ).toBeVisible()
 
     // Should display welcome text
