@@ -1,34 +1,39 @@
-import { test as setup } from "@playwright/test"
+import { expect, test as setup } from "@playwright/test"
+import { mockUserMe, mockUserQuizzes } from "./fixtures/api-mocking"
+import { mockEmptyQuizList, mockUser } from "./mocks"
 
-const authFile = "playwright/.auth/user.json"
+// Mock JWT used only in Playwright tests:
+// - Header: {"alg": "HS256", "typ": "JWT"}
+// - Payload: {"sub": "test-user-uuid-1234", "name": "Test User", "iat": 1705322400}
+// - The `sub` claim matches `mockUser.id` from ./mocks/user.mock.ts
+// - The signature "mock_signature" is intentionally non-cryptographic for testing
+const MOCK_JWT_TOKEN =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LXVzZXItdXVpZC0xMjM0IiwibmFtZSI6IlRlc3QgVXNlciIsImlhdCI6MTcwNTMyMjQwMH0.mock_signature"
+
+const AUTH_FILE = "playwright/.auth/user.json"
 
 setup("authenticate", async ({ page }) => {
-  // Mock successful authentication by setting up the necessary tokens/cookies
-  // This simulates a successful Canvas OAuth flow without actually going through it
+  // Mock the API endpoints using shared mock functions
+  await mockUserMe(page, mockUser)
+  await mockUserQuizzes(page, mockEmptyQuizList)
 
-  // Navigate to the app
+  // Navigate to the app and inject the mock token
   await page.goto("/")
 
-  // Add authentication cookies/localStorage to simulate logged-in state
-  await page.evaluate(() => {
-    // Mock authentication tokens in localStorage - use the correct token name
-    localStorage.setItem("access_token", "mock_access_token_12345")
-    localStorage.setItem(
-      "user_data",
-      JSON.stringify({
-        id: "test_user_123",
-        name: "Test User",
-        email: "test@example.com",
-      }),
-    )
-  })
+  // Inject the mock JWT token into localStorage
+  await page.evaluate((token) => {
+    localStorage.setItem("access_token", token)
+  }, MOCK_JWT_TOKEN)
 
-  // Reload to ensure the auth state is recognized
+  // Reload to apply the authentication
   await page.reload()
 
-  // Wait for the authenticated page to load
+  // Verify we're authenticated by checking we're on the dashboard
+  await expect(page).toHaveURL("/")
+
+  // Wait for the page to be fully loaded
   await page.waitForLoadState("networkidle")
 
-  // Save signed-in state to 'playwright/.auth/user.json'
-  await page.context().storageState({ path: authFile })
+  // Save the storage state for reuse by other tests
+  await page.context().storageState({ path: AUTH_FILE })
 })
