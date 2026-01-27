@@ -490,7 +490,11 @@ export const ModuleQuestionSelectionStep: React.FC<
             display="inline-block"
           >
             <RouterLink
-              to={getLocalizedRoute(LOCALIZED_ROUTES.questionTypes) as "/question-types"}
+              to={
+                getLocalizedRoute(
+                  LOCALIZED_ROUTES.questionTypes,
+                ) as "/question-types"
+              }
             >
               {t("questionConfig.learnMoreQuestionTypes")}
             </RouterLink>
