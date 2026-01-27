@@ -245,7 +245,9 @@ secrets:
 
 | Secret Name | Description |
 |-------------|-------------|
-| `AZURE_CREDENTIALS` | Service principal JSON for Azure login |
+| `AZURE_CLIENT_ID` | Microsoft Entra Application (client) ID for OIDC |
+| `AZURE_TENANT_ID` | Azure AD tenant ID for OIDC |
+| `AZURE_SUBSCRIPTION_ID` | Azure subscription ID for OIDC |
 | `ACR_LOGIN_SERVER` | `quizcrafteracr.azurecr.io` |
 | `ACR_USERNAME` | Container registry username |
 | `ACR_PASSWORD` | Container registry password |

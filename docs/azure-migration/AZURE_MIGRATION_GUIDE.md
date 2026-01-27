@@ -199,24 +199,80 @@ az provider register --namespace Microsoft.Web
 az provider show --namespace Microsoft.App --query "registrationState"
 ```
 
-### Step 1.3: Create Service Principal for GitHub Actions
+### Step 1.3: Configure OpenID Connect (OIDC) for GitHub Actions
+
+Using OIDC with Microsoft Entra is more secure than service principal secrets - no credentials to rotate or manage.
+
+#### Step 1.3.1: Create Microsoft Entra Application
 
 ```bash
-# Create service principal with Contributor role on subscription
-SP_NAME="${APP_NAME}-github-actions"
-SUBSCRIPTION_ID=$(az account show --query id -o tsv)
+APP_NAME="${APP_NAME}-github-oidc"
 
-az ad sp create-for-rbac \
-  --name $SP_NAME \
-  --role Contributor \
-  --scopes /subscriptions/$SUBSCRIPTION_ID \
-  --sdk-auth > azure-credentials.json
+# Create the application
+az ad app create --display-name $APP_NAME
+APP_ID=$(az ad app list --display-name $APP_NAME --query "[0].appId" -o tsv)
 
-# IMPORTANT: Save this output - you'll need it for GitHub secrets
-cat azure-credentials.json
+# Create service principal for the app
+az ad sp create --id $APP_ID
 ```
 
-**Store the output as a GitHub secret named `AZURE_CREDENTIALS`.**
+#### Step 1.3.2: Add Federated Credentials for GitHub
+
+```bash
+# Set your GitHub org/repo info
+GITHUB_ORG="your-github-org"
+GITHUB_REPO="quizcrafter"
+
+# Create federated credential for main branch
+az ad app federated-credential create --id $APP_ID --parameters "{
+  \"name\": \"github-main\",
+  \"issuer\": \"https://token.actions.githubusercontent.com\",
+  \"subject\": \"repo:${GITHUB_ORG}/${GITHUB_REPO}:ref:refs/heads/main\",
+  \"audiences\": [\"api://AzureADTokenExchange\"]
+}"
+
+# Create federated credential for pull requests (optional)
+az ad app federated-credential create --id $APP_ID --parameters "{
+  \"name\": \"github-pr\",
+  \"issuer\": \"https://token.actions.githubusercontent.com\",
+  \"subject\": \"repo:${GITHUB_ORG}/${GITHUB_REPO}:pull_request\",
+  \"audiences\": [\"api://AzureADTokenExchange\"]
+}"
+```
+
+#### Step 1.3.3: Assign Contributor Role
+
+```bash
+SUBSCRIPTION_ID=$(az account show --query id -o tsv)
+SP_OBJECT_ID=$(az ad sp list --display-name $APP_NAME --query "[0].id" -o tsv)
+
+# For specific resource group (recommended)
+az role assignment create \
+  --role Contributor \
+  --assignee-object-id $SP_OBJECT_ID \
+  --assignee-principal-type ServicePrincipal \
+  --scope /subscriptions/$SUBSCRIPTION_ID/resourceGroups/${APP_NAME}-prod-rg
+
+# Or for entire subscription (if deploying to multiple resource groups)
+az role assignment create \
+  --role Contributor \
+  --assignee-object-id $SP_OBJECT_ID \
+  --assignee-principal-type ServicePrincipal \
+  --scope /subscriptions/$SUBSCRIPTION_ID
+```
+
+#### Step 1.3.4: Get Values for GitHub Secrets
+
+```bash
+echo "AZURE_CLIENT_ID: $APP_ID"
+echo "AZURE_TENANT_ID: $(az account show --query tenantId -o tsv)"
+echo "AZURE_SUBSCRIPTION_ID: $SUBSCRIPTION_ID"
+```
+
+**Store these as GitHub secrets:**
+- `AZURE_CLIENT_ID` - The Application (client) ID
+- `AZURE_TENANT_ID` - Your Azure AD tenant ID
+- `AZURE_SUBSCRIPTION_ID` - Your Azure subscription ID
 
 ---
 
@@ -1238,7 +1294,9 @@ Add these secrets to your GitHub repository (Settings > Secrets and variables > 
 
 | Secret Name | Value |
 |-------------|-------|
-| `AZURE_CREDENTIALS` | Service principal JSON from Phase 1 |
+| `AZURE_CLIENT_ID` | Microsoft Entra Application (client) ID |
+| `AZURE_TENANT_ID` | Azure AD tenant ID |
+| `AZURE_SUBSCRIPTION_ID` | Azure subscription ID |
 | `ACR_LOGIN_SERVER` | `quizcrafteracr.azurecr.io` |
 | `ACR_USERNAME` | ACR admin username |
 | `ACR_PASSWORD` | ACR admin password |
@@ -1342,12 +1400,17 @@ jobs:
     needs: build-backend
     runs-on: ubuntu-latest
     environment: production
+    permissions:
+      id-token: write
+      contents: read
 
     steps:
-      - name: Azure Login
+      - name: Azure Login (OIDC)
         uses: azure/login@v2
         with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
       - name: Deploy to Container Apps
         uses: azure/container-apps-deploy-action@v2
@@ -1423,14 +1486,19 @@ jobs:
     needs: test
     runs-on: ubuntu-latest
     environment: staging
+    permissions:
+      id-token: write
+      contents: read
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Azure Login
+      - name: Azure Login (OIDC)
         uses: azure/login@v2
         with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
       - name: Log in to ACR
         uses: azure/docker-login@v2
