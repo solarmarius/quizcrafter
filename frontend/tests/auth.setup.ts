@@ -1,5 +1,6 @@
 import { test as setup, expect } from "@playwright/test"
-import { mockUser } from "./mocks"
+import { mockUserMe, mockUserQuizzes } from "./fixtures/api-mocking"
+import { mockUser, mockEmptyQuizList } from "./mocks"
 
 const MOCK_JWT_TOKEN =
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LXVzZXItdXVpZC0xMjM0IiwibmFtZSI6IlRlc3QgVXNlciIsImlhdCI6MTcwNTMyMjQwMH0.mock_signature"
@@ -7,31 +8,9 @@ const MOCK_JWT_TOKEN =
 const AUTH_FILE = "playwright/.auth/user.json"
 
 setup("authenticate", async ({ page }) => {
-  // Mock the /users/me API endpoint before any navigation
-  await page.route("**/api/v1/users/me", async (route) => {
-    if (route.request().method() === "GET") {
-      await route.fulfill({
-        status: 200,
-        contentType: "application/json",
-        body: JSON.stringify(mockUser),
-      })
-    } else {
-      await route.continue()
-    }
-  })
-
-  // Mock the quizzes endpoint to prevent errors
-  await page.route("**/api/v1/quiz/", async (route) => {
-    if (route.request().method() === "GET") {
-      await route.fulfill({
-        status: 200,
-        contentType: "application/json",
-        body: JSON.stringify([]),
-      })
-    } else {
-      await route.continue()
-    }
-  })
+  // Mock the API endpoints using shared mock functions
+  await mockUserMe(page, mockUser)
+  await mockUserQuizzes(page, mockEmptyQuizList)
 
   // Navigate to the app and inject the mock token
   await page.goto("/")

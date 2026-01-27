@@ -45,7 +45,7 @@ export const mockQuizReadyForReview: Quiz = {
   id: "quiz-uuid-4",
   title: "Data Science Quiz",
   status: "ready_for_review",
-  question_count: 10,
+  question_count: 5, // Matches mockQuestionsList.length
 }
 
 export const mockQuizPublished: Quiz = {
@@ -74,8 +74,9 @@ export const mockQuizList: Quiz[] = [
 
 export const mockEmptyQuizList: Quiz[] = []
 
+// Stats that match mockQuestionsList (5 total, 1 approved)
 export const mockQuizStats = {
-  total: 10,
-  approved: 5,
-  pending: 5,
+  total: 5,
+  approved: 1,
+  pending: 4,
 }

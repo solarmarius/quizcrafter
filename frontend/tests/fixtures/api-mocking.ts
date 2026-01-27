@@ -97,11 +97,15 @@ export async function mockQuizStats(
   stats: { total: number; approved: number; pending?: number }
 ) {
   await page.route(`${API_BASE}/quiz/${quizId}/questions/stats`, async (route) => {
-    await route.fulfill({
-      status: 200,
-      contentType: "application/json",
-      body: JSON.stringify(stats),
-    })
+    if (route.request().method() === "GET") {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify(stats),
+      })
+    } else {
+      await route.continue()
+    }
   })
 }
 
@@ -133,11 +137,15 @@ export async function mockCanvasModules(
   await page.route(
     `${API_BASE}/canvas/courses/${courseId}/modules`,
     async (route) => {
-      await route.fulfill({
-        status: 200,
-        contentType: "application/json",
-        body: JSON.stringify(modules),
-      })
+      if (route.request().method() === "GET") {
+        await route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify(modules),
+        })
+      } else {
+        await route.continue()
+      }
     }
   )
 }
@@ -170,11 +178,15 @@ export async function mockApproveQuestion(
   await page.route(
     `${API_BASE}/questions/${quizId}/*/approve`,
     async (route) => {
-      await route.fulfill({
-        status: 200,
-        contentType: "application/json",
-        body: JSON.stringify({ ...approvedQuestion, is_approved: true }),
-      })
+      if (route.request().method() === "PUT") {
+        await route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify({ ...approvedQuestion, is_approved: true }),
+        })
+      } else {
+        await route.continue()
+      }
     }
   )
 }
@@ -207,11 +219,15 @@ export async function mockBulkApprove(
   await page.route(
     `${API_BASE}/questions/${quizId}/bulk-approve`,
     async (route) => {
-      await route.fulfill({
-        status: 200,
-        contentType: "application/json",
-        body: JSON.stringify(response),
-      })
+      if (route.request().method() === "PUT") {
+        await route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify(response),
+        })
+      } else {
+        await route.continue()
+      }
     }
   )
 }
@@ -221,14 +237,18 @@ export async function mockBulkApprove(
  */
 export async function mockExportQuiz(page: Page, quizId: string) {
   await page.route(`${API_BASE}/quiz/${quizId}/export`, async (route) => {
-    await route.fulfill({
-      status: 200,
-      contentType: "application/json",
-      body: JSON.stringify({
-        message: "Quiz exported successfully",
-        canvas_quiz_id: "canvas-123",
-      }),
-    })
+    if (route.request().method() === "POST") {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          message: "Quiz exported successfully",
+          canvas_quiz_id: "canvas-123",
+        }),
+      })
+    } else {
+      await route.continue()
+    }
   })
 }
 
@@ -258,11 +278,15 @@ export async function mockCreateQuestion(
  */
 export async function mockLogout(page: Page) {
   await page.route(`${API_BASE}/auth/logout`, async (route) => {
-    await route.fulfill({
-      status: 200,
-      contentType: "application/json",
-      body: JSON.stringify({ message: "Logged out successfully" }),
-    })
+    if (route.request().method() === "DELETE") {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({ message: "Logged out successfully" }),
+      })
+    } else {
+      await route.continue()
+    }
   })
 }
 
@@ -273,11 +297,15 @@ export async function mockExtractContent(page: Page, quizId: string) {
   await page.route(
     `${API_BASE}/quiz/${quizId}/extract-content`,
     async (route) => {
-      await route.fulfill({
-        status: 200,
-        contentType: "application/json",
-        body: JSON.stringify({ message: "Content extraction started" }),
-      })
+      if (route.request().method() === "POST") {
+        await route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify({ message: "Content extraction started" }),
+        })
+      } else {
+        await route.continue()
+      }
     }
   )
 }
@@ -289,11 +317,15 @@ export async function mockGenerateQuestions(page: Page, quizId: string) {
   await page.route(
     `${API_BASE}/quiz/${quizId}/generate-questions`,
     async (route) => {
-      await route.fulfill({
-        status: 200,
-        contentType: "application/json",
-        body: JSON.stringify({ message: "Question generation started" }),
-      })
+      if (route.request().method() === "POST") {
+        await route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify({ message: "Question generation started" }),
+        })
+      } else {
+        await route.continue()
+      }
     }
   )
 }
