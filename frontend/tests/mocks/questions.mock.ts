@@ -1,5 +1,10 @@
 import type { QuestionResponse } from "@/client/types.gen"
 
+// All mock questions belong to:
+// - quiz_id: "quiz-uuid-4" (mockQuizReadyForReview from ./quiz.mock.ts)
+// - module_id: "1001" (Machine Learning Basics)
+// This ensures consistency when testing quiz detail pages with questions.
+
 export const mockMultipleChoiceQuestion: QuestionResponse = {
   id: "question-uuid-1",
   quiz_id: "quiz-uuid-4",
@@ -53,6 +58,10 @@ export const mockTrueFalseQuestion: QuestionResponse = {
   module_id: "1001",
 }
 
+// 5 questions total: 1 approved, 4 pending (matches mockQuizStats in ./quiz.mock.ts)
+// - 1 approved multiple choice
+// - 3 pending multiple choice
+// - 1 pending true/false
 export const mockQuestionsList: QuestionResponse[] = [
   mockMultipleChoiceQuestion,
   mockApprovedQuestion,

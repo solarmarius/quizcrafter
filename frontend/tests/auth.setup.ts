@@ -2,6 +2,11 @@ import { expect, test as setup } from "@playwright/test"
 import { mockUserMe, mockUserQuizzes } from "./fixtures/api-mocking"
 import { mockEmptyQuizList, mockUser } from "./mocks"
 
+// Mock JWT used only in Playwright tests:
+// - Header: {"alg": "HS256", "typ": "JWT"}
+// - Payload: {"sub": "test-user-uuid-1234", "name": "Test User", "iat": 1705322400}
+// - The `sub` claim matches `mockUser.id` from ./mocks/user.mock.ts
+// - The signature "mock_signature" is intentionally non-cryptographic for testing
 const MOCK_JWT_TOKEN =
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LXVzZXItdXVpZC0xMjM0IiwibmFtZSI6IlRlc3QgVXNlciIsImlhdCI6MTcwNTMyMjQwMH0.mock_signature"
 

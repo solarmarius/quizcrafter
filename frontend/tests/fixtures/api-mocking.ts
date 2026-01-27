@@ -15,6 +15,45 @@ import type { Page } from "@playwright/test"
 const API_BASE = "**://*:8000"
 
 /**
+ * Standard error response structure matching FastAPI's HTTPException format
+ */
+interface ApiErrorResponse {
+  detail: string
+}
+
+/**
+ * Mock an API endpoint to return an error response.
+ * Use this for testing error handling scenarios (4xx, 5xx responses).
+ *
+ * @example
+ * // Mock 401 Unauthorized
+ * await mockApiError(page, "/users/me", 401, "Not authenticated")
+ *
+ * @example
+ * // Mock 404 Not Found
+ * await mockApiError(page, "/quiz/invalid-id", 404, "Quiz not found")
+ *
+ * @example
+ * // Mock 500 Server Error
+ * await mockApiError(page, "/quiz/", 500, "Internal server error")
+ */
+export async function mockApiError(
+  page: Page,
+  path: string,
+  status: number,
+  detail: string,
+) {
+  const response: ApiErrorResponse = { detail }
+  await page.route(`${API_BASE}${path}`, async (route) => {
+    await route.fulfill({
+      status,
+      contentType: "application/json",
+      body: JSON.stringify(response),
+    })
+  })
+}
+
+/**
  * Mock GET /users/me endpoint
  */
 export async function mockUserMe(page: Page, user: UserPublic) {
@@ -377,9 +416,13 @@ export async function mockAllApis(page: Page, config: MockConfig) {
 
   if (config.quiz) {
     await mockQuizDetail(page, config.quiz.id!, config.quiz)
+    // Calculate approved count from questions if provided, otherwise default to 0
+    const approvedCount = config.questions
+      ? config.questions.filter((q) => q.is_approved).length
+      : 0
     await mockQuizStats(page, config.quiz.id!, {
       total: config.quiz.question_count || 0,
-      approved: 0,
+      approved: approvedCount,
     })
   }
 

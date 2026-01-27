@@ -1,7 +1,6 @@
 import { expect, test } from "@playwright/test"
 import { mockUserMe, mockUserQuizzes } from "../fixtures/api-mocking"
 import {
-  mockEmptyQuizList,
   mockQuizGenerating,
   mockQuizList,
   mockQuizReadyForReview,
