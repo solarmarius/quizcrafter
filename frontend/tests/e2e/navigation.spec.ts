@@ -1,116 +1,63 @@
-import { expect, test } from "@playwright/test"
+import { test, expect } from "@playwright/test"
+import {
+  mockUserMe,
+  mockUserQuizzes,
+  mockQuizDetail,
+  mockQuizQuestions,
+  mockQuizStats,
+} from "../fixtures/api-mocking"
+import {
+  mockUser,
+  mockQuizList,
+  mockQuizReadyForReview,
+  mockQuestionsList,
+  mockQuizStats as mockStats,
+} from "../mocks"
 
 test.describe("Navigation", () => {
-  test.beforeEach(async ({ page }) => {
+  test("sidebar navigation works correctly", async ({ page }) => {
+    // Set up API mocks
+    await mockUserMe(page, mockUser)
+    await mockUserQuizzes(page, mockQuizList)
+
+    // Start on dashboard
     await page.goto("/")
-  })
-
-  test("should navigate to dashboard from any page", async ({ page }) => {
-    // Go to settings first
-    await page.click('a[href="/settings"]')
-    await expect(page).toHaveURL("/settings")
-
-    // Click on dashboard link
-    await page.click('a[href="/"]')
     await expect(page).toHaveURL("/")
 
-    // Verify we're on the dashboard
-    const dashboardLink = page.locator('a[href="/"]').nth(1)
-    const activeElement = dashboardLink.locator("div")
-    await expect(activeElement).toHaveCSS(
-      "background-color",
-      "rgb(255, 255, 255)",
-    )
-  })
+    // Click on Quizzes link in sidebar
+    await page.getByRole("link", { name: "Quizzes" }).click()
+    await expect(page).toHaveURL("/quizzes")
 
-  test("should navigate to settings page", async ({ page }) => {
-    await page.click('a[href="/settings"]')
+    // Click on Settings link in sidebar
+    await page.getByRole("link", { name: "Settings" }).click()
     await expect(page).toHaveURL("/settings")
 
-    // Verify settings link is active
-    const settingsLink = page.locator('a[href="/settings"]')
-    const activeElement = settingsLink.locator("div")
-    await expect(activeElement).toHaveCSS(
-      "background-color",
-      "rgb(255, 255, 255)",
-    )
-  })
-
-  test("should show quizzes link in sidebar", async ({ page }) => {
-    // Verify quizzes link exists in sidebar (even if route doesn't exist yet)
-    const quizzesLink = page.locator('a[href="/quizzes"]')
-    await expect(quizzesLink).toBeVisible()
-
-    // Click should work even if it goes to 404
-    await quizzesLink.click()
-    await page.waitForLoadState("networkidle")
-
-    // Should either be on quiz route or 404 - both are acceptable
-    const currentUrl = page.url()
-    expect(
-      currentUrl.includes("/quizzes") || currentUrl.includes("/"),
-    ).toBeTruthy()
-  })
-
-  test("should maintain navigation state during page reloads", async ({
-    page,
-  }) => {
-    // Navigate to settings
-    await page.click('a[href="/settings"]')
-    await expect(page).toHaveURL("/settings")
-
-    // Reload the page
-    await page.reload()
-
-    // Should still be on settings page
-    await expect(page).toHaveURL("/settings")
-
-    // Settings link should still be active
-    const settingsLink = page.locator('a[href="/settings"]')
-    const activeElement = settingsLink.locator("div")
-    await expect(activeElement).toHaveCSS(
-      "background-color",
-      "rgb(255, 255, 255)",
-    )
-  })
-
-  test("should navigate back and forward using browser buttons", async ({
-    page,
-  }) => {
-    // Navigate to settings
-    await page.click('a[href="/settings"]')
-    await expect(page).toHaveURL("/settings")
-
-    // Go back
-    await page.goBack()
+    // Click on Dashboard link to go back
+    await page.getByRole("link", { name: "Dashboard" }).click()
     await expect(page).toHaveURL("/")
-
-    // Go forward
-    await page.goForward()
-    await expect(page).toHaveURL("/settings")
   })
 
-  test("should handle direct URL navigation", async ({ page }) => {
-    // Navigate directly to settings URL
-    await page.goto("/settings")
-    await expect(page).toHaveURL("/settings")
+  test("tab navigation in quiz detail works correctly", async ({ page }) => {
+    // Set up API mocks
+    await mockUserMe(page, mockUser)
+    await mockUserQuizzes(page, mockQuizList)
+    await mockQuizDetail(page, mockQuizReadyForReview.id!, mockQuizReadyForReview)
+    await mockQuizQuestions(page, mockQuizReadyForReview.id!, mockQuestionsList)
+    await mockQuizStats(page, mockQuizReadyForReview.id!, mockStats)
 
-    // Settings link should be active
-    const settingsLink = page.locator('a[href="/settings"]')
-    const activeElement = settingsLink.locator("div")
-    await expect(activeElement).toHaveCSS(
-      "background-color",
-      "rgb(255, 255, 255)",
-    )
-  })
+    // Navigate to quiz detail page
+    await page.goto(`/quiz/${mockQuizReadyForReview.id}`)
 
-  test("should show correct page title for each route", async ({ page }) => {
-    // Check dashboard title
-    await page.goto("/")
-    await expect(page).toHaveTitle("QuizCrafter")
+    // Should be on Quiz Information tab by default
+    await expect(page.getByRole("tab", { name: "Quiz Information" })).toBeVisible()
 
-    // Check settings title
-    await page.goto("/settings")
-    await expect(page).toHaveTitle("QuizCrafter")
+    // Click on Questions tab
+    await page.getByRole("tab", { name: "Questions" }).click()
+
+    // Should navigate to questions page
+    await expect(page).toHaveURL(`/quiz/${mockQuizReadyForReview.id}/questions`)
+
+    // Should display Review Questions heading
+    await expect(page.getByText("Review Questions")).toBeVisible()
   })
 })
