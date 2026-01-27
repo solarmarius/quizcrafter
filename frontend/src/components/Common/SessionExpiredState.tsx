@@ -11,7 +11,7 @@ export function SessionExpiredState() {
 
   const handleLoginClick = () => {
     clearAuthToken()
-    navigate({ to: "/login" })
+    navigate({ to: "/login", search: { error: undefined } })
   }
 
   return (

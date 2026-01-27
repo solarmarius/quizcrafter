@@ -39,7 +39,7 @@ const handleApiError = (error: Error) => {
       // Delay redirect slightly to show toast
       setTimeout(() => {
         clearAuthToken()
-        router.navigate({ to: "/login" })
+        router.navigate({ to: "/login", search: { error: undefined } })
       }, 1000)
     }
     // Canvas 401s will bubble up to component level for graceful handling
