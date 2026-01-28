@@ -28,7 +28,7 @@ export function useAuth() {
       console.error("Logout error:", error)
     } finally {
       clearAuthToken()
-      navigate({ to: "/login" })
+      navigate({ to: "/login", search: { error: undefined } })
     }
   }
 

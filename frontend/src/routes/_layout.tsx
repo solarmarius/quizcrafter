@@ -12,6 +12,7 @@ export const Route = createFileRoute("/_layout")({
     if (!isAuthenticated()) {
       throw redirect({
         to: "/login",
+        search: { error: undefined },
       })
     }
   },
