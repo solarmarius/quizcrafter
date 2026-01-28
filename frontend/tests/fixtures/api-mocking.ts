@@ -3,6 +3,8 @@ import type {
   CanvasCourse,
   CanvasModule,
   ManualModuleResponse,
+  ModuleCoverageResponse,
+  ModuleListResponse,
   QuestionResponse,
   Quiz,
   UserPublic,
@@ -390,6 +392,54 @@ export async function mockUploadManualModule(
       await route.continue()
     }
   })
+}
+
+/**
+ * Mock GET /coverage/{quiz_id}/modules endpoint
+ */
+export async function mockCoverageModuleList(
+  page: Page,
+  quizId: string,
+  response: ModuleListResponse,
+) {
+  await page.route(`${API_BASE}/coverage/${quizId}/modules`, async (route) => {
+    if (route.request().method() === "GET") {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify(response),
+      })
+    } else {
+      await route.continue()
+    }
+  })
+}
+
+/**
+ * Mock GET /coverage/{quiz_id}/modules/{module_id} endpoint
+ * Uses wildcard to match any module_id format (handles URL encoding)
+ */
+export async function mockModuleCoverage(
+  page: Page,
+  quizId: string,
+  _moduleId: string,
+  response: ModuleCoverageResponse,
+) {
+  // Use wildcard to match any module_id, including URL-encoded variants
+  await page.route(
+    `${API_BASE}/coverage/${quizId}/modules/*`,
+    async (route) => {
+      if (route.request().method() === "GET") {
+        await route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify(response),
+        })
+      } else {
+        await route.continue()
+      }
+    },
+  )
 }
 
 /**
