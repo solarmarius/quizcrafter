@@ -3,8 +3,8 @@
 import re
 from dataclasses import dataclass
 
-import nltk  # type: ignore[import-not-found]
-from nltk.tokenize import sent_tokenize  # type: ignore[import-not-found]
+import nltk  # type: ignore[import-untyped]
+from nltk.tokenize import sent_tokenize  # type: ignore[import-untyped]
 
 from src.config import get_logger
 

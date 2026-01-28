@@ -58,6 +58,10 @@ services:
     restart: "no"
     ports:
       - "8000:8000"
+    dns:
+      - 8.8.8.8
+      - 8.8.4.4
+      - 1.1.1.1
     build:
       context: ./backend
     # command: sleep infinity # Infinite loop to keep container alive doing nothing

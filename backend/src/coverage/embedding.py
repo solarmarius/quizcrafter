@@ -29,19 +29,25 @@ def get_embedding_client() -> AzureOpenAI:
     global _client
     if _client is None:
         endpoint = settings.AZURE_OPENAI_EMBEDDING_ENDPOINT
-        api_key = settings.AZURE_OPENAI_API_KEY
+        api_key = settings.AZURE_OPENAI_EMBEDDING_API_KEY
 
         if not endpoint:
             raise ValueError(
                 "AZURE_OPENAI_EMBEDDING_ENDPOINT is required for coverage analysis"
             )
         if not api_key:
-            raise ValueError("AZURE_OPENAI_API_KEY is required for coverage analysis")
+            raise ValueError(
+                "AZURE_OPENAI_EMBEDDING_API_KEY is required for coverage analysis"
+            )
+
+        # Ensure endpoint doesn't have trailing slash for consistent URL building
+        endpoint = endpoint.rstrip("/")
 
         logger.info(
             "initializing_azure_embedding_client",
             endpoint=endpoint,
             deployment=settings.AZURE_OPENAI_EMBEDDING_DEPLOYMENT,
+            api_version=settings.AZURE_OPENAI_EMBEDDING_API_VERSION,
         )
         _client = AzureOpenAI(
             api_key=api_key,

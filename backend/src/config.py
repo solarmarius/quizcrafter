@@ -97,9 +97,10 @@ class Settings(BaseSettings):
     LLM_API_TIMEOUT: float = 500.0  # LLM request timeout in seconds (5 minutes)
 
     # Azure OpenAI Embeddings settings (separate endpoint for coverage analysis)
+    AZURE_OPENAI_EMBEDDING_API_KEY: str | None = None
     AZURE_OPENAI_EMBEDDING_ENDPOINT: str | None = None
     AZURE_OPENAI_EMBEDDING_DEPLOYMENT: str = "text-embedding-3-large"
-    AZURE_OPENAI_EMBEDDING_API_VERSION: str = "2024-02-01"
+    AZURE_OPENAI_EMBEDDING_API_VERSION: str = "2024-12-01-preview"
 
     # Module-based question generation settings
     MAX_CONCURRENT_MODULES: int = 5  # Maximum concurrent module processing tasks
