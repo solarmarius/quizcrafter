@@ -37,6 +37,9 @@ dependencies = [
     "openai>=1.91.0",
     "asyncpg>=0.30.0",
     "greenlet>=3.1.1",
+    # Content coverage analysis
+    "nltk>=3.8.0",
+    "numpy>=1.26.0",
 ]
 
 [tool.uv]

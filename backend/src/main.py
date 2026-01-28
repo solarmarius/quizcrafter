@@ -12,6 +12,7 @@ from src.auth import router as auth_router
 from src.auth import users_router
 from src.canvas.router import router as canvas_router
 from src.config import configure_logging, get_logger, settings
+from src.coverage.router import router as coverage_router
 from src.exceptions import (
     ServiceError,
     general_exception_handler,
@@ -75,6 +76,7 @@ api_router.include_router(canvas_router)
 api_router.include_router(quiz_router)
 api_router.include_router(quiz_sharing_router)
 api_router.include_router(question_router)
+api_router.include_router(coverage_router)
 
 
 # Health check endpoint (moved from api/routes/utils.py)

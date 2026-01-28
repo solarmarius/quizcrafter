@@ -90,11 +90,16 @@ class Settings(BaseSettings):
     # Course filtering
     CANVAS_COURSE_PREFIX_FILTER: str = ""
 
-    # Azure OpenAI settings
+    # Azure OpenAI settings (Chat/Completion)
     AZURE_OPENAI_API_KEY: str | None = None
     AZURE_OPENAI_ENDPOINT: str | None = None
     AZURE_OPENAI_API_VERSION: str | None = None
     LLM_API_TIMEOUT: float = 500.0  # LLM request timeout in seconds (5 minutes)
+
+    # Azure OpenAI Embeddings settings (separate endpoint for coverage analysis)
+    AZURE_OPENAI_EMBEDDING_ENDPOINT: str | None = None
+    AZURE_OPENAI_EMBEDDING_DEPLOYMENT: str = "text-embedding-3-large"
+    AZURE_OPENAI_EMBEDDING_API_VERSION: str = "2024-02-01"
 
     # Module-based question generation settings
     MAX_CONCURRENT_MODULES: int = 5  # Maximum concurrent module processing tasks
