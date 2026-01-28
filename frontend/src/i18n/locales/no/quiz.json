@@ -215,7 +215,8 @@
     "lastUpdated": "Sist oppdatert",
     "tabs": {
       "info": "Quiz-informasjon",
-      "questions": "Spørsmål"
+      "questions": "Spørsmål",
+      "coverage": "Dekning"
     }
   },
   "generationTrigger": {

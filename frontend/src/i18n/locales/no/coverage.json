@@ -1,0 +1,64 @@
+{
+  "title": "Innholdsdekning",
+  "description": "Analyser hvor godt sporsmalene dekker kildeinnholdet",
+  "selectModule": {
+    "title": "Velg en Modul",
+    "description": "Velg en modul for a analysere innholdsdekningen",
+    "noModules": "Ingen Moduler Tilgjengelig",
+    "noModulesDescription": "Ingen moduler er tilgjengelige for dekningsanalyse. Sjekk at du har ekstrahert innhold og generert sporsmal.",
+    "questionCount": "{{count}} sporsmal",
+    "questionCount_other": "{{count}} sporsmal",
+    "noContent": "Ingen innhold",
+    "needsContent": "Denne modulen trenger ekstrahert innhold for analyse",
+    "needsQuestions": "Denne modulen trenger sporsmal for analyse"
+  },
+  "statistics": {
+    "covered": "dekket",
+    "sentences": "Setninger",
+    "questions": "Sporsmal",
+    "largestGap": "Storste Gap",
+    "gapSentences": "{{count}} setning",
+    "gapSentences_other": "{{count}} setninger"
+  },
+  "levels": {
+    "high": "Hoy Dekning",
+    "medium": "Middels Dekning",
+    "low": "Lav Dekning",
+    "none": "Ingen Dekning"
+  },
+  "legend": {
+    "title": "Dekningsforklaring"
+  },
+  "content": {
+    "title": "Annotert Innhold",
+    "words": "ord"
+  },
+  "tooltip": {
+    "matchedQuestions": "Matchede Sporsmal",
+    "more": "flere"
+  },
+  "detail": {
+    "title": "Setningsdetaljer",
+    "sentence": "Setning",
+    "score": "Poengsum",
+    "level": "Niva",
+    "matchedQuestions": "Matchede Sporsmal",
+    "similarity": "Likhet"
+  },
+  "actions": {
+    "backToModules": "Tilbake til Moduler"
+  },
+  "loading": {
+    "computing": "Beregner Dekning",
+    "computingDescription": "Analyserer semantisk likhet mellom sporsmal og innhold. Dette kan ta noen sekunder."
+  },
+  "errors": {
+    "loadModulesFailed": "Kunne Ikke Laste Moduler",
+    "loadModulesMessage": "Kunne ikke laste tilgjengelige moduler for dekningsanalyse.",
+    "computeFailed": "Dekningsberegning Feilet",
+    "computeFailedMessage": "Kunne ikke beregne dekning for denne modulen. Vennligst prov igjen."
+  },
+  "tabs": {
+    "coverage": "Dekning"
+  }
+}

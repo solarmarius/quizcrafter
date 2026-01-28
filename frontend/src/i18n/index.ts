@@ -4,6 +4,7 @@ import { initReactI18next } from "react-i18next"
 
 // Import English translation files
 import enCommon from "./locales/en/common.json"
+import enCoverage from "./locales/en/coverage.json"
 import enCreation from "./locales/en/creation.json"
 import enDashboard from "./locales/en/dashboard.json"
 import enNavigation from "./locales/en/navigation.json"
@@ -13,6 +14,7 @@ import enValidation from "./locales/en/validation.json"
 
 // Import Norwegian translation files
 import noCommon from "./locales/no/common.json"
+import noCoverage from "./locales/no/coverage.json"
 import noCreation from "./locales/no/creation.json"
 import noDashboard from "./locales/no/dashboard.json"
 import noNavigation from "./locales/no/navigation.json"
@@ -37,6 +39,7 @@ export const STORAGE_KEY_UI_LANGUAGE = "quizcrafter_ui_language"
 const resources = {
   en: {
     common: enCommon,
+    coverage: enCoverage,
     navigation: enNavigation,
     quiz: enQuiz,
     creation: enCreation,
@@ -46,6 +49,7 @@ const resources = {
   },
   no: {
     common: noCommon,
+    coverage: noCoverage,
     navigation: noNavigation,
     quiz: noQuiz,
     creation: noCreation,
@@ -64,6 +68,7 @@ i18n
     defaultNS: "common",
     ns: [
       "common",
+      "coverage",
       "navigation",
       "quiz",
       "creation",

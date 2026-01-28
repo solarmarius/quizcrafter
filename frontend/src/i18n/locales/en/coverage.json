@@ -1,0 +1,64 @@
+{
+  "title": "Content Coverage",
+  "description": "Analyze how well your questions cover the source content",
+  "selectModule": {
+    "title": "Select a Module",
+    "description": "Choose a module to analyze its content coverage",
+    "noModules": "No Modules Available",
+    "noModulesDescription": "No modules are available for coverage analysis. Make sure you have extracted content and generated questions.",
+    "questionCount": "{{count}} question",
+    "questionCount_other": "{{count}} questions",
+    "noContent": "No content",
+    "needsContent": "This module needs extracted content for analysis",
+    "needsQuestions": "This module needs questions for analysis"
+  },
+  "statistics": {
+    "covered": "covered",
+    "sentences": "Sentences",
+    "questions": "Questions",
+    "largestGap": "Largest Gap",
+    "gapSentences": "{{count}} sentence",
+    "gapSentences_other": "{{count}} sentences"
+  },
+  "levels": {
+    "high": "High Coverage",
+    "medium": "Medium Coverage",
+    "low": "Low Coverage",
+    "none": "No Coverage"
+  },
+  "legend": {
+    "title": "Coverage Legend"
+  },
+  "content": {
+    "title": "Annotated Content",
+    "words": "words"
+  },
+  "tooltip": {
+    "matchedQuestions": "Matched Questions",
+    "more": "more"
+  },
+  "detail": {
+    "title": "Sentence Details",
+    "sentence": "Sentence",
+    "score": "Score",
+    "level": "Level",
+    "matchedQuestions": "Matched Questions",
+    "similarity": "Similarity"
+  },
+  "actions": {
+    "backToModules": "Back to Modules"
+  },
+  "loading": {
+    "computing": "Computing Coverage",
+    "computingDescription": "Analyzing semantic similarity between questions and content. This may take a few seconds."
+  },
+  "errors": {
+    "loadModulesFailed": "Failed to Load Modules",
+    "loadModulesMessage": "Unable to load available modules for coverage analysis.",
+    "computeFailed": "Coverage Computation Failed",
+    "computeFailedMessage": "Unable to compute coverage for this module. Please try again."
+  },
+  "tabs": {
+    "coverage": "Coverage"
+  }
+}

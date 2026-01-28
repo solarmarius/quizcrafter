@@ -72,6 +72,7 @@ class QuestionMapping(BaseModel):
         max_length=300,
         description="Truncated question text for display",
     )
+    question_type: str = Field(description="Type of question (e.g., multiple_choice)")
     best_matching_sentences: list[int] = Field(
         description="Indices of best matching sentences"
     )

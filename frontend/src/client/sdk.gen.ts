@@ -4,69 +4,73 @@ import type { CancelablePromise } from "./core/CancelablePromise"
 import { OpenAPI } from "./core/OpenAPI"
 import { request as __request } from "./core/request"
 import type {
-  AuthAuthCanvasResponse,
   AuthLoginCanvasResponse,
+  AuthAuthCanvasResponse,
   AuthLogoutCanvasResponse,
+  CanvasGetCoursesResponse,
   CanvasGetCourseModulesData,
   CanvasGetCourseModulesResponse,
-  CanvasGetCoursesResponse,
-  CanvasGetFileInfoData,
-  CanvasGetFileInfoResponse,
   CanvasGetModuleItemsData,
   CanvasGetModuleItemsResponse,
   CanvasGetPageContentData,
   CanvasGetPageContentResponse,
-  QuestionsApproveQuestionData,
-  QuestionsApproveQuestionResponse,
+  CanvasGetFileInfoData,
+  CanvasGetFileInfoResponse,
+  CoverageListCoverageModulesData,
+  CoverageListCoverageModulesResponse,
+  CoverageGetModuleCoverageData,
+  CoverageGetModuleCoverageResponse,
+  QuestionsGetQuizQuestionsData,
+  QuestionsGetQuizQuestionsResponse,
+  QuestionsCreateQuestionData,
+  QuestionsCreateQuestionResponse,
+  QuestionsGetQuestionData,
+  QuestionsGetQuestionResponse,
+  QuestionsUpdateQuestionData,
+  QuestionsUpdateQuestionResponse,
+  QuestionsDeleteQuestionData,
+  QuestionsDeleteQuestionResponse,
   QuestionsBulkApproveQuestionsData,
   QuestionsBulkApproveQuestionsResponse,
   QuestionsBulkDeleteQuestionsData,
   QuestionsBulkDeleteQuestionsResponse,
-  QuestionsCreateQuestionData,
-  QuestionsCreateQuestionResponse,
-  QuestionsDeleteQuestionData,
-  QuestionsDeleteQuestionResponse,
-  QuestionsGetQuestionData,
-  QuestionsGetQuestionResponse,
-  QuestionsGetQuizQuestionsData,
-  QuestionsGetQuizQuestionsResponse,
-  QuestionsUpdateQuestionData,
-  QuestionsUpdateQuestionResponse,
+  QuestionsApproveQuestionData,
+  QuestionsApproveQuestionResponse,
+  QuizGetUserQuizzesEndpointResponse,
   QuizCreateNewQuizData,
   QuizCreateNewQuizResponse,
+  QuizUploadManualModuleData,
+  QuizUploadManualModuleResponse,
+  QuizGetQuizData,
+  QuizGetQuizResponse,
+  QuizUpdateQuizEndpointData,
+  QuizUpdateQuizEndpointResponse,
   QuizDeleteQuizEndpointData,
   QuizDeleteQuizEndpointResponse,
-  QuizExportQuizToCanvasData,
-  QuizExportQuizToCanvasResponse,
-  QuizGetQuizData,
-  QuizGetQuizQuestionStatsData,
-  QuizGetQuizQuestionStatsResponse,
-  QuizGetQuizResponse,
-  QuizGetUserQuizzesEndpointResponse,
+  QuizTriggerContentExtractionData,
+  QuizTriggerContentExtractionResponse,
+  QuizTriggerQuestionGenerationData,
+  QuizTriggerQuestionGenerationResponse,
   QuizRegenerateSingleBatchData,
   QuizRegenerateSingleBatchResponse,
-  QuizSharingAcceptInviteData,
-  QuizSharingAcceptInviteResponse,
+  QuizGetQuizQuestionStatsData,
+  QuizGetQuizQuestionStatsResponse,
+  QuizExportQuizToCanvasData,
+  QuizExportQuizToCanvasResponse,
   QuizSharingCreateInviteData,
   QuizSharingCreateInviteResponse,
-  QuizSharingGetInviteInfoData,
-  QuizSharingGetInviteInfoResponse,
   QuizSharingListCollaboratorsData,
   QuizSharingListCollaboratorsResponse,
   QuizSharingRemoveCollaboratorEndpointData,
   QuizSharingRemoveCollaboratorEndpointResponse,
   QuizSharingRevokeInviteEndpointData,
   QuizSharingRevokeInviteEndpointResponse,
-  QuizTriggerContentExtractionData,
-  QuizTriggerContentExtractionResponse,
-  QuizTriggerQuestionGenerationData,
-  QuizTriggerQuestionGenerationResponse,
-  QuizUpdateQuizEndpointData,
-  QuizUpdateQuizEndpointResponse,
-  QuizUploadManualModuleData,
-  QuizUploadManualModuleResponse,
-  UsersDeleteUserMeResponse,
+  QuizSharingGetInviteInfoData,
+  QuizSharingGetInviteInfoResponse,
+  QuizSharingAcceptInviteData,
+  QuizSharingAcceptInviteResponse,
   UsersReadUserMeResponse,
+  UsersDeleteUserMeResponse,
   UsersUpdateUserMeData,
   UsersUpdateUserMeResponse,
   UtilsHealthCheckResponse,
@@ -436,6 +440,88 @@ export class CanvasService {
       path: {
         course_id: data.courseId,
         file_id: data.fileId,
+      },
+      errors: {
+        422: "Validation Error",
+      },
+    })
+  }
+}
+
+export class CoverageService {
+  /**
+   * List Coverage Modules
+   * List modules available for coverage analysis.
+   *
+   * Returns a list of modules with their question counts and content availability.
+   * Use this to show the user which modules can be analyzed.
+   *
+   * **Parameters:**
+   * quiz_id (UUID): The UUID of the quiz
+   *
+   * **Returns:**
+   * ModuleListResponse: List of modules with metadata
+   *
+   * **Authentication:**
+   * Requires valid JWT token with quiz access (owner or collaborator)
+   * @param data The data for the request.
+   * @param data.quizId
+   * @returns ModuleListResponse Successful Response
+   * @throws ApiError
+   */
+  public static listCoverageModules(
+    data: CoverageListCoverageModulesData,
+  ): CancelablePromise<CoverageListCoverageModulesResponse> {
+    return __request(OpenAPI, {
+      method: "GET",
+      url: "/coverage/{quiz_id}/modules",
+      path: {
+        quiz_id: data.quizId,
+      },
+      errors: {
+        422: "Validation Error",
+      },
+    })
+  }
+
+  /**
+   * Get Module Coverage
+   * Get content coverage analysis for a specific module.
+   *
+   * Computes sentence-level coverage by comparing question embeddings
+   * against content sentence embeddings using semantic similarity.
+   *
+   * **Parameters:**
+   * quiz_id (UUID): The UUID of the quiz
+   * module_id (str): The module identifier to analyze
+   *
+   * **Returns:**
+   * ModuleCoverageResponse: Detailed coverage analysis including:
+   * - Annotated sentences with coverage levels
+   * - Question-to-content mappings
+   * - Summary statistics and gap analysis
+   *
+   * **Authentication:**
+   * Requires valid JWT token with quiz access (owner or collaborator)
+   *
+   * **Performance:**
+   * First request may take 3-10 seconds due to embedding generation.
+   * Consider showing a loading indicator in the UI.
+   * @param data The data for the request.
+   * @param data.quizId
+   * @param data.moduleId
+   * @returns ModuleCoverageResponse Successful Response
+   * @throws ApiError
+   */
+  public static getModuleCoverage(
+    data: CoverageGetModuleCoverageData,
+  ): CancelablePromise<CoverageGetModuleCoverageResponse> {
+    return __request(OpenAPI, {
+      method: "GET",
+      url: "/coverage/{quiz_id}/modules/{module_id}",
+      path: {
+        quiz_id: data.quizId,
+        module_id: data.moduleId,
       },
       errors: {
         422: "Validation Error",

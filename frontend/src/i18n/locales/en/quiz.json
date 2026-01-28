@@ -215,7 +215,8 @@
     "lastUpdated": "Last Updated",
     "tabs": {
       "info": "Quiz Information",
-      "questions": "Questions"
+      "questions": "Questions",
+      "coverage": "Coverage"
     }
   },
   "generationTrigger": {

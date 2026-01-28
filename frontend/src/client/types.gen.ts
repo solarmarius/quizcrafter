@@ -10,6 +10,30 @@ export type AcceptInviteResponse = {
   message: string
 }
 
+/**
+ * A single page/item within a module with coverage annotations.
+ */
+export type AnnotatedPage = {
+  /**
+   * Page or document title
+   */
+  title: string
+  /**
+   * Annotated sentences with coverage data
+   */
+  sentences: Array<SentenceCoverage>
+  /**
+   * Total word count of the page
+   */
+  word_count: number
+  /**
+   * Count of sentences by coverage level
+   */
+  coverage_summary: {
+    [key: string]: number
+  }
+}
+
 export type Body_quiz_upload_manual_module = {
   /**
    * Module name
@@ -106,6 +130,32 @@ export type CollaboratorResponse = {
 }
 
 /**
+ * Overall coverage statistics for a module.
+ */
+export type CoverageStatistics = {
+  /**
+   * Total sentences in content
+   */
+  total_sentences: number
+  /**
+   * Sentences with coverage >= threshold
+   */
+  covered_sentences: number
+  /**
+   * Percentage of sentences covered
+   */
+  coverage_percentage: number
+  /**
+   * Total questions analyzed
+   */
+  total_questions: number
+  /**
+   * Longest consecutive uncovered stretch
+   */
+  largest_gap_sentences: number
+}
+
+/**
  * Specific failure reasons for detailed error tracking.
  */
 export type FailureReason =
@@ -161,6 +211,102 @@ export type ManualModuleResponse = {
   processing_metadata?: {
     [key: string]: unknown
   }
+}
+
+/**
+ * Coverage data for an entire module.
+ */
+export type ModuleCoverage = {
+  /**
+   * Module identifier
+   */
+  module_id: string
+  /**
+   * Human-readable module name
+   */
+  module_name: string
+  /**
+   * Annotated pages in the module
+   */
+  pages: Array<AnnotatedPage>
+  /**
+   * Percentage of sentences with coverage above threshold
+   */
+  overall_coverage_percentage: number
+  /**
+   * Total number of sentences analyzed
+   */
+  total_sentences: number
+  /**
+   * Number of sentences with coverage above threshold
+   */
+  covered_sentences: number
+  /**
+   * Number of consecutive uncovered sentence groups
+   */
+  gap_count: number
+}
+
+/**
+ * Response for single module coverage analysis.
+ */
+export type ModuleCoverageResponse = {
+  /**
+   * Quiz UUID
+   */
+  quiz_id: string
+  /**
+   * Coverage data for the module
+   */
+  module: ModuleCoverage
+  /**
+   * Question-to-content mappings
+   */
+  question_mappings: Array<QuestionMapping>
+  /**
+   * Summary statistics
+   */
+  statistics: CoverageStatistics
+  /**
+   * ISO timestamp when coverage was computed
+   */
+  computed_at: string
+}
+
+/**
+ * Summary of a module available for coverage analysis.
+ */
+export type ModuleListItem = {
+  /**
+   * Module identifier
+   */
+  module_id: string
+  /**
+   * Human-readable module name
+   */
+  module_name: string
+  /**
+   * Number of questions generated from this module
+   */
+  question_count: number
+  /**
+   * Whether extracted content exists for this module
+   */
+  has_content: boolean
+}
+
+/**
+ * Response listing modules available for coverage analysis.
+ */
+export type ModuleListResponse = {
+  /**
+   * Quiz UUID
+   */
+  quiz_id: string
+  /**
+   * Modules available for coverage analysis
+   */
+  modules: Array<ModuleListItem>
 }
 
 /**
@@ -242,6 +388,32 @@ export type QuestionDeleteRequest = {
  * Question difficulty levels.
  */
 export type QuestionDifficulty = "easy" | "medium" | "hard"
+
+/**
+ * Maps a question to its best matching content.
+ */
+export type QuestionMapping = {
+  /**
+   * Question UUID
+   */
+  question_id: string
+  /**
+   * Truncated question text for display
+   */
+  question_text: string
+  /**
+   * Type of question (e.g., multiple_choice)
+   */
+  question_type: string
+  /**
+   * Indices of best matching sentences
+   */
+  best_matching_sentences: Array<number>
+  /**
+   * Highest similarity score to any sentence
+   */
+  best_similarity_score: number
+}
 
 /**
  * Public question schema for API responses.
@@ -502,6 +674,44 @@ export type RejectionReason =
   | "other"
 
 /**
+ * Coverage data for a single sentence.
+ */
+export type SentenceCoverage = {
+  /**
+   * Index of sentence within the page
+   */
+  sentence_index: number
+  /**
+   * The sentence text
+   */
+  text: string
+  /**
+   * Start character position in original content
+   */
+  start_char: number
+  /**
+   * End character position in original content
+   */
+  end_char: number
+  /**
+   * Similarity score (0=no match, 1=perfect match)
+   */
+  coverage_score: number
+  /**
+   * Coverage level: 'none', 'low', 'medium', 'high'
+   */
+  coverage_level: string
+  /**
+   * IDs of questions that match this sentence
+   */
+  matched_questions?: Array<string>
+  /**
+   * Highest similarity score among matched questions
+   */
+  top_question_similarity?: number | null
+}
+
+/**
  * Public user information schema.
  */
 export type UserPublic = {
@@ -566,6 +776,19 @@ export type CanvasGetFileInfoData = {
 export type CanvasGetFileInfoResponse = {
   [key: string]: unknown
 }
+
+export type CoverageListCoverageModulesData = {
+  quizId: string
+}
+
+export type CoverageListCoverageModulesResponse = ModuleListResponse
+
+export type CoverageGetModuleCoverageData = {
+  moduleId: string
+  quizId: string
+}
+
+export type CoverageGetModuleCoverageResponse = ModuleCoverageResponse
 
 export type QuestionsGetQuizQuestionsData = {
   /**

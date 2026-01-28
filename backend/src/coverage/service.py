@@ -150,15 +150,17 @@ async def compute_module_coverage(
     if not questions:
         raise ValueError(f"No questions found for module {module_id}")
 
-    # Extract question texts
+    # Extract question texts and types
     question_texts: list[str] = []
     question_ids: list[UUID] = []
+    question_types: list[str] = []
 
     for q in questions:
         q_text = q.question_data.get("question_text", "")
         if q_text:
             question_texts.append(q_text)
             question_ids.append(q.id)
+            question_types.append(q.question_type.value)
 
     if not question_texts:
         raise ValueError("No valid question texts found")
@@ -186,6 +188,7 @@ async def compute_module_coverage(
         qid: QuestionMapping(
             question_id=qid,
             question_text=question_texts[i][:300],
+            question_type=question_types[i],
             best_matching_sentences=[],
             best_similarity_score=0.0,
         )
@@ -233,7 +236,8 @@ async def compute_module_coverage(
         for i, span in enumerate(sentence_spans):
             if similarity_matrix.size > 0:
                 similarities = similarity_matrix[i]
-                max_similarity = float(similarities.max())
+                # Clamp to 0 as negative cosine similarity indicates no semantic match
+                max_similarity = max(0.0, float(similarities.max()))
 
                 # Find matched questions (above low threshold)
                 matched_q_ids = [

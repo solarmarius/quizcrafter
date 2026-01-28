@@ -44,6 +44,7 @@ function QuizLayout() {
     select: (state) => state.location.pathname,
   })
   const isQuestionsRoute = pathname.endsWith("/questions")
+  const isCoverageRoute = pathname.endsWith("/coverage")
   const isIndexRoute = pathname === `/quiz/${id}` || pathname === `/quiz/${id}/`
 
   // Custom polling logic for index route - stops polling for stable states
@@ -64,6 +65,7 @@ function QuizLayout() {
   // Determine polling strategy based on route
   const getPollingInterval = () => {
     if (isQuestionsRoute) return false // No polling on questions page
+    if (isCoverageRoute) return false // No polling on coverage page
     if (isIndexRoute) return indexPolling // Custom polling logic for index route
     return globalPollingInterval // Default polling for other routes
   }
@@ -108,6 +110,12 @@ function QuizLayout() {
     quiz.status === QUIZ_STATUS.READY_FOR_REVIEW ||
     quiz.status === QUIZ_STATUS.READY_FOR_REVIEW_PARTIAL
 
+  // Check if coverage tab should be shown (has questions)
+  const showCoverageTab =
+    quiz.status === QUIZ_STATUS.READY_FOR_REVIEW ||
+    quiz.status === QUIZ_STATUS.READY_FOR_REVIEW_PARTIAL ||
+    quiz.status === QUIZ_STATUS.PUBLISHED
+
   // Check if current user is the owner
   const isOwner = user?.id === quiz.owner_id
 
@@ -150,7 +158,16 @@ function QuizLayout() {
         </Box>
 
         {/* Tabs */}
-        <Tabs.Root value={isQuestionsRoute ? "questions" : "info"} size="lg">
+        <Tabs.Root
+          value={
+            isCoverageRoute
+              ? "coverage"
+              : isQuestionsRoute
+                ? "questions"
+                : "info"
+          }
+          size="lg"
+        >
           <Tabs.List>
             <Tabs.Trigger
               value="info"
@@ -174,6 +191,19 @@ function QuizLayout() {
             >
               {t("detail.tabs.questions")}
             </Tabs.Trigger>
+            {showCoverageTab && (
+              <Tabs.Trigger
+                value="coverage"
+                onClick={() =>
+                  router.navigate({
+                    to: "/quiz/$id/coverage",
+                    params: { id },
+                  })
+                }
+              >
+                {t("detail.tabs.coverage", { defaultValue: "Coverage" })}
+              </Tabs.Trigger>
+            )}
           </Tabs.List>
 
           <Box mt={6}>

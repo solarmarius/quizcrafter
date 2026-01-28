@@ -24,6 +24,7 @@ import { Route as LayoutQuizIdRouteImport } from './routes/_layout/quiz.$id'
 import { Route as LayoutInviteTokenRouteImport } from './routes/_layout/invite.$token'
 import { Route as LayoutQuizIdIndexRouteImport } from './routes/_layout/quiz.$id.index'
 import { Route as LayoutQuizIdQuestionsRouteImport } from './routes/_layout/quiz.$id.questions'
+import { Route as LayoutQuizIdCoverageRouteImport } from './routes/_layout/quiz.$id.coverage'
 
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
@@ -99,6 +100,11 @@ const LayoutQuizIdQuestionsRoute = LayoutQuizIdQuestionsRouteImport.update({
   path: '/questions',
   getParentRoute: () => LayoutQuizIdRoute,
 } as any)
+const LayoutQuizIdCoverageRoute = LayoutQuizIdCoverageRouteImport.update({
+  id: '/coverage',
+  path: '/coverage',
+  getParentRoute: () => LayoutQuizIdRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof LayoutIndexRoute
@@ -113,6 +119,7 @@ export interface FileRoutesByFullPath {
   '/login/success': typeof LoginSuccessRoute
   '/invite/$token': typeof LayoutInviteTokenRoute
   '/quiz/$id': typeof LayoutQuizIdRouteWithChildren
+  '/quiz/$id/coverage': typeof LayoutQuizIdCoverageRoute
   '/quiz/$id/questions': typeof LayoutQuizIdQuestionsRoute
   '/quiz/$id/': typeof LayoutQuizIdIndexRoute
 }
@@ -128,6 +135,7 @@ export interface FileRoutesByTo {
   '/login/success': typeof LoginSuccessRoute
   '/': typeof LayoutIndexRoute
   '/invite/$token': typeof LayoutInviteTokenRoute
+  '/quiz/$id/coverage': typeof LayoutQuizIdCoverageRoute
   '/quiz/$id/questions': typeof LayoutQuizIdQuestionsRoute
   '/quiz/$id': typeof LayoutQuizIdIndexRoute
 }
@@ -146,6 +154,7 @@ export interface FileRoutesById {
   '/_layout/': typeof LayoutIndexRoute
   '/_layout/invite/$token': typeof LayoutInviteTokenRoute
   '/_layout/quiz/$id': typeof LayoutQuizIdRouteWithChildren
+  '/_layout/quiz/$id/coverage': typeof LayoutQuizIdCoverageRoute
   '/_layout/quiz/$id/questions': typeof LayoutQuizIdQuestionsRoute
   '/_layout/quiz/$id/': typeof LayoutQuizIdIndexRoute
 }
@@ -164,6 +173,7 @@ export interface FileRouteTypes {
     | '/login/success'
     | '/invite/$token'
     | '/quiz/$id'
+    | '/quiz/$id/coverage'
     | '/quiz/$id/questions'
     | '/quiz/$id/'
   fileRoutesByTo: FileRoutesByTo
@@ -179,6 +189,7 @@ export interface FileRouteTypes {
     | '/login/success'
     | '/'
     | '/invite/$token'
+    | '/quiz/$id/coverage'
     | '/quiz/$id/questions'
     | '/quiz/$id'
   id:
@@ -196,6 +207,7 @@ export interface FileRouteTypes {
     | '/_layout/'
     | '/_layout/invite/$token'
     | '/_layout/quiz/$id'
+    | '/_layout/quiz/$id/coverage'
     | '/_layout/quiz/$id/questions'
     | '/_layout/quiz/$id/'
   fileRoutesById: FileRoutesById
@@ -312,15 +324,24 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LayoutQuizIdQuestionsRouteImport
       parentRoute: typeof LayoutQuizIdRoute
     }
+    '/_layout/quiz/$id/coverage': {
+      id: '/_layout/quiz/$id/coverage'
+      path: '/coverage'
+      fullPath: '/quiz/$id/coverage'
+      preLoaderRoute: typeof LayoutQuizIdCoverageRouteImport
+      parentRoute: typeof LayoutQuizIdRoute
+    }
   }
 }
 
 interface LayoutQuizIdRouteChildren {
+  LayoutQuizIdCoverageRoute: typeof LayoutQuizIdCoverageRoute
   LayoutQuizIdQuestionsRoute: typeof LayoutQuizIdQuestionsRoute
   LayoutQuizIdIndexRoute: typeof LayoutQuizIdIndexRoute
 }
 
 const LayoutQuizIdRouteChildren: LayoutQuizIdRouteChildren = {
+  LayoutQuizIdCoverageRoute: LayoutQuizIdCoverageRoute,
   LayoutQuizIdQuestionsRoute: LayoutQuizIdQuestionsRoute,
   LayoutQuizIdIndexRoute: LayoutQuizIdIndexRoute,
 }

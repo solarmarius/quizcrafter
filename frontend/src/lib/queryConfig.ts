@@ -80,6 +80,12 @@ export const queryKeys = {
   // Canvas-related keys
   canvasCourses: () => ["canvas", "courses"] as const,
   canvasCourse: (id: string) => ["canvas", "course", id] as const,
+
+  // Coverage-related keys
+  coverageModules: (quizId: string) =>
+    ["quiz", quizId, "coverage", "modules"] as const,
+  moduleCoverage: (quizId: string, moduleId: string) =>
+    ["quiz", quizId, "coverage", "modules", moduleId] as const,
 } as const
 
 /**
