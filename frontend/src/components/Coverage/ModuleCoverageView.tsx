@@ -10,7 +10,7 @@ import {
   VStack,
 } from "@chakra-ui/react"
 import { useQuery } from "@tanstack/react-query"
-import { useState } from "react"
+import { memo, useCallback, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { LuArrowLeft, LuChevronDown, LuChevronRight } from "react-icons/lu"
 
@@ -44,6 +44,10 @@ export function ModuleCoverageView({
   const { t } = useTranslation("coverage")
   const [selectedSentence, setSelectedSentence] =
     useState<SentenceCoverageType | null>(null)
+
+  const handleSentenceClick = useCallback((sentence: SentenceCoverageType) => {
+    setSelectedSentence(sentence)
+  }, [])
 
   const {
     data: coverage,
@@ -122,7 +126,7 @@ export function ModuleCoverageView({
           <PageCoverageCard
             key={index}
             page={page}
-            onSentenceClick={setSelectedSentence}
+            onSentenceClick={handleSentenceClick}
           />
         ))}
       </VStack>
@@ -138,7 +142,7 @@ export function ModuleCoverageView({
   )
 }
 
-function CoverageLegend() {
+const CoverageLegend = memo(function CoverageLegend() {
   const { t } = useTranslation("coverage")
 
   const levels = [
@@ -161,19 +165,17 @@ function CoverageLegend() {
       ))}
     </HStack>
   )
-}
+})
 
 interface PageCoverageCardProps {
   page: AnnotatedPage
-  coverage: ModuleCoverageResponse
-  selectedSentence: SentenceCoverageType | null
   onSentenceClick: (sentence: SentenceCoverageType) => void
 }
 
-function PageCoverageCard({
+const PageCoverageCard = memo(function PageCoverageCard({
   page,
   onSentenceClick,
-}: Omit<PageCoverageCardProps, "coverage" | "selectedSentence">) {
+}: PageCoverageCardProps) {
   const { t } = useTranslation("coverage")
   const [isOpen, setIsOpen] = useState(true)
 
@@ -220,7 +222,7 @@ function PageCoverageCard({
       </Collapsible.Root>
     </Card.Root>
   )
-}
+})
 
 interface SentenceDetailPanelProps {
   sentence: SentenceCoverageType

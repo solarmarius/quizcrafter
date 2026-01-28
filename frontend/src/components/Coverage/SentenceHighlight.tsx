@@ -1,6 +1,6 @@
 import { Box } from "@chakra-ui/react"
 import type { KeyboardEvent } from "react"
-import { useState } from "react"
+import { memo, useState } from "react"
 
 import type { SentenceCoverage } from "@/client"
 
@@ -14,7 +14,7 @@ interface SentenceHighlightProps {
  * Click or press Enter/Space to see details in the detail panel.
  * Fully keyboard accessible when clickable.
  */
-export function SentenceHighlight({
+export const SentenceHighlight = memo(function SentenceHighlight({
   sentence,
   onSentenceClick,
 }: SentenceHighlightProps) {
@@ -49,14 +49,16 @@ export function SentenceHighlight({
       role={isClickable ? "button" : undefined}
       aria-label={
         isClickable
-          ? `Sentence with ${Math.round(sentence.coverage_score * 100)}% coverage. ${sentence.text}`
+          ? `Sentence with ${Math.round(
+              sentence.coverage_score * 100,
+            )}% coverage. ${sentence.text}`
           : undefined
       }
     >
       {sentence.text}
     </Box>
   )
-}
+})
 
 function getCoverageBgColor(level: string, isHovered: boolean): string {
   const alpha = isHovered ? "400" : "200"

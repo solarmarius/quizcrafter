@@ -187,6 +187,7 @@ export function QuestionReview({
       invalidateQueries: [
         queryKeys.quizQuestions(quizId),
         queryKeys.quizQuestionStats(quizId),
+        queryKeys.coverageModules(quizId),
       ],
     },
   )
@@ -208,7 +209,10 @@ export function QuestionReview({
     },
     {
       successMessage: t("questions.questionUpdated"),
-      invalidateQueries: [queryKeys.quizQuestions(quizId)],
+      invalidateQueries: [
+        queryKeys.quizQuestions(quizId),
+        queryKeys.coverageModules(quizId),
+      ],
       onSuccess: () => {
         cancelEditing()
       },
@@ -241,6 +245,7 @@ export function QuestionReview({
         queryKeys.quizQuestions(quizId),
         queryKeys.quizQuestionStats(quizId),
         queryKeys.quiz(quizId), // Invalidate quiz cache to update question_count
+        queryKeys.coverageModules(quizId),
       ],
       onSuccess: () => {
         setRejectingQuestionId(null)
@@ -265,6 +270,9 @@ export function QuestionReview({
         })
         queryClient.invalidateQueries({
           queryKey: queryKeys.quizQuestionStats(quizId),
+        })
+        queryClient.invalidateQueries({
+          queryKey: queryKeys.coverageModules(quizId),
         })
       },
       successMessage: t("questions.bulk.approveSuccess", {
@@ -305,6 +313,9 @@ export function QuestionReview({
           queryKey: queryKeys.quizQuestionStats(quizId),
         })
         queryClient.invalidateQueries({ queryKey: queryKeys.quiz(quizId) })
+        queryClient.invalidateQueries({
+          queryKey: queryKeys.coverageModules(quizId),
+        })
       },
       successMessage: t("questions.bulk.rejectSuccess", {
         count: selectionCount,

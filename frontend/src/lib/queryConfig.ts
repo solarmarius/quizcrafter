@@ -107,5 +107,6 @@ export function getRelatedQueryKeys(quizId: string) {
     queryKeys.quiz(quizId),
     queryKeys.quizQuestions(quizId),
     queryKeys.quizQuestionStats(quizId),
+    queryKeys.coverageModules(quizId),
   ]
 }
