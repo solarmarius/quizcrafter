@@ -60,5 +60,21 @@
   },
   "tabs": {
     "coverage": "Coverage"
+  },
+  "experimental": {
+    "title": "Experimental Feature",
+    "message": "Coverage analysis is experimental and may not be 100% accurate. Use it as a guide, not an absolute measure."
+  },
+  "explanation": {
+    "title": "How coverageanalysis works",
+    "intro": "The analysis measures how well your questions address the source content using semantic similarity.",
+    "process": "Each sentence in your content is compared to your questions using a textembedding-model. The highest similarity score determines the coverage level:",
+    "thresholds": {
+      "high": "High (≥70%): Strongly related to a question",
+      "medium": "Medium (50-69%): Moderately related",
+      "low": "Low (30-49%): Weakly related",
+      "none": "None (<30%): Not covered by any question"
+    },
+    "note": "Each question maps to at most 3 sentences to prevent general questions from inflating scores."
   }
 }

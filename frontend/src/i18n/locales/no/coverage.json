@@ -60,5 +60,21 @@
   },
   "tabs": {
     "coverage": "Dekning"
+  },
+  "experimental": {
+    "title": "Eksperimentell funksjon",
+    "message": "Dekningsanalysen er eksperimentell og er ikke 100% nøyaktig. Bruk det som en veiledning, ikke et absolutt mål."
+  },
+  "explanation": {
+    "title": "Hvordan dekningsanalysen fungerer",
+    "intro": "Analysen måler hvor godt spørsmålene dine dekker kildeinnholdet ved hjelp av semantisk likhet.",
+    "process": "Hver setning i innholdet ditt sammenlignes med spørsmålene dine ved hjelp av en tekstembeddingsmodell. Den høyeste likhetspoengsummen bestemmer dekningsnivået:",
+    "thresholds": {
+      "high": "Høy (≥70%): Sterkt relatert til et spørsmål",
+      "medium": "Middels (50-69%): Moderat relatert",
+      "low": "Lav (30-49%): Svakt relatert",
+      "none": "Ingen (<30%): Ikke dekket av noe spørsmål"
+    },
+    "note": "Hvert spørsmål kan kobles til maks 3 setninger for å forhindre at generelle spørsmål blåser opp poengsummene."
   }
 }
