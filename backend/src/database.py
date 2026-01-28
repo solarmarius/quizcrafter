@@ -333,3 +333,23 @@ def get_session_dep() -> Generator[Session, None, None]:
 
 
 SessionDep = Annotated[Session, Depends(get_session_dep)]
+
+
+async def get_async_session_dep() -> AsyncGenerator[AsyncSession, None]:
+    """
+    FastAPI dependency to get async database session with auto-commit/rollback.
+
+    Uses the get_async_session() context manager to provide proper transaction
+    management with automatic commit on success and rollback on exceptions.
+
+    Usage:
+        @app.get("/items")
+        async def get_items(session: AsyncSessionDep):
+            result = await session.execute(select(Item))
+            return result.scalars().all()
+    """
+    async with get_async_session() as session:
+        yield session
+
+
+AsyncSessionDep = Annotated[AsyncSession, Depends(get_async_session_dep)]

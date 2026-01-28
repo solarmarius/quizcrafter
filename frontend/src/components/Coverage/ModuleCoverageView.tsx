@@ -49,6 +49,7 @@ export function ModuleCoverageView({
     data: coverage,
     isLoading,
     error,
+    refetch,
   } = useQuery({
     queryKey: queryKeys.moduleCoverage(quizId, moduleId),
     queryFn: () => CoverageService.getModuleCoverage({ quizId, moduleId }),
@@ -88,6 +89,7 @@ export function ModuleCoverageView({
           title={t("errors.computeFailed")}
           message={t("errors.computeFailedMessage")}
           showRetry
+          onRetry={() => refetch()}
         />
       </VStack>
     )

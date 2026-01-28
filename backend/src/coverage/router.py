@@ -6,7 +6,7 @@ from fastapi import APIRouter, HTTPException
 
 from src.auth.dependencies import CurrentUser
 from src.config import get_logger
-from src.database import SessionDep, get_async_session
+from src.database import AsyncSessionDep, SessionDep
 from src.quiz.dependencies import QuizAccess
 
 from .schemas import ModuleCoverageResponse, ModuleListResponse
@@ -19,7 +19,7 @@ logger = get_logger("coverage.router")
 @router.get("/{quiz_id}/modules", response_model=ModuleListResponse)
 def list_coverage_modules(
     quiz_id: UUID,
-    quiz: QuizAccess,  # noqa: ARG001
+    quiz: QuizAccess,
     current_user: CurrentUser,
     session: SessionDep,
 ) -> ModuleListResponse:
@@ -38,6 +38,9 @@ def list_coverage_modules(
     **Authentication:**
         Requires valid JWT token with quiz access (owner or collaborator)
     """
+    # Authorization validated by QuizAccess dependency
+    _ = quiz.id  # Ensure quiz is loaded and user has access
+
     logger.info(
         "coverage_modules_list_requested",
         quiz_id=str(quiz_id),
@@ -72,8 +75,9 @@ def list_coverage_modules(
 async def get_module_coverage(
     quiz_id: UUID,
     module_id: str,
-    quiz: QuizAccess,  # noqa: ARG001
+    quiz: QuizAccess,
     current_user: CurrentUser,
+    session: AsyncSessionDep,
 ) -> ModuleCoverageResponse:
     """
     Get content coverage analysis for a specific module.
@@ -98,6 +102,9 @@ async def get_module_coverage(
         First request may take 3-10 seconds due to embedding generation.
         Consider showing a loading indicator in the UI.
     """
+    # Authorization validated by QuizAccess dependency
+    _ = quiz.id  # Ensure quiz is loaded and user has access
+
     logger.info(
         "coverage_analysis_requested",
         quiz_id=str(quiz_id),
@@ -106,8 +113,7 @@ async def get_module_coverage(
     )
 
     try:
-        async with get_async_session() as session:
-            return await compute_module_coverage(session, quiz_id, module_id)
+        return await compute_module_coverage(session, quiz_id, module_id)
 
     except ValueError as e:
         logger.warning(
