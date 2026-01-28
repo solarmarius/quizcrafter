@@ -653,16 +653,162 @@ npx @azure/static-web-apps-cli deploy ./dist --deployment-token $SWA_TOKEN --env
 
 ---
 
+## Phase 8: Post-Deployment Fixes
+
+### 8.1 Canvas OAuth Secrets Update
+
+**Date:** 2026-01-28
+
+**Issue:** Canvas OAuth credentials needed to be updated for the new Azure deployment.
+
+**Commands:**
+```bash
+az keyvault secret set --vault-name qzcrft-test-kv --name CANVAS-CLIENT-ID --value "<new-client-id>"
+az keyvault secret set --vault-name qzcrft-test-kv --name CANVAS-CLIENT-SECRET --value "<new-client-secret>"
+az containerapp revision restart --name qzcrft-test-backend --resource-group p-qzcrft-test --revision $(az containerapp revision list --name qzcrft-test-backend --resource-group p-qzcrft-test --query "[0].name" -o tsv)
+```
+
+**Result:** Secrets updated successfully.
+
+### 8.2 CANVAS-REDIRECT-URI Path Correction
+
+**Issue:** The original redirect URI had incorrect path format.
+
+**Original (incorrect):**
+
+```text
+https://qzcrft-test-backend.icycliff-e1332370.westeurope.azurecontainerapps.io/api/auth/canvas/callback
+```
+
+**Corrected:**
+
+```text
+https://qzcrft-test-backend.icycliff-e1332370.westeurope.azurecontainerapps.io/auth/callback/canvas
+```
+
+**Command:**
+```bash
+az keyvault secret set --vault-name qzcrft-test-kv --name CANVAS-REDIRECT-URI --value "https://qzcrft-test-backend.icycliff-e1332370.westeurope.azurecontainerapps.io/auth/callback/canvas"
+```
+
+**Note:** The Canvas Developer Key also needed to be updated with the correct redirect URI.
+
+### 8.3 Database Migration
+
+**Issue:** Database tables did not exist - migrations were never run on Azure PostgreSQL.
+
+**Error:**
+
+```sql
+relation "user" does not exist
+```
+
+**Solution:** Exec into the running container and run Alembic migrations.
+
+**Commands:**
+```bash
+# Exec into the container
+az containerapp exec --name qzcrft-test-backend --resource-group p-qzcrft-test --command /bin/bash
+
+# Inside the container, run migrations
+alembic upgrade head
+```
+
+**Result:** All 6 migrations applied successfully:
+
+- Initial migration
+- add_module_id_to_questions
+- add_quiz_sharing_tables
+- add_custom_instructions_to_quiz
+- add_rejection_feedback_fields
+- add_multiple_answer_to_questiontype_enum
+
+### 8.4 Frontend SPA Routing Fix
+
+**Issue:** After Canvas OAuth callback, frontend returned 404 for `/login/success` route.
+
+**Root Cause:** Azure Static Web Apps requires `staticwebapp.config.json` for SPA fallback routing.
+
+**Solution:** Created `frontend/staticwebapp.config.json`:
+```json
+{
+  "navigationFallback": {
+    "rewrite": "/index.html",
+    "exclude": ["/assets/*", "/*.ico", "/*.png", "/*.svg", "/*.jpg", "/*.jpeg", "/*.gif", "/*.webp"]
+  },
+  "routes": [
+    {
+      "route": "/api/*",
+      "allowedRoles": ["anonymous"]
+    }
+  ],
+  "responseOverrides": {
+    "404": {
+      "rewrite": "/index.html",
+      "statusCode": 200
+    }
+  },
+  "platform": {
+    "apiRuntime": "node:18"
+  }
+}
+```
+
+### 8.5 Frontend API URL Configuration
+
+**Issue:** Frontend was redirecting to `localhost:8000` instead of Azure backend URL.
+
+**Root Cause:** The `.env` file contained `VITE_API_URL=http://localhost:8000` and no production override existed.
+
+**Solution:** Created `frontend/.env.production`:
+
+```text
+VITE_API_URL=https://qzcrft-test-backend.icycliff-e1332370.westeurope.azurecontainerapps.io
+```
+
+**Redeployment Commands:**
+```bash
+cd frontend
+npm run build
+SWA_TOKEN=$(az staticwebapp secrets list --name qzcrft-test-frontend --resource-group p-qzcrft-test --query properties.apiKey -o tsv)
+npx @azure/static-web-apps-cli deploy ./dist --deployment-token $SWA_TOKEN --env production
+```
+
+**Result:** Frontend now correctly points to Azure backend.
+
+### 8.6 Useful Debugging Commands
+
+**View backend logs:**
+
+```bash
+# Recent logs
+az containerapp logs show --name qzcrft-test-backend --resource-group p-qzcrft-test --tail 100
+
+# Stream live logs
+az containerapp logs show --name qzcrft-test-backend --resource-group p-qzcrft-test --follow
+
+# System logs (container events)
+az containerapp logs show --name qzcrft-test-backend --resource-group p-qzcrft-test --type system
+```
+
+**Check container status:**
+
+```bash
+az containerapp show --name qzcrft-test-backend --resource-group p-qzcrft-test --query "{status:properties.runningStatus, latestRevision:properties.latestRevisionName}" -o table
+```
+
+---
+
 ## Next Steps
 
 1. **[COMPLETE]** Create Bicep infrastructure files
 2. **[COMPLETE]** Deploy infrastructure to test resource group
 3. **[COMPLETE]** Phase 3: Build and push Docker image to Container Registry
-4. **[COMPLETE]** Phase 4: Database Migration (skipped - fresh start)
+4. **[COMPLETE]** Phase 4: Database Migration
 5. **[COMPLETE]** Phase 5: Add secrets to Key Vault
 6. **[COMPLETE]** Phase 6: Deploy backend Container App
 7. **[COMPLETE]** Phase 7: Deploy frontend to Static Web App
-8. **[COMPLETE]** Update Canvas redirect URI with new backend URL
+8. **[COMPLETE]** Phase 8: Post-deployment fixes (OAuth, migrations, SPA routing)
 9. **[PENDING]** Phase 9: Add GitHub secrets for CI/CD
 10. **[PENDING]** Phase 9: Get Azure admin to assign Contributor role (for GitHub Actions)
 11. **[PENDING]** Phase 10: Monitoring setup
@@ -681,3 +827,4 @@ npx @azure/static-web-apps-cli deploy ./dist --deployment-token $SWA_TOKEN --env
 | 2026-01-27 | Claude Code | Added secrets to Key Vault (Phase 5 complete) |
 | 2026-01-27 | Claude Code | Deployed backend Container App with Key Vault integration (Phase 6 complete) |
 | 2026-01-27 | Claude Code | Deployed frontend to Static Web App (Phase 7 complete) |
+| 2026-01-28 | Claude Code | Phase 8: Fixed Canvas OAuth secrets, redirect URI path, database migrations, SPA routing, and frontend API URL |
