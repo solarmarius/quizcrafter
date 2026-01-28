@@ -23,7 +23,7 @@ export const QuizTableRow = memo(function QuizTableRow({
   return (
     <Table.Row key={quiz.id}>
       <Table.Cell>
-        <RouterLink to={`/quiz/${quiz.id}`} params={{ id: quiz.id! }}>
+        <RouterLink to="/quiz/$id" params={{ id: quiz.id! }}>
           <Text fontWeight="medium" _hover={{ textDecoration: "underline" }}>
             {quiz.title}
           </Text>
@@ -67,7 +67,7 @@ export const QuizTableRow = memo(function QuizTableRow({
       <Table.Cell>
         <HStack gap={2}>
           <Button size="sm" variant="outline" asChild>
-            <RouterLink to={`/quiz/${quiz.id}`} params={{ id: quiz.id! }}>
+            <RouterLink to="/quiz/$id" params={{ id: quiz.id! }}>
               {t("common:actions.view")}
             </RouterLink>
           </Button>

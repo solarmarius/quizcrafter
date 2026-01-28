@@ -50,7 +50,9 @@ const LanguagePreference = () => {
 
       <RadioGroup.Root
         value={i18n.language.split("-")[0]}
-        onValueChange={(details) => handleLanguageChange(details.value)}
+        onValueChange={(details) =>
+          details.value && handleLanguageChange(details.value)
+        }
       >
         <VStack gap={3} align="stretch">
           {languageOptions.map((option) => (
