@@ -5,7 +5,7 @@
     "title": "Select a Module",
     "description": "Choose a module to analyze its content coverage",
     "noModules": "No Modules Available",
-    "noModulesDescription": "No modules are available for coverage analysis. Make sure you have extracted content and generated questions.",
+    "noModulesDescription": "No modules are available for coverage analysis.",
     "questionCount": "{{count}} question",
     "questionCount_other": "{{count}} questions",
     "noContent": "No content",
@@ -46,7 +46,7 @@
     "similarity": "Similarity"
   },
   "actions": {
-    "backToModules": "Back to Modules"
+    "backToModules": "Back"
   },
   "loading": {
     "computing": "Computing Coverage",

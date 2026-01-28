@@ -1,9 +1,5 @@
-import {
-  MutationCache,
-  QueryCache,
-  QueryClient,
-  QueryClientProvider,
-} from "@tanstack/react-query"
+import { MutationCache, QueryCache, QueryClient } from "@tanstack/react-query"
+import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client"
 import { RouterProvider, createRouter } from "@tanstack/react-router"
 import { StrictMode } from "react"
 import ReactDOM from "react-dom/client"
@@ -13,6 +9,7 @@ import { ApiError } from "./client"
 import { CustomProvider } from "./components/ui/provider"
 import { toaster } from "./components/ui/toaster"
 import { clearAuthToken, configureApiClient } from "./lib/api/client"
+import { queryPersister } from "./lib/queryPersister"
 
 // Configure API client
 configureApiClient()
@@ -82,9 +79,22 @@ declare module "@tanstack/react-router" {
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <CustomProvider>
-      <QueryClientProvider client={queryClient}>
+      <PersistQueryClientProvider
+        client={queryClient}
+        persistOptions={{
+          persister: queryPersister,
+          maxAge: 60 * 60 * 1000, // 1 hour max persistence
+          dehydrateOptions: {
+            shouldDehydrateQuery: (query) => {
+              // Only persist coverage queries (expensive to compute)
+              const key = query.queryKey
+              return Array.isArray(key) && key.includes("coverage")
+            },
+          },
+        }}
+      >
         <RouterProvider router={router} />
-      </QueryClientProvider>
+      </PersistQueryClientProvider>
     </CustomProvider>
   </StrictMode>,
 )

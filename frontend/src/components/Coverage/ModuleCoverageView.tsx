@@ -21,7 +21,7 @@ import {
   type SentenceCoverage as SentenceCoverageType,
 } from "@/client"
 import { ErrorState } from "@/components/Common"
-import { queryKeys } from "@/lib/queryConfig"
+import { coverageQueryConfig, queryKeys } from "@/lib/queryConfig"
 
 import { CoverageStatisticsCard } from "./CoverageStatisticsCard"
 import { SentenceHighlight } from "./SentenceHighlight"
@@ -52,7 +52,7 @@ export function ModuleCoverageView({
   } = useQuery({
     queryKey: queryKeys.moduleCoverage(quizId, moduleId),
     queryFn: () => CoverageService.getModuleCoverage({ quizId, moduleId }),
-    staleTime: 5 * 60 * 1000, // 5 minutes - coverage is expensive to compute
+    ...coverageQueryConfig,
   })
 
   if (isLoading) {

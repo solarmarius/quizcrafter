@@ -13,7 +13,7 @@ import { LuBookOpen, LuFileQuestion } from "react-icons/lu"
 
 import { CoverageService, type ModuleListItem } from "@/client"
 import { ErrorState, LoadingSkeleton } from "@/components/Common"
-import { queryKeys } from "@/lib/queryConfig"
+import { coverageQueryConfig, queryKeys } from "@/lib/queryConfig"
 
 interface CoverageModuleSelectorProps {
   quizId: string
@@ -37,7 +37,7 @@ export function CoverageModuleSelector({
   } = useQuery({
     queryKey: queryKeys.coverageModules(quizId),
     queryFn: () => CoverageService.listCoverageModules({ quizId }),
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    ...coverageQueryConfig,
   })
 
   if (isLoading) {

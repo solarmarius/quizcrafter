@@ -46,6 +46,16 @@ export const freshDataQueryConfig = {
 } as const
 
 /**
+ * Query options for coverage data.
+ * Coverage is expensive to compute and rarely changes (only when questions are modified).
+ */
+export const coverageQueryConfig = {
+  staleTime: 30 * 60 * 1000, // 30 minutes - coverage is expensive, rarely changes
+  gcTime: 60 * 60 * 1000, // 60 minutes - keep in memory longer
+  refetchOnWindowFocus: false,
+} as const
+
+/**
  * Creates a query configuration with optional polling.
  * Useful for quiz status monitoring with intelligent polling.
  */

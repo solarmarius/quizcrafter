@@ -1,27 +1,27 @@
 {
   "title": "Innholdsdekning",
-  "description": "Analyser hvor godt sporsmalene dekker kildeinnholdet",
+  "description": "Analyser hvor godt spørsmålene dekker kildeinnholdet",
   "selectModule": {
     "title": "Velg en Modul",
-    "description": "Velg en modul for a analysere innholdsdekningen",
+    "description": "Velg en modul for å analysere innholdsdekningen",
     "noModules": "Ingen Moduler Tilgjengelig",
-    "noModulesDescription": "Ingen moduler er tilgjengelige for dekningsanalyse. Sjekk at du har ekstrahert innhold og generert sporsmal.",
-    "questionCount": "{{count}} sporsmal",
-    "questionCount_other": "{{count}} sporsmal",
+    "noModulesDescription": "Ingen moduler er tilgjengelige for dekningsanalyse.",
+    "questionCount": "{{count}} spørsmål",
+    "questionCount_other": "{{count}} spørsmål",
     "noContent": "Ingen innhold",
-    "needsContent": "Denne modulen trenger ekstrahert innhold for analyse",
-    "needsQuestions": "Denne modulen trenger sporsmal for analyse"
+    "needsContent": "Denne modulen trenger modulinnhold for analyse",
+    "needsQuestions": "Denne modulen trenger spørsmål for analyse"
   },
   "statistics": {
     "covered": "dekket",
     "sentences": "Setninger",
-    "questions": "Sporsmal",
-    "largestGap": "Storste Gap",
+    "questions": "spørsmål",
+    "largestGap": "Største Gap",
     "gapSentences": "{{count}} setning",
     "gapSentences_other": "{{count}} setninger"
   },
   "levels": {
-    "high": "Hoy Dekning",
+    "high": "Høy Dekning",
     "medium": "Middels Dekning",
     "low": "Lav Dekning",
     "none": "Ingen Dekning"
@@ -34,29 +34,29 @@
     "words": "ord"
   },
   "tooltip": {
-    "matchedQuestions": "Matchede Sporsmal",
+    "matchedQuestions": "Matchede spørsmål",
     "more": "flere"
   },
   "detail": {
     "title": "Setningsdetaljer",
     "sentence": "Setning",
     "score": "Poengsum",
-    "level": "Niva",
-    "matchedQuestions": "Matchede Sporsmal",
+    "level": "Nivå",
+    "matchedQuestions": "Matchede spørsmål",
     "similarity": "Likhet"
   },
   "actions": {
-    "backToModules": "Tilbake til Moduler"
+    "backToModules": "Tilbake"
   },
   "loading": {
     "computing": "Beregner Dekning",
-    "computingDescription": "Analyserer semantisk likhet mellom sporsmal og innhold. Dette kan ta noen sekunder."
+    "computingDescription": "Analyserer semantisk likhet mellom spørsmål og innhold. Dette kan ta noen sekunder."
   },
   "errors": {
     "loadModulesFailed": "Kunne Ikke Laste Moduler",
     "loadModulesMessage": "Kunne ikke laste tilgjengelige moduler for dekningsanalyse.",
     "computeFailed": "Dekningsberegning Feilet",
-    "computeFailedMessage": "Kunne ikke beregne dekning for denne modulen. Vennligst prov igjen."
+    "computeFailedMessage": "Kunne ikke beregne dekning for denne modulen. Vennligst prøv igjen."
   },
   "tabs": {
     "coverage": "Dekning"
