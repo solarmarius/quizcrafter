@@ -6,12 +6,9 @@
   "files": {
     "ignore": [
       "node_modules",
-      "dist",
-      "src/client",
       "src/routeTree.gen.ts",
       "playwright.config.ts",
-      "playwright-report",
-      "openapi.json"
+      "playwright-report"
     ]
   },
   "linter": {
