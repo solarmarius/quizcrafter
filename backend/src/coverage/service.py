@@ -21,7 +21,7 @@ from .schemas import (
     QuestionMapping,
     SentenceCoverage,
 )
-from .tokenizer import split_into_sentences
+from .tokenizer import SentenceSpan, split_into_sentences
 
 logger = get_logger("coverage.service")
 
@@ -32,6 +32,9 @@ COVERAGE_THRESHOLDS = {
     "low": 0.3,  # >= 0.3 = low coverage
     # < 0.3 = no coverage
 }
+
+# Maximum sentences each question can map to (prevents general questions from inflating coverage)
+MAX_SENTENCES_PER_QUESTION = 3
 
 
 def get_modules_for_coverage(
@@ -182,25 +185,19 @@ async def compute_module_coverage(
     )
     question_embeddings = generate_embeddings(question_texts)
 
-    # Process each page
-    annotated_pages: list[AnnotatedPage] = []
-    all_question_mappings: dict[UUID, QuestionMapping] = {
-        qid: QuestionMapping(
-            question_id=qid,
-            question_text=question_texts[i][:300],
-            question_type=question_types[i],
-            best_matching_sentences=[],
-            best_similarity_score=0.0,
-        )
-        for i, qid in enumerate(question_ids)
+    # First pass: collect all sentence data and similarities
+    # Structure: list of (page_idx, title, word_count, list of sentence data)
+    # Sentence data: (span, similarities_to_questions)
+    page_sentence_data: list[
+        tuple[int, str, int, list[tuple[SentenceSpan, list[float]]]]
+    ] = []
+
+    # Collect similarities: question_idx -> list of (page_idx, sent_idx, similarity)
+    question_sentence_sims: dict[int, list[tuple[int, int, float]]] = {
+        i: [] for i in range(len(question_ids))
     }
 
-    total_sentences = 0
-    total_covered = 0
-    largest_gap = 0
-    current_gap = 0
-
-    for page in pages_data:
+    for page_idx, page in enumerate(pages_data):
         if not isinstance(page, dict):
             continue
 
@@ -229,35 +226,73 @@ async def compute_module_coverage(
             sentence_embeddings, question_embeddings
         )
 
-        # Process each sentence
+        # Collect sentence data with similarities
+        sentences_in_page: list[tuple[SentenceSpan, list[float]]] = []
+        for sent_idx, span in enumerate(sentence_spans):
+            if similarity_matrix.size > 0:
+                sims = [max(0.0, float(s)) for s in similarity_matrix[sent_idx]]
+                # Record similarities for each question above threshold
+                for q_idx, sim in enumerate(sims):
+                    if sim >= COVERAGE_THRESHOLDS["low"]:
+                        question_sentence_sims[q_idx].append((page_idx, sent_idx, sim))
+            else:
+                sims = [0.0] * len(question_ids)
+            sentences_in_page.append((span, sims))
+
+        word_count = len(content.split())
+        page_sentence_data.append((page_idx, title, word_count, sentences_in_page))
+
+    # Second pass: filter to top N sentences per question
+    # Build set of allowed (question_idx, page_idx, sent_idx) tuples
+    allowed_mappings: set[tuple[int, int, int]] = set()
+    all_question_mappings: dict[UUID, QuestionMapping] = {}
+
+    for q_idx, qid in enumerate(question_ids):
+        # Sort by similarity descending, keep top N
+        sorted_sims = sorted(
+            question_sentence_sims[q_idx], key=lambda x: x[2], reverse=True
+        )
+        top_sims = sorted_sims[:MAX_SENTENCES_PER_QUESTION]
+
+        # Record allowed mappings
+        for page_idx, sent_idx, _sim in top_sims:
+            allowed_mappings.add((q_idx, page_idx, sent_idx))
+
+        # Create question mapping
+        best_score = top_sims[0][2] if top_sims else 0.0
+        best_sentences = [sent_idx for _, sent_idx, _ in top_sims]
+
+        all_question_mappings[qid] = QuestionMapping(
+            question_id=qid,
+            question_text=question_texts[q_idx][:300],
+            question_type=question_types[q_idx],
+            best_matching_sentences=best_sentences,
+            best_similarity_score=best_score,
+        )
+
+    # Third pass: build annotated pages with filtered coverage data
+    annotated_pages: list[AnnotatedPage] = []
+    total_sentences = 0
+    total_covered = 0
+    largest_gap = 0
+    current_gap = 0
+
+    for page_idx, title, word_count, sentences_in_page in page_sentence_data:
         sentence_coverages: list[SentenceCoverage] = []
         coverage_counts: dict[str, int] = {"none": 0, "low": 0, "medium": 0, "high": 0}
 
-        for i, span in enumerate(sentence_spans):
-            if similarity_matrix.size > 0:
-                similarities = similarity_matrix[i]
-                # Clamp to 0 as negative cosine similarity indicates no semantic match
-                max_similarity = max(0.0, float(similarities.max()))
+        for sent_idx, (span, sims) in enumerate(sentences_in_page):
+            # Find which questions map to this sentence (after filtering)
+            matched_q_ids: list[UUID] = []
+            matched_sims: list[float] = []
 
-                # Find matched questions (above low threshold)
-                matched_q_ids = [
-                    question_ids[j]
-                    for j, sim in enumerate(similarities)
-                    if sim >= COVERAGE_THRESHOLDS["low"]
-                ]
+            for q_idx, sim in enumerate(sims):
+                if (q_idx, page_idx, sent_idx) in allowed_mappings:
+                    matched_q_ids.append(question_ids[q_idx])
+                    matched_sims.append(sim)
 
-                # Update question mappings
-                for j, sim in enumerate(similarities):
-                    if sim >= COVERAGE_THRESHOLDS["low"]:
-                        qid = question_ids[j]
-                        mapping = all_question_mappings[qid]
-                        if sim > mapping.best_similarity_score:
-                            mapping.best_similarity_score = float(sim)
-                        if span.index not in mapping.best_matching_sentences:
-                            mapping.best_matching_sentences.append(span.index)
-            else:
-                max_similarity = 0.0
-                matched_q_ids = []
+            # Coverage score is max similarity among matched questions
+            max_similarity = max(matched_sims) if matched_sims else 0.0
 
             # Determine coverage level
             if max_similarity >= COVERAGE_THRESHOLDS["high"]:
@@ -294,11 +329,8 @@ async def compute_module_coverage(
             else:
                 current_gap += 1
 
-        # Final gap check
+        # Final gap check for this page
         largest_gap = max(largest_gap, current_gap)
-
-        # Calculate word count
-        word_count = len(content.split())
 
         annotated_pages.append(
             AnnotatedPage(
@@ -334,10 +366,7 @@ async def compute_module_coverage(
         largest_gap_sentences=largest_gap,
     )
 
-    # Limit sentence references in question mappings
     question_mappings = list(all_question_mappings.values())
-    for mapping in question_mappings:
-        mapping.best_matching_sentences = mapping.best_matching_sentences[:5]
 
     logger.info(
         "coverage_computation_completed",
