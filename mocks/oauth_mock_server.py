@@ -5,6 +5,7 @@ from typing import Optional
 from fastapi import Body, FastAPI, Form, Header, HTTPException, Query
 from fastapi.responses import HTMLResponse, RedirectResponse
 from mock_bodys import (
+    basicsinformaticsbody,
     csp_body,
     markov_decision_process_body,
     naermestenabo_body,
@@ -271,6 +272,19 @@ mock_modules = {
             "items_count": 3,
             "items_url": "https://uit.instructure.com/api/v1/courses/37823/modules/173577/items",
         },
+        {
+            "id": 173578,
+            "name": "Basics of informatics",
+            "position": 7,
+            "unlock_at": None,
+            "require_sequential_progress": False,
+            "requirement_type": "all",
+            "publish_final_grade": False,
+            "prerequisite_module_ids": [],
+            "published": True,
+            "items_count": 3,
+            "items_url": "https://uit.instructure.com/api/v1/courses/37823/modules/173578/items",
+        },
     ],
     37825: [
         {
@@ -451,6 +465,23 @@ mock_items = {
             "url": "https://uit.instructure.com/api/v1/courses/37823/files/3615151",
             "published": True,
             "unpublishable": False,
+        },
+    ],
+    173578: [
+        {
+            "id": 1119441,
+            "title": "Basics of informatics",
+            "position": 10,
+            "indent": 0,
+            "quiz_lti": False,
+            "type": "Page",
+            "module_id": 182386,
+            "html_url": "https://uit.instructure.com/courses/37823/modules/items/1119441",
+            "page_url": "basics-of-informatics",
+            "publish_at": None,
+            "url": "https://uit.instructure.com/api/v1/courses/37823/pages/basics-of-informatics",
+            "published": True,
+            "unpublishable": True,
         },
     ],
     183468: [
@@ -736,6 +767,30 @@ mock_pages = {
         "updated_at": "2025-07-17T07:04:45Z",
         "locked_for_user": False,
         "body": nevralenettverk_body,
+    },
+    "basics-of-informatics": {
+        "title": "Basics of informatics",
+        "created_at": "2025-07-17T07:04:33Z",
+        "url": "basics-of-informatics",
+        "editing_roles": "teachers",
+        "page_id": 428217,
+        "last_edited_by": {
+            "id": 71202,
+            "anonymous_id": "1ixu",
+            "display_name": "Marius Rungmanee Solaas",
+            "avatar_image_url": "https://uit.instructure.com/images/thumbnails/1711458/KP9GqxzKd0VQzE400AHhImiJtv8fzGV1cR5gfYW2",
+            "html_url": "https://uit.instructure.com/courses/37823/users/71202",
+            "pronouns": None,
+        },
+        "published": True,
+        "hide_from_students": False,
+        "front_page": False,
+        "html_url": "https://uit.instructure.com/courses/37823/pages/basics-of-informatics",
+        "todo_date": None,
+        "publish_at": None,
+        "updated_at": "2025-07-17T07:04:45Z",
+        "locked_for_user": False,
+        "body": basicsinformaticsbody,
     },
 }
 
