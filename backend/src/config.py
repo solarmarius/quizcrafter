@@ -58,10 +58,12 @@ class Settings(BaseSettings):
     POSTGRES_USER: str
     POSTGRES_PASSWORD: str = ""
     POSTGRES_DB: str = ""
+    POSTGRES_SSLMODE: str = "prefer"  # "prefer" locally, set to "require" in Azure
 
     # Database pool settings
-    DATABASE_POOL_SIZE: int = 20
-    DATABASE_MAX_OVERFLOW: int = 40
+    # Sizing: 4 workers × (pool_size + max_overflow) must stay under PostgreSQL max_connections (~100 on D2ds_v5)
+    DATABASE_POOL_SIZE: int = 5
+    DATABASE_MAX_OVERFLOW: int = 10
     DATABASE_POOL_TIMEOUT: int = 30
     DATABASE_POOL_RECYCLE: int = 1800
     # Feature flag for optimized pool

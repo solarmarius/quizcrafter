@@ -29,7 +29,10 @@ engine_args = {
     "poolclass": get_pool_class(),
     "echo": settings.ENVIRONMENT == "local",  # SQL logging in dev
     # Handle timezone issues with PostgreSQL
-    "connect_args": {"options": "-c timezone=UTC"},
+    "connect_args": {
+        "options": "-c timezone=UTC",
+        "sslmode": settings.POSTGRES_SSLMODE,
+    },
 }
 
 if settings.ENVIRONMENT != "test" and settings.USE_OPTIMIZED_DB_POOL:
@@ -81,7 +84,8 @@ async_engine_args: dict[str, Any] = {
     "connect_args": {
         "server_settings": {
             "timezone": "UTC",
-        }
+        },
+        "ssl": settings.POSTGRES_SSLMODE != "disable",
     },
 }
 

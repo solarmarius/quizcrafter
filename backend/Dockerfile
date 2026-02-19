@@ -1,4 +1,4 @@
-FROM python:3.10
+FROM python:3.12-slim
 
 ENV PYTHONUNBUFFERED=1
 
@@ -41,4 +41,10 @@ COPY ./alembic /app/alembic
 RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync
 
-CMD ["fastapi", "run", "--workers", "4", "src/main.py"]
+# Create non-root user and transfer ownership (Azure security best practice)
+RUN useradd --create-home --shell /bin/bash appuser \
+    && chown -R appuser:appuser /app
+USER appuser
+
+# Run migrations then start FastAPI (WEB_CONCURRENCY configurable via Azure App Service app settings)
+CMD ["bash", "/app/scripts/start.sh"]

@@ -89,6 +89,32 @@ async def health_check() -> bool:
     return True
 
 
+@api_router.get("/utils/health-check/ready", tags=["utils"])
+async def health_check_ready() -> dict[str, str]:
+    """
+    Readiness check that verifies database connectivity.
+
+    Returns 200 with db=ok if the database is reachable.
+    Returns 503 if the database is unreachable.
+    Use this for deployment verification and deep monitoring checks.
+    The shallow /utils/health-check/ remains the Azure App Service health check path.
+    """
+    from fastapi import HTTPException
+    from sqlalchemy import text
+
+    from src.database import async_engine
+
+    try:
+        async with async_engine.connect() as conn:
+            await conn.execute(text("SELECT 1"))
+        return {"status": "ok", "db": "ok"}
+    except Exception as e:
+        logger.error("health_check_ready_failed", error=str(e))
+        raise HTTPException(
+            status_code=503, detail={"status": "error", "db": "unreachable"}
+        )
+
+
 # Add global exception handlers
 @app.exception_handler(ServiceError)
 async def handle_service_error(request: Request, exc: ServiceError) -> JSONResponse:
