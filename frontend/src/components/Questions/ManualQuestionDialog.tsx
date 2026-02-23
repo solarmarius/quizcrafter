@@ -140,8 +140,8 @@ export const ManualQuestionDialog = memo(function ManualQuestionDialog({
           </DialogTitle>
         </DialogHeader>
 
-        <DialogBody>
-          <VStack gap={6} align="center" h="full">
+        <DialogBody overflowY="auto">
+          <VStack gap={6} align="center" minH="full">
             <VStack gap={6} align="stretch" maxW="75%" w="full">
               {currentStep === "type-selection" && (
                 <QuestionTypeSelector
