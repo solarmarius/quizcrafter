@@ -297,7 +297,6 @@ DEFAULT_FILL_IN_BLANK_DATA = {
             "position": 1,
             "correct_answer": "Paris",
             "answer_variations": ["paris", "PARIS"],
-            "case_sensitive": False,
         }
     ],
     "explanation": "Paris is the capital of France.",

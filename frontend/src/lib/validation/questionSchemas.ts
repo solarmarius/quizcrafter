@@ -63,7 +63,6 @@ export const fillInBlankSchema = z
           position: z.number().min(1, "Position must be at least 1"),
           correctAnswer: nonEmptyString,
           answerVariations: optionalString,
-          caseSensitive: z.boolean().default(false),
         }),
       )
       .min(1, "At least one blank is required")

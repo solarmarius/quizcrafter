@@ -1189,7 +1189,6 @@ async def test_prepare_questions_for_export_fill_in_blank_success():
                         "position": 1,
                         "correct_answer": "Paris",
                         "answer_variations": ["paris", "PARIS"],
-                        "case_sensitive": False,
                     }
                 ],
                 "explanation": "Paris is the capital of France.",
@@ -1208,7 +1207,6 @@ async def test_prepare_questions_for_export_fill_in_blank_success():
                 position=1,
                 correct_answer="Paris",
                 answer_variations=["paris", "PARIS"],
-                case_sensitive=False,
             )
         ],
         explanation="Paris is the capital of France.",
@@ -1238,7 +1236,6 @@ async def test_prepare_questions_for_export_fill_in_blank_success():
     assert result[0]["blanks"][0]["position"] == 1
     assert result[0]["blanks"][0]["correct_answer"] == "Paris"
     assert result[0]["blanks"][0]["answer_variations"] == ["paris", "PARIS"]
-    assert result[0]["blanks"][0]["case_sensitive"] is False
     assert result[0]["explanation"] == "Paris is the capital of France."
 
 
@@ -1262,18 +1259,15 @@ async def test_prepare_questions_for_export_fill_in_blank_multiple_blanks():
                     {
                         "position": 1,
                         "correct_answer": "France",
-                        "case_sensitive": False,
                     },
                     {
                         "position": 2,
                         "correct_answer": "Paris",
                         "answer_variations": ["paris"],
-                        "case_sensitive": False,
                     },
                     {
                         "position": 3,
                         "correct_answer": "Europe",
-                        "case_sensitive": False,
                     },
                 ],
                 "explanation": "Paris is the capital of France in Europe.",
@@ -1291,18 +1285,15 @@ async def test_prepare_questions_for_export_fill_in_blank_multiple_blanks():
             BlankData(
                 position=1,
                 correct_answer="France",
-                case_sensitive=False,
             ),
             BlankData(
                 position=2,
                 correct_answer="Paris",
                 answer_variations=["paris"],
-                case_sensitive=False,
             ),
             BlankData(
                 position=3,
                 correct_answer="Europe",
-                case_sensitive=False,
             ),
         ],
         explanation="Paris is the capital of France in Europe.",
@@ -1341,74 +1332,6 @@ async def test_prepare_questions_for_export_fill_in_blank_multiple_blanks():
 
 
 @pytest.mark.asyncio
-async def test_prepare_questions_for_export_fill_in_blank_case_sensitive():
-    """Test Fill-in-Blank export with case-sensitive answers."""
-    from src.question.models import Question, QuestionType
-    from src.question.service import prepare_questions_for_export
-
-    quiz_id = uuid.uuid4()
-
-    # Create Fill-in-Blank question with case-sensitive answers
-    questions = [
-        Question(
-            id=uuid.uuid4(),
-            quiz_id=quiz_id,
-            question_type=QuestionType.FILL_IN_BLANK,
-            question_data={
-                "question_text": "The chemical symbol for gold is [blank_1].",
-                "blanks": [
-                    {
-                        "position": 1,
-                        "correct_answer": "Au",
-                        "case_sensitive": True,
-                    }
-                ],
-                "explanation": "Au is the chemical symbol for gold.",
-            },
-            is_approved=True,
-        )
-    ]
-
-    # Create proper FillInBlankData instance
-    from src.question.types.fill_in_blank import BlankData, FillInBlankData
-
-    mock_fib_data = FillInBlankData(
-        question_text="The chemical symbol for gold is [blank_1].",
-        blanks=[
-            BlankData(
-                position=1,
-                correct_answer="Au",
-                case_sensitive=True,
-            )
-        ],
-        explanation="Au is the chemical symbol for gold.",
-    )
-
-    # Mock question.get_typed_data to return the mock data
-    for question in questions:
-        object.__setattr__(
-            question, "get_typed_data", MagicMock(return_value=mock_fib_data)
-        )
-
-    with (
-        patch("src.database.get_async_session") as mock_get_session,
-        patch("src.question.service.get_questions_by_quiz", return_value=questions),
-        patch("src.question.service.get_question_type_registry"),
-    ):
-        # Mock the async context manager
-        mock_session = AsyncMock()
-        mock_get_session.return_value.__aenter__.return_value = mock_session
-
-        result = await prepare_questions_for_export(quiz_id)
-
-    assert len(result) == 1
-    assert result[0]["question_type"] == "fill_in_blank"
-    assert len(result[0]["blanks"]) == 1
-    assert result[0]["blanks"][0]["case_sensitive"] is True
-    assert result[0]["blanks"][0]["correct_answer"] == "Au"
-
-
-@pytest.mark.asyncio
 async def test_prepare_questions_for_export_mixed_question_types():
     """Test export preparation with mixed MCQ and Fill-in-Blank questions."""
     from src.question.models import Question, QuestionType
@@ -1442,7 +1365,6 @@ async def test_prepare_questions_for_export_mixed_question_types():
                     {
                         "position": 1,
                         "correct_answer": "Paris",
-                        "case_sensitive": False,
                     }
                 ],
                 "explanation": "Paris is the capital of France.",
@@ -1470,7 +1392,6 @@ async def test_prepare_questions_for_export_mixed_question_types():
             BlankData(
                 position=1,
                 correct_answer="Paris",
-                case_sensitive=False,
             )
         ],
         explanation="Paris is the capital of France.",
@@ -1531,7 +1452,6 @@ async def test_prepare_questions_for_export_fill_in_blank_with_answer_variations
                         "position": 1,
                         "correct_answer": "Paris",
                         "answer_variations": ["paris", "PARIS", "Paříž", "パリ"],
-                        "case_sensitive": False,
                     }
                 ],
                 "explanation": "Paris is the capital of France.",
@@ -1550,7 +1470,6 @@ async def test_prepare_questions_for_export_fill_in_blank_with_answer_variations
                 position=1,
                 correct_answer="Paris",
                 answer_variations=["paris", "PARIS", "Paříž", "パリ"],
-                case_sensitive=False,
             )
         ],
         explanation="Paris is the capital of France.",
@@ -1580,7 +1499,6 @@ async def test_prepare_questions_for_export_fill_in_blank_with_answer_variations
     blank = result[0]["blanks"][0]
     assert blank["correct_answer"] == "Paris"
     assert blank["answer_variations"] == ["paris", "PARIS", "Paříž", "パリ"]
-    assert blank["case_sensitive"] is False
 
 
 # Question Unapproval Tests

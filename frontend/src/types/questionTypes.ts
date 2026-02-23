@@ -40,7 +40,6 @@ export interface FillInBlankData {
     position: number
     correct_answer: string
     answer_variations?: string[]
-    case_sensitive?: boolean
   }>
   explanation?: string | null
 }

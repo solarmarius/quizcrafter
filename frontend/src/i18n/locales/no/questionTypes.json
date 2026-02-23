@@ -74,8 +74,8 @@
         "variations": "Opptil 10 svarvariasjoner per tomrom"
       },
       "canvas": {
-        "points": "1 poeng per riktige blanke",
-        "scoring": "Hvert tomrom gis poeng uavhengig"
+        "points": "1 poeng per riktige blanke (eksakt match av korrekt svar eller dens svaralternativer)",
+        "scoring": "Hvert blanke gis poeng uavhengig"
       }
     },
     "categorization": {

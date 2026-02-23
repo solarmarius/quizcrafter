@@ -71,11 +71,10 @@
       "validation": {
         "blanks": "1-10 blanks per question",
         "blankFormat": "Use [blank_1], [blank_2], etc. in question text",
-        "variations": "Up to 10 answer variations per blank",
-        "caseSensitive": "Optional case sensitivity setting"
+        "variations": "Up to 10 answer variations per blank (include all case variants)"
       },
       "canvas": {
-        "points": "1 point per correct blank",
+        "points": "1 point per correct blank (exact match of correct answer or its alternatives)",
         "scoring": "Each blank scored independently"
       }
     },

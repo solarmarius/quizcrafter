@@ -5,13 +5,11 @@ import { useTranslation } from "react-i18next"
 interface CorrectAnswerBoxProps {
   correctAnswer: string
   answerVariations?: string[]
-  caseSensitive?: boolean
 }
 
 export const CorrectAnswerBox = memo(function CorrectAnswerBox({
   correctAnswer,
   answerVariations,
-  caseSensitive,
 }: CorrectAnswerBoxProps) {
   const { t } = useTranslation("quiz")
 
@@ -44,11 +42,6 @@ export const CorrectAnswerBox = memo(function CorrectAnswerBox({
             {answerVariations.join(", ")}
           </Text>
         </>
-      )}
-      {caseSensitive && (
-        <Text fontSize="xs" color="orange.600" mt={1}>
-          {t("questions.editor.caseSensitive")}
-        </Text>
       )}
     </Box>
   )

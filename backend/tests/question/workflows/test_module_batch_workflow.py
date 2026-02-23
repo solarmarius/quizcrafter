@@ -279,7 +279,6 @@ def test_dynamic_question_validation_fib(test_llm_provider, test_template_manage
                 "position": 1,
                 "correct_answer": "Paris",
                 "answer_variations": ["paris", "PARIS"],
-                "case_sensitive": False,
             }
         ],
         "explanation": "Paris is the capital of France.",
