@@ -26,6 +26,7 @@ import {
   type FieldErrors,
   useFieldArray,
   useForm,
+  useWatch,
 } from "react-hook-form"
 import { useTranslation } from "react-i18next"
 import { MdAdd, MdDelete } from "react-icons/md"
@@ -87,10 +88,11 @@ function CategorizationEditorComponent({
     const {
       control,
       handleSubmit,
-      formState: { errors, isDirty },
+      formState: { errors, isDirty, isValid },
     } = useForm<CategorizationFormData>({
       resolver: zodResolver(categorizationSchema),
       defaultValues: defaultFormData,
+      mode: "onChange",
     })
 
     // Field arrays for dynamic management
@@ -111,6 +113,15 @@ function CategorizationEditorComponent({
       control,
       name: "distractors",
     })
+
+    // Live validation errors derived directly from schema (timing-independent)
+    const watchedValues = useWatch({ control })
+    const schemaErrors = useMemo(() => {
+      const result = categorizationSchema.safeParse(watchedValues)
+      if (result.success) return []
+      const messages = result.error.issues.map((issue) => issue.message)
+      return [...new Set(messages)]
+    }, [watchedValues])
 
     // Handle form submission - transform back to backend format
     const onSubmit = useCallback(
@@ -191,8 +202,8 @@ function CategorizationEditorComponent({
     return (
       <Box as="form" onSubmit={handleSubmit(onSubmit)}>
         <VStack gap={8} align="stretch">
-          {/* Form-level validation errors */}
-          {errors.root?.message && (
+          {/* Validation errors — derived live from schema, independent of form state timing */}
+          {schemaErrors.length > 0 && (
             <Box
               p={3}
               bg="red.50"
@@ -200,9 +211,13 @@ function CategorizationEditorComponent({
               borderColor="red.200"
               borderRadius="md"
             >
-              <Text color="red.600" fontSize="sm" fontWeight="medium">
-                {errors.root.message}
-              </Text>
+              <VStack align="stretch" gap={1}>
+                {schemaErrors.map((msg, i) => (
+                  <Text key={i} color="red.600" fontSize="sm">
+                    • {msg}
+                  </Text>
+                ))}
+              </VStack>
             </Box>
           )}
           {/* Question Text */}
@@ -382,7 +397,7 @@ function CategorizationEditorComponent({
               type="submit"
               colorScheme="blue"
               loading={isLoading}
-              disabled={!isDirty}
+              disabled={!isDirty || !isValid}
             >
               {t("questions.editor.saveChanges")}
             </Button>

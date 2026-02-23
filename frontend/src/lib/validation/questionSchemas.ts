@@ -350,15 +350,15 @@ export const categorizationSchema = z
   })
   .refine(
     (data) => {
-      // Validate total items are within limits (6-20)
+      // Validate total items are within limits (4-20)
       const totalItems = data.categories.reduce(
         (sum, cat) => sum + cat.items.length,
         0,
       )
-      return totalItems >= 6 && totalItems <= 20
+      return totalItems >= 4 && totalItems <= 20
     },
     {
-      message: "Total items must be between 6 and 20",
+      message: "Total items must be between 4 and 20",
       path: ["categories"],
     },
   )
@@ -473,7 +473,7 @@ export const validationMessages = {
   maxDistractors: "Maximum 5 distractors allowed",
   minCategories: "At least 2 categories are required",
   maxCategories: "Maximum 8 categories allowed",
-  minItems: "At least 6 items are required",
+  minItems: "At least 4 items are required",
   maxItems: "Maximum 20 items allowed",
   duplicateCategories: "Duplicate category names are not allowed",
   duplicateItems: "Duplicate item texts are not allowed",
