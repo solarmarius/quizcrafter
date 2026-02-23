@@ -97,8 +97,9 @@ test.describe("Question Review", () => {
     await mockQuizQuestions(page, mockQuizReadyForReview.id!, approvedQuestions)
     await mockQuizStats(page, mockQuizReadyForReview.id!, allApprovedStats)
     await mockBulkApprove(page, mockQuizReadyForReview.id!, {
-      approved_count: mockQuestionsList.length,
-      total_requested: mockQuestionsList.length,
+      success_count: mockQuestionsList.length,
+      failed_count: 0,
+      message: "All questions approved",
     })
     await mockExportQuiz(page, mockQuizReadyForReview.id!)
 
