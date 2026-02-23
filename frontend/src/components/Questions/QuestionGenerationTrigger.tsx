@@ -80,12 +80,20 @@ export function QuestionGenerationTrigger({
 
     // Type-safe access to generation metadata
     const metadata = quiz.generation_metadata as GenerationMetadata
-    const totalQuestions =
-      Number(metadata.total_questions_target) ||
-      Number(quiz.question_count) ||
-      0
-    const savedQuestions = Number(metadata.total_questions_saved) || 0
-    const remainingQuestions = totalQuestions - savedQuestions
+
+    // Parse question counts from batch keys (format: "{module_id}_{type}_{count}_{difficulty}")
+    const parseBatchCount = (keys: string[]) =>
+      keys.reduce((sum, key) => {
+        const parts = key.split("_")
+        const count = Number.parseInt(parts[parts.length - 2], 10)
+        return sum + (Number.isNaN(count) ? 0 : count)
+      }, 0)
+
+    const failedBatches = metadata.failed_batches ?? []
+    const successfulBatches = metadata.successful_batches ?? []
+    const remainingQuestions = parseBatchCount(failedBatches)
+    const savedQuestions = parseBatchCount(successfulBatches)
+    const totalQuestions = savedQuestions + remainingQuestions
     const successRate =
       totalQuestions > 0 ? (savedQuestions / totalQuestions) * 100 : 0
 
@@ -94,8 +102,8 @@ export function QuestionGenerationTrigger({
       savedQuestions,
       remainingQuestions,
       successRate,
-      successfulBatches: metadata.successful_batches?.length ?? 0,
-      failedBatches: metadata.failed_batches?.length ?? 0,
+      successfulBatches: successfulBatches.length,
+      failedBatches: failedBatches.length,
     }
   }
 
