@@ -153,12 +153,12 @@ function getDefaultQuestionData(questionType: string): Record<string, any> {
           {
             id: "cat_1",
             name: "",
-            correct_items: ["item_1", "item_2", "item_3"],
+            correct_items: ["item_1", "item_2"],
           },
           {
             id: "cat_2",
             name: "",
-            correct_items: ["item_4", "item_5", "item_6"],
+            correct_items: ["item_3", "item_4"],
           },
         ],
         items: [
@@ -166,8 +166,6 @@ function getDefaultQuestionData(questionType: string): Record<string, any> {
           { id: "item_2", text: "" },
           { id: "item_3", text: "" },
           { id: "item_4", text: "" },
-          { id: "item_5", text: "" },
-          { id: "item_6", text: "" },
         ],
         distractors: [],
         explanation: null,
