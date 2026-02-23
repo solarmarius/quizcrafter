@@ -128,9 +128,6 @@ class BlankData(BaseModel):
         default=None,
         description="Alternative acceptable answers for this blank",
     )
-    case_sensitive: bool = Field(
-        default=False, description="Whether answers are case-sensitive"
-    )
 
     @field_validator("answer_variations")
     @classmethod
@@ -322,7 +319,6 @@ class FillInBlankQuestionType(BaseQuestionType):
             blank_dict = {
                 "position": blank.position,
                 "correct_answer": blank.correct_answer,
-                "case_sensitive": blank.case_sensitive,
             }
             if blank.answer_variations:
                 blank_dict["answer_variations"] = blank.answer_variations
@@ -424,7 +420,6 @@ class FillInBlankQuestionType(BaseQuestionType):
                     "scoring_data": {
                         "value": all_answers,
                         "blank_text": blank.correct_answer,
-                        "ignore_case": not blank.case_sensitive,
                     },
                     "scoring_algorithm": CanvasScoringAlgorithm.TEXT_IN_CHOICES,
                 }
@@ -489,7 +484,6 @@ class FillInBlankQuestionType(BaseQuestionType):
             blank_dict = {
                 "position": blank.position,
                 "correct_answer": blank.correct_answer,
-                "case_sensitive": blank.case_sensitive,
             }
             if blank.answer_variations:
                 blank_dict["answer_variations"] = blank.answer_variations

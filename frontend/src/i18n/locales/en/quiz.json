@@ -446,7 +446,7 @@
       "remove": "Remove",
       "answerVariations": "Answer Variations",
       "answerVariationsHelper": "Separate multiple variations with commas",
-      "caseSensitiveCheckbox": "Case sensitive",
+      "caseVariationHint": "Matching is exact. Add all acceptable capitalizations as variations (e.g. \"paris\", \"PARIS\").",
       "blankHelperText": "Use [blank_1], [blank_2], etc. to mark blanks in your question",
       "addBlankDisabledText": "Add question text first to enable smart blank creation",
       "nextPosition": "Next position: {{position}}",
@@ -456,8 +456,7 @@
       "categoriesCount": "Categories ({{count}}/{{max}})",
       "itemsCount": "Items ({{count}})",
       "category": "Category {{number}}",
-      "acceptedVariations": "Accepted Variations",
-      "caseSensitive": "(Case sensitive)"
+      "acceptedVariations": "Accepted Variations"
     }
   }
 }

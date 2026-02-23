@@ -870,7 +870,6 @@ def mock_questions_with_difficulty():
                         "position": 1,
                         "correct_answer": "Paris",
                         "answer_variations": ["paris"],
-                        "case_sensitive": False,
                     }
                 ],
                 "explanation": "Paris is the capital.",

@@ -1,6 +1,5 @@
 import type { QuestionResponse, QuestionUpdateRequest } from "@/client"
 import { FormField, FormGroup } from "@/components/forms"
-import { Checkbox } from "@/components/ui/checkbox"
 import {
   getNextBlankPosition,
   validateBlankTextComprehensive,
@@ -57,7 +56,6 @@ export const FillInBlankEditor = memo(function FillInBlankEditor({
           position: blank.position,
           correctAnswer: blank.correct_answer,
           answerVariations: blank.answer_variations?.join(", ") || "",
-          caseSensitive: blank.case_sensitive || false,
         })),
         explanation: fibData.explanation || "",
       },
@@ -85,7 +83,6 @@ export const FillInBlankEditor = memo(function FillInBlankEditor({
                   .map((v) => v.trim())
                   .filter((v) => v)
               : undefined,
-            case_sensitive: blank.caseSensitive,
           })),
           explanation: data.explanation || null,
         },
@@ -149,7 +146,6 @@ export const FillInBlankEditor = memo(function FillInBlankEditor({
             position: missingPosition,
             correctAnswer: "",
             answerVariations: "",
-            caseSensitive: false,
           })
         } else {
           // No missing positions, add next sequential position
@@ -158,7 +154,6 @@ export const FillInBlankEditor = memo(function FillInBlankEditor({
             position: nextPosition,
             correctAnswer: "",
             answerVariations: "",
-            caseSensitive: false,
           })
         }
       } else {
@@ -168,7 +163,6 @@ export const FillInBlankEditor = memo(function FillInBlankEditor({
           position: newPosition,
           correctAnswer: "",
           answerVariations: "",
-          caseSensitive: false,
         })
       }
     }
@@ -268,22 +262,9 @@ export const FillInBlankEditor = memo(function FillInBlankEditor({
                     )}
                   />
 
-                  <Controller
-                    name={`blanks.${index}.caseSensitive`}
-                    control={control}
-                    render={({ field: { onChange, value } }) => (
-                      <FormField
-                        error={errors.blanks?.[index]?.caseSensitive?.message}
-                      >
-                        <Checkbox
-                          checked={value}
-                          onCheckedChange={(e) => onChange(!!e.checked)}
-                        >
-                          {t("questions.editor.caseSensitiveCheckbox")}
-                        </Checkbox>
-                      </FormField>
-                    )}
-                  />
+                  <Text fontSize="xs" color="blue.600">
+                    {t("questions.editor.caseVariationHint")}
+                  </Text>
                 </FormGroup>
               </Box>
             ))}
