@@ -55,7 +55,6 @@ export interface BlankConfiguration {
   position: number
   correctAnswer: string
   answerVariations?: string
-  caseSensitive?: boolean
 }
 
 /**

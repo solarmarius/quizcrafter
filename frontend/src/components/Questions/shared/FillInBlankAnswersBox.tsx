@@ -6,7 +6,6 @@ interface BlankData {
   position: number
   correct_answer: string
   answer_variations?: string[]
-  case_sensitive?: boolean
 }
 
 interface FillInBlankAnswersBoxProps {
@@ -44,11 +43,6 @@ export const FillInBlankAnswersBox = memo(function FillInBlankAnswersBox({
               <Text fontSize="xs" color="green.500" ml={4}>
                 {t("questions.variationsLabel")}{" "}
                 {blank.answer_variations.join(", ")}
-              </Text>
-            )}
-            {blank.case_sensitive && (
-              <Text fontSize="xs" color="orange.600" ml={4}>
-                {t("questions.editor.caseSensitive")}
               </Text>
             )}
           </Box>

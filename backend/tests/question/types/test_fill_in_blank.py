@@ -11,12 +11,10 @@ def test_blank_data_creation():
         position=1,
         correct_answer="Paris",
         answer_variations=["paris", "PARIS"],
-        case_sensitive=False,
     )
     assert blank.position == 1
     assert blank.correct_answer == "Paris"
     assert blank.answer_variations == ["paris", "PARIS"]
-    assert blank.case_sensitive is False
 
 
 def test_blank_data_minimal():
@@ -27,7 +25,6 @@ def test_blank_data_minimal():
     assert blank.position == 1
     assert blank.correct_answer == "Paris"
     assert blank.answer_variations is None
-    assert blank.case_sensitive is False
 
 
 def test_blank_data_position_validation():
@@ -345,7 +342,6 @@ def test_fill_in_blank_question_type_validate_data():
                 "position": 1,
                 "correct_answer": "Paris",
                 "answer_variations": ["paris"],
-                "case_sensitive": False,
             }
         ],
         "explanation": "Paris is the capital of France.",
@@ -390,7 +386,6 @@ def test_fill_in_blank_question_type_format_for_display():
                 position=1,
                 correct_answer="Paris",
                 answer_variations=["paris"],
-                case_sensitive=False,
             )
         ],
         explanation="Paris is the capital of France.",
@@ -404,7 +399,6 @@ def test_fill_in_blank_question_type_format_for_display():
     assert result["blanks"][0]["position"] == 1
     assert result["blanks"][0]["correct_answer"] == "Paris"
     assert result["blanks"][0]["answer_variations"] == ["paris"]
-    assert result["blanks"][0]["case_sensitive"] is False
 
 
 def test_fill_in_blank_question_type_format_for_display_wrong_type():
@@ -433,7 +427,6 @@ def test_fill_in_blank_question_type_format_for_canvas():
                 position=1,
                 correct_answer="Paris",
                 answer_variations=["paris"],
-                case_sensitive=False,
             )
         ],
     )
@@ -457,31 +450,6 @@ def test_fill_in_blank_question_type_format_for_canvas():
     # Check scoring algorithms
     scoring_values = result["scoring_data"]["value"]
     assert scoring_values[0]["scoring_data"]["value"] == ["Paris", "paris"]
-    assert scoring_values[0]["scoring_algorithm"] == "TextInChoices"
-
-
-def test_fill_in_blank_question_type_format_for_canvas_case_sensitive():
-    """Test Canvas formatting with case-sensitive answers."""
-    from src.question.types.fill_in_blank import (
-        BlankData,
-        FillInBlankData,
-        FillInBlankQuestionType,
-    )
-
-    question_type = FillInBlankQuestionType()
-    data = FillInBlankData(
-        question_text="The capital of France is [blank_1].",
-        blanks=[
-            BlankData(
-                position=1,
-                correct_answer="Paris",
-                case_sensitive=True,
-            )
-        ],
-    )
-
-    result = question_type.format_for_canvas(data)
-    scoring_values = result["scoring_data"]["value"]
     assert scoring_values[0]["scoring_algorithm"] == "TextInChoices"
 
 
@@ -559,12 +527,10 @@ def test_fill_in_blank_end_to_end_workflow():
                 position=1,
                 correct_answer="Paris",
                 answer_variations=["paris", "PARIS"],
-                case_sensitive=False,
             ),
             BlankData(
                 position=2,
                 correct_answer="Europe",
-                case_sensitive=False,
             ),
         ],
         explanation="Paris is the capital of France and is located in Europe.",
@@ -601,7 +567,6 @@ def test_fill_in_blank_validation_round_trip():
                 "position": 1,
                 "correct_answer": "Paris",
                 "answer_variations": ["paris"],
-                "case_sensitive": False,
             }
         ],
         "explanation": "Paris is the capital of France.",

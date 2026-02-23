@@ -51,7 +51,6 @@ export interface MCQStats extends QuestionTypeStats {
 export interface FillInBlankStats extends QuestionTypeStats {
   average_blanks_per_question: number
   questions_with_variations: number
-  case_sensitive_questions: number
 }
 
 export interface MatchingStats extends QuestionTypeStats {

@@ -361,7 +361,6 @@ def test_convert_question_to_canvas_format_fill_in_blank_single_blank():
                 "position": 1,
                 "correct_answer": "Paris",
                 "answer_variations": ["paris", "PARIS"],
-                "case_sensitive": False,
             }
         ],
         "explanation": "Paris is the capital of France.",
@@ -420,18 +419,15 @@ def test_convert_question_to_canvas_format_fill_in_blank_multiple_blanks():
             {
                 "position": 1,
                 "correct_answer": "France",
-                "case_sensitive": False,
             },
             {
                 "position": 2,
                 "correct_answer": "Paris",
                 "answer_variations": ["paris"],
-                "case_sensitive": False,
             },
             {
                 "position": 3,
                 "correct_answer": "Europe",
-                "case_sensitive": False,
             },
         ],
         "explanation": "Paris is the capital of France in Europe.",
@@ -463,35 +459,6 @@ def test_convert_question_to_canvas_format_fill_in_blank_multiple_blanks():
     assert ["Europe"] in answers
 
 
-def test_convert_question_to_canvas_format_fill_in_blank_case_sensitive():
-    """Test Canvas format conversion for case-sensitive Fill-in-Blank question."""
-    from src.canvas.service import convert_question_to_canvas_format
-
-    question_data = {
-        "id": str(uuid.uuid4()),
-        "question_text": "The chemical symbol for gold is [blank_1].",
-        "blanks": [
-            {
-                "position": 1,
-                "correct_answer": "Au",
-                "case_sensitive": True,
-            }
-        ],
-        "question_type": "fill_in_blank",
-    }
-
-    result = convert_question_to_canvas_format(question_data, position=1)
-
-    # Check scoring data
-    scoring_data = result["item"]["entry"]["scoring_data"]
-    assert len(scoring_data["value"]) == 1  # Only main answer
-
-    # Check scoring algorithm
-    scoring_value = scoring_data["value"][0]
-    assert scoring_value["scoring_algorithm"] == "TextInChoices"
-    assert scoring_value["scoring_data"]["value"] == ["Au"]
-
-
 def test_convert_question_to_canvas_format_fill_in_blank_no_variations():
     """Test Canvas format conversion for Fill-in-Blank question without variations."""
     from src.canvas.service import convert_question_to_canvas_format
@@ -503,7 +470,6 @@ def test_convert_question_to_canvas_format_fill_in_blank_no_variations():
             {
                 "position": 1,
                 "correct_answer": "Paris",
-                "case_sensitive": False,
             }
         ],
         "question_type": "fill_in_blank",
@@ -532,7 +498,6 @@ def test_convert_question_to_canvas_format_fill_in_blank_with_explanation():
             {
                 "position": 1,
                 "correct_answer": "Paris",
-                "case_sensitive": False,
             }
         ],
         "explanation": "Paris is the capital and largest city of France.",
@@ -559,12 +524,10 @@ def test_convert_question_to_canvas_format_fill_in_blank_uuid_generation():
             {
                 "position": 1,
                 "correct_answer": "blank1",
-                "case_sensitive": False,
             },
             {
                 "position": 2,
                 "correct_answer": "blank2",
-                "case_sensitive": False,
             },
         ],
         "question_type": "fill_in_blank",
@@ -645,8 +608,8 @@ def test_convert_question_to_canvas_format_unsupported_type():
         convert_question_to_canvas_format(question_data, position=1)
 
 
-def test_convert_question_to_canvas_format_mixed_case_sensitivity():
-    """Test Canvas format conversion with mixed case sensitivity."""
+def test_convert_question_to_canvas_format_multiple_blanks_no_variations():
+    """Test Canvas format conversion with multiple blanks and no variations."""
     from src.canvas.service import convert_question_to_canvas_format
 
     question_data = {
@@ -656,12 +619,10 @@ def test_convert_question_to_canvas_format_mixed_case_sensitivity():
             {
                 "position": 1,
                 "correct_answer": "Paris",
-                "case_sensitive": False,
             },
             {
                 "position": 2,
                 "correct_answer": "Au",
-                "case_sensitive": True,
             },
         ],
         "question_type": "fill_in_blank",
@@ -675,10 +636,8 @@ def test_convert_question_to_canvas_format_mixed_case_sensitivity():
 
     # Check scoring algorithms
     scoring_values = scoring_data["value"]
-    algorithms = [sv["scoring_algorithm"] for sv in scoring_values]
-    # All should use TextContainsAnswer in the new implementation
-    for algorithm in algorithms:
-        assert algorithm == "TextInChoices"
+    for sv in scoring_values:
+        assert sv["scoring_algorithm"] == "TextInChoices"
 
 
 # Canvas Export 502 Error Handling Tests

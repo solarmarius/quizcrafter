@@ -439,7 +439,7 @@
       "remove": "Fjern",
       "answerVariations": "Svarvariasjoner",
       "answerVariationsHelper": "Skill flere variasjoner med komma",
-      "caseSensitiveCheckbox": "Skill mellom store og små bokstaver",
+      "caseVariationHint": "Svar sjekkes nøyaktig. Legg til alle akseptable varianter av store/små bokstaver (f.eks. \"oslo\", \"OSLO\").",
       "blankHelperText": "Bruk [blank_1], [blank_2], osv. for å markere blanke felt i spørsmålet",
       "addBlankDisabledText": "Legg til spørsmålstekst først for å aktivere smart blanke felt-oppretting",
       "nextPosition": "Neste posisjon: {{position}}",
@@ -459,8 +459,7 @@
       "addDistractor": "Legg til distraktor",
       "removeDistractor": "Fjern distraktor",
       "distractorsDescription": "Valgfrie feilsvar som ikke matcher noe spørsmål. Maksimalt 5 tillatt.",
-      "acceptedVariations": "Godkjente variasjoner",
-      "caseSensitive": "(Skill mellom store og små bokstaver)"
+      "acceptedVariations": "Godkjente variasjoner"
     }
   }
 }
