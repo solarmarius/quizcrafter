@@ -524,12 +524,10 @@ def test_convert_question_to_canvas_format_fill_in_blank_uuid_generation():
             {
                 "position": 1,
                 "correct_answer": "blank1",
-                "case_sensitive": False,
             },
             {
                 "position": 2,
                 "correct_answer": "blank2",
-                "case_sensitive": False,
             },
         ],
         "question_type": "fill_in_blank",
