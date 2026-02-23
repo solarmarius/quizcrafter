@@ -424,6 +424,7 @@ class FillInBlankQuestionType(BaseQuestionType):
                     "scoring_data": {
                         "value": all_answers,
                         "blank_text": blank.correct_answer,
+                        "ignore_case": not blank.case_sensitive,
                     },
                     "scoring_algorithm": CanvasScoringAlgorithm.TEXT_IN_CHOICES,
                 }
