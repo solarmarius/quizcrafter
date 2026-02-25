@@ -37,12 +37,12 @@
 │  │                                                                    │  │
 │  │  ┌──────────────────────────┐   ┌──────────────────────────┐      │  │
 │  │  │  p-qzcrft-backend        │   │  p-qzcrft-frontend       │      │  │
-│  │  │  (Docker container)      │   │  (Node.js 20 + PM2)      │      │  │
+│  │  │  (Docker container)      │   │  (Docker container)      │      │  │
 │  │  │                          │   │                          │      │  │
 │  │  │  • FastAPI + Python 3.10 │   │  • React SPA             │      │  │
-│  │  │  • Port 8000             │   │  • Static file serving   │      │  │
+│  │  │  • Port 8000             │   │  • nginx:1 on port 80    │      │  │
 │  │  │  • System Managed ID     │   │  • SPA routing           │      │  │
-│  │  │  • VNet integrated       │   │                          │      │  │
+│  │  │  • VNet integrated       │   │  • System Managed ID     │      │  │
 │  │  │  • staging slot          │   │  • staging slot          │      │  │
 │  │  └──────────┬───────────────┘   └──────────────────────────┘      │  │
 │  └─────────────┼──────────────────────────────────────────────────────┘  │
@@ -151,7 +151,7 @@ User Browser
 | Observation | Detail |
 |-------------|--------|
 | Backend runtime | Set to `PYTHON\|3.14` — will be changed to Docker container mode |
-| Frontend runtime | Set to `NODE\|24-lts` — will configure PM2 startup command |
+| Frontend runtime | Set to `NODE\|24-lts` — will be changed to Docker container mode |
 | ACR admin user | Disabled — will use managed identity (AcrPull role already assigned) |
 | ACR login server | `pqzcrftacr-afb8abgzafb6fxf5.azurecr.io` (custom format) |
 | App Service Plan | PremiumV3 P0v3 — supports VNet integration |
@@ -169,7 +169,7 @@ User Browser
 | App Service Plan | `p-qzcrft-asp` | Microsoft.Web/serverfarms | PremiumV3 P0v3, Linux, 1 instance |
 | Backend App Service | `p-qzcrft-backend` | Microsoft.Web/sites | Docker container, managed identity |
 | Backend Staging Slot | `p-qzcrft-backend/staging` | Microsoft.Web/sites/slots | Available for blue-green |
-| Frontend App Service | `p-qzcrft-frontend` | Microsoft.Web/sites | Node.js 20, PM2 serve |
+| Frontend App Service | `p-qzcrft-frontend` | Microsoft.Web/sites | Docker container, nginx:1, managed identity |
 | Frontend Staging Slot | `p-qzcrft-frontend/staging` | Microsoft.Web/sites/slots | Available for blue-green |
 | Container Registry | `pqzcrftacr` | Microsoft.ContainerRegistry | Basic, admin disabled |
 | Key Vault | `p-qzcrft-kv` | Microsoft.KeyVault | RBAC authorization, soft delete |
@@ -626,30 +626,36 @@ az webapp log download \
 
 ## Phase 6: Deploy Frontend
 
-### 6.1 Build Frontend
+The frontend uses a two-stage Docker build: `node:20` builds the Vite/React app, `nginx:1` serves the static bundle on port 80. `VITE_API_URL` is baked in at build time from `frontend/.env.production`.
+
+> **Note:** The Dockerfile declares `ARG VITE_API_URL` with **no default value**. This is intentional and critical. If you write `ARG VITE_API_URL=${VITE_API_URL}`, Docker defaults the arg to an empty string when no `--build-arg` is passed. Docker ARG values are exposed as process environment variables during `RUN` commands, and Vite gives process env vars higher priority than `.env` files — so the empty string would override `frontend/.env.production` and break the build. With no default (`ARG VITE_API_URL`), the variable is unset when not provided, and Vite correctly reads `frontend/.env.production`.
+
+### 6.1 Build and Push Frontend Image
 
 ```bash
-cd frontend
+az acr login --name pqzcrftacr
 
-# Install dependencies
-npm ci
+COMMIT_SHA=$(git rev-parse --short HEAD)
+ACR_LOGIN="pqzcrftacr-afb8abgzafb6fxf5.azurecr.io"
 
-# Build with production backend URL
-VITE_API_URL="https://p-qzcrft-backend-eab9c7dga9d4cxgv.westeurope-01.azurewebsites.net" npm run build
+# Build for linux/amd64 (required for App Service)
+# VITE_API_URL is read from frontend/.env.production at build time
+docker build --platform linux/amd64 \
+  -t ${ACR_LOGIN}/quizcrafter-frontend:latest \
+  -t ${ACR_LOGIN}/quizcrafter-frontend:${COMMIT_SHA} \
+  ./frontend
+
+docker push ${ACR_LOGIN}/quizcrafter-frontend --all-tags
 ```
-
-> **Note:** `VITE_API_URL` is baked into the static assets at build time. It must match the backend's public URL exactly.
 
 #### Verification 6.1
 
 ```bash
-# Verify the build output exists
-ls -la frontend/dist/
-# Should contain index.html and assets/ directory
-
-# Verify the API URL is embedded in the build
-grep -r "p-qzcrft-backend" frontend/dist/assets/*.js | head -1
-# Should find the backend URL in the bundled JavaScript
+az acr repository show-tags \
+  --name pqzcrftacr \
+  --repository quizcrafter-frontend \
+  --output table
+# Expected: latest and commit SHA listed
 ```
 
 ---
@@ -657,19 +663,26 @@ grep -r "p-qzcrft-backend" frontend/dist/assets/*.js | head -1
 ### 6.2 Configure Frontend App Service
 
 ```bash
-# Set the startup command for SPA routing
+ACR_LOGIN="pqzcrftacr-afb8abgzafb6fxf5.azurecr.io"
+
+# Switch to Docker container mode
 az webapp config set \
   --name p-qzcrft-frontend \
   --resource-group p-qzcrft \
-  --startup-file "pm2 serve /home/site/wwwroot --no-daemon --spa"
+  --linux-fx-version "DOCKER|${ACR_LOGIN}/quizcrafter-frontend:latest"
 
-# Set app settings
+# Clear startup command (MUST use resource update — --startup-file "" has no effect)
+az resource update \
+  --ids /subscriptions/f2d616a4-6e35-4999-aa17-22fa2c83dca5/resourceGroups/p-qzcrft/providers/Microsoft.Web/sites/p-qzcrft-frontend/config/web \
+  --set properties.appCommandLine=""
+
+# Container settings
 az webapp config appsettings set \
   --name p-qzcrft-frontend \
   --resource-group p-qzcrft \
   --settings \
-    WEBSITE_NODE_DEFAULT_VERSION="~20" \
-    SCM_DO_BUILD_DURING_DEPLOYMENT="false"
+    WEBSITES_PORT="80" \
+    WEBSITES_ENABLE_APP_SERVICE_STORAGE="false"
 
 # Security settings
 az webapp config set \
@@ -681,38 +694,37 @@ az webapp config set \
   --min-tls-version 1.2
 ```
 
-> **Note:** `pm2 serve ... --spa` handles client-side routing by returning `index.html` for all routes that don't match a static file.
+> **Key notes:**
+> - `WEBSITES_PORT=80` — nginx listens on port 80.
+> - `appCommandLine` must be cleared via `az resource update` — the `--startup-file ""` flag on `az webapp config set` does not clear it.
+> - SPA routing is handled by nginx's `try_files $uri /index.html =404;` directive. No PM2 needed.
+
+#### Verification 6.2
+
+```bash
+az webapp config show \
+  --name p-qzcrft-frontend --resource-group p-qzcrft \
+  --query "{linuxFxVersion:linuxFxVersion, appCommandLine:appCommandLine}" -o json
+# Expected:
+# { "linuxFxVersion": "DOCKER|...quizcrafter-frontend:latest", "appCommandLine": "" }
+```
 
 ---
 
-### 6.3 Deploy via Zip
+### 6.3 Start and Verify
 
 ```bash
-# Create zip archive of the build output
-cd frontend/dist
-zip -r ../frontend-dist.zip .
-cd ..
+az webapp restart --name p-qzcrft-frontend --resource-group p-qzcrft
 
-# Deploy to App Service
-az webapp deployment source config-zip \
-  --name p-qzcrft-frontend \
-  --resource-group p-qzcrft \
-  --src frontend-dist.zip
-```
-
-#### Verification 6.3
-
-```bash
-# Check HTTP response
+# After ~60s:
 curl -s -o /dev/null -w "%{http_code}" \
   https://p-qzcrft-frontend-gjabc8deeeahbjh3.westeurope-01.azurewebsites.net
 
-# Check that SPA routing works (should return 200, not 404)
 curl -s -o /dev/null -w "%{http_code}" \
   https://p-qzcrft-frontend-gjabc8deeeahbjh3.westeurope-01.azurewebsites.net/dashboard
 ```
 
-**Expected result:** Both return `200`.
+**Expected result:** Both return `200`. Log stream should show `nginx/1.x.x start worker processes` with no PM2 errors.
 
 ---
 
@@ -924,12 +936,21 @@ python3 -c "import socket; s=socket.create_connection(('p-qzcrft-psql.postgres.d
 
 ### Frontend 404 on Routes
 
+nginx handles SPA routing via `try_files $uri /index.html =404;`. If you're seeing 404s:
+
 ```bash
-# Verify the startup command
+# Verify appCommandLine is empty (must not contain PM2 or any startup command)
 az webapp config show --name p-qzcrft-frontend --resource-group p-qzcrft \
   --query "appCommandLine" -o tsv
-# Expected: pm2 serve /home/site/wwwroot --no-daemon --spa
+# Expected: (empty)
+
+# If appCommandLine is non-empty, clear it:
+az resource update \
+  --ids /subscriptions/f2d616a4-6e35-4999-aa17-22fa2c83dca5/resourceGroups/p-qzcrft/providers/Microsoft.Web/sites/p-qzcrft-frontend/config/web \
+  --set properties.appCommandLine=""
 ```
+
+> **Note:** `az webapp config set --startup-file ""` does NOT clear `appCommandLine`. Must use `az resource update`.
 
 ### CORS Errors
 
@@ -973,13 +994,34 @@ alembic downgrade <revision_id>
 
 ### Rollback Frontend
 
-Rebuild from a previous commit and redeploy:
+Point the App Service at a previous image tag (already in ACR) and restart:
+
+```bash
+# List available image tags
+az acr repository show-tags --name pqzcrftacr --repository quizcrafter-frontend -o table
+
+# Set a specific image tag
+az webapp config set \
+  --name p-qzcrft-frontend \
+  --resource-group p-qzcrft \
+  --linux-fx-version "DOCKER|pqzcrftacr-afb8abgzafb6fxf5.azurecr.io/quizcrafter-frontend:<TAG>"
+
+az webapp restart --name p-qzcrft-frontend --resource-group p-qzcrft
+```
+
+To rebuild from a previous commit:
 
 ```bash
 git checkout <commit>
-cd frontend && npm ci && VITE_API_URL="https://p-qzcrft-backend-eab9c7dga9d4cxgv.westeurope-01.azurewebsites.net" npm run build
-cd dist && zip -r ../frontend-dist.zip .
-az webapp deployment source config-zip --name p-qzcrft-frontend --resource-group p-qzcrft --src ../frontend-dist.zip
+az acr login --name pqzcrftacr
+ACR_LOGIN="pqzcrftacr-afb8abgzafb6fxf5.azurecr.io"
+docker build --platform linux/amd64 \
+  -t ${ACR_LOGIN}/quizcrafter-frontend:rollback \
+  ./frontend
+docker push ${ACR_LOGIN}/quizcrafter-frontend:rollback
+az webapp config set --name p-qzcrft-frontend --resource-group p-qzcrft \
+  --linux-fx-version "DOCKER|${ACR_LOGIN}/quizcrafter-frontend:rollback"
+az webapp restart --name p-qzcrft-frontend --resource-group p-qzcrft
 ```
 
 ---
@@ -1026,17 +1068,24 @@ az webapp config set \
   --resource-group p-qzcrft \
   --linux-fx-version "DOCKER|pqzcrftacr-afb8abgzafb6fxf5.azurecr.io/quizcrafter-backend:latest"
 
-# Deploy new frontend build
-az webapp deployment source config-zip \
-  --name p-qzcrft-frontend \
-  --resource-group p-qzcrft \
-  --src frontend-dist.zip
+# Deploy new frontend image
+ACR_LOGIN="pqzcrftacr-afb8abgzafb6fxf5.azurecr.io"
+az acr login --name pqzcrftacr
+docker build --platform linux/amd64 \
+  -t ${ACR_LOGIN}/quizcrafter-frontend:latest \
+  -t ${ACR_LOGIN}/quizcrafter-frontend:$(git rev-parse --short HEAD) \
+  ./frontend
+docker push ${ACR_LOGIN}/quizcrafter-frontend --all-tags
+az webapp restart --name p-qzcrft-frontend --resource-group p-qzcrft
 
 # List Key Vault secrets
 az keyvault secret list --vault-name p-qzcrft-kv --query "[].name" -o tsv
 
-# List ACR images
+# List ACR images (backend)
 az acr repository show-tags --name pqzcrftacr --repository quizcrafter-backend -o table
+
+# List ACR images (frontend)
+az acr repository show-tags --name pqzcrftacr --repository quizcrafter-frontend -o table
 ```
 
 ---
@@ -1046,3 +1095,4 @@ az acr repository show-tags --name pqzcrftacr --repository quizcrafter-backend -
 | Date | Author | Changes |
 |------|--------|---------|
 | 2026-02-19 | Claude Code | Initial document creation based on Azure CLI inspection |
+| 2026-02-25 | Claude Code | Updated Phase 6 to container-based deployment (nginx:1 via ACR); updated architecture diagram, resource inventory, troubleshooting, rollback, and quick reference to reflect removal of PM2/zip approach |

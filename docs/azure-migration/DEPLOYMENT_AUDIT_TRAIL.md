@@ -432,16 +432,16 @@ exec gunicorn \
   src.main:app
 ```
 
-| Flag | Value | Rationale |
-| ---------------------- | ---------------------- | --------------------------------------------------------------------------- |
-| `-w` | `${WEB_CONCURRENCY:-2}` | Default 2 workers; saves ~500 MB RAM vs 4 on a 4 GB machine |
-| `-k` | `UvicornWorker` | Each worker runs a full Uvicorn asyncio event loop — full async support |
-| `--timeout` | `600` | Must exceed `LLM_API_TIMEOUT=500 s`; kills and restarts hung workers |
-| `--keep-alive` | `5` | Reuses HTTP connections for 5 s — reduces TCP handshake overhead |
-| `--max-requests` | `1000` | Recycles workers after 1000 requests — prevents Python memory leaks |
-| `--max-requests-jitter` | `100` | Staggers recycling so not all workers restart simultaneously |
-| `--worker-tmp-dir` | `/dev/shm` | Uses tmpfs (RAM) for Gunicorn heartbeat files — no disk I/O in Docker |
-| `exec` | — | Replaces the shell process so Gunicorn receives container signals directly |
+| Flag                    | Value                   | Rationale                                                                  |
+| ----------------------- | ----------------------- | -------------------------------------------------------------------------- |
+| `-w`                    | `${WEB_CONCURRENCY:-2}` | Default 2 workers; saves ~500 MB RAM vs 4 on a 4 GB machine                |
+| `-k`                    | `UvicornWorker`         | Each worker runs a full Uvicorn asyncio event loop — full async support    |
+| `--timeout`             | `600`                   | Must exceed `LLM_API_TIMEOUT=500 s`; kills and restarts hung workers       |
+| `--keep-alive`          | `5`                     | Reuses HTTP connections for 5 s — reduces TCP handshake overhead           |
+| `--max-requests`        | `1000`                  | Recycles workers after 1000 requests — prevents Python memory leaks        |
+| `--max-requests-jitter` | `100`                   | Staggers recycling so not all workers restart simultaneously               |
+| `--worker-tmp-dir`      | `/dev/shm`              | Uses tmpfs (RAM) for Gunicorn heartbeat files — no disk I/O in Docker      |
+| `exec`                  | —                       | Replaces the shell process so Gunicorn receives container signals directly |
 
 ### Azure App Service Settings — Commands Run
 
@@ -462,11 +462,11 @@ az resource update \
 
 **Results:**
 
-| Setting | Before | After |
+| Setting                 | Before  | After   |
 | ----------------------- | ------- | ------- |
-| `WEB_CONCURRENCY` | `4` | `2` |
-| `MALLOC_ARENA_MAX` | not set | `2` |
-| `use32BitWorkerProcess` | `true` | `false` |
+| `WEB_CONCURRENCY`       | `4`     | `2`     |
+| `MALLOC_ARENA_MAX`      | not set | `2`     |
+| `use32BitWorkerProcess` | `true`  | `false` |
 
 ### Docker Image Rebuild — Completed
 
@@ -517,3 +517,116 @@ curl -s https://p-qzcrft-backend-eab9c7dga9d4cxgv.westeurope-01.azurewebsites.ne
 curl -s https://p-qzcrft-backend-eab9c7dga9d4cxgv.westeurope-01.azurewebsites.net/utils/health-check/ready
 # Expected: {"status":"ok","db":"ok"}
 ```
+
+---
+
+## Step 11: Production Custom Domain & Container Migration (p-qzcrft)
+
+### 8.1 Enable ACR Managed Identity on Frontend App Service
+
+**Context:** Migrating `p-qzcrft-frontend` from zip deploy (blocked by Deny-all access restrictions) to container-based deployment via ACR. Zip deploy uses SCM/Kudu endpoint which is also blocked.
+
+**Command:**
+
+```bash
+az webapp update \
+  --name p-qzcrft-frontend \
+  --resource-group p-qzcrft \
+  --set siteConfig.acrUseManagedIdentityCreds=true
+```
+
+**Status:** Success
+
+**Prerequisites completed before this step:**
+
+- System-assigned managed identity assigned to `p-qzcrft-frontend` (principal ID: `00249979-a1ff-4f0d-901c-22baecb7ca28`)
+- AcrPull role granted to managed identity on `pqzcrftacr` (performed by Azure admin)
+- Key Vault `CANVAS-REDIRECT-URI` updated to `https://quizcrafter-api.uit.no/auth/callback/canvas`
+- `frontend/.env.production` updated to `VITE_API_URL=https://quizcrafter-api.uit.no`
+
+---
+
+## Step 12: Migrate Frontend to Container-Based Deployment
+
+**Date:** 2026-02-25
+**Deployer:** Marius Solaas
+
+### Context
+
+Migrated `p-qzcrft-frontend` from zip-based deployment (Node.js 24-lts + PM2) to Docker container mode, consistent with the backend. The frontend already had a production-ready `Dockerfile` (two-stage: `node:20` Vite build → `nginx:1` static serving).
+
+**Key finding:** `VITE_API_URL=https://quizcrafter-api.uit.no` is baked into the bundle at build time via `frontend/.env.production`. The Dockerfile declares `ARG VITE_API_URL` with **no default value** — this is critical. If the ARG were written as `ARG VITE_API_URL=${VITE_API_URL}`, Docker would default it to an empty string when no `--build-arg` is passed, and Vite would bake that empty string into the bundle (process env vars override `.env` files in Vite). With no default, the ARG is simply unset, and Vite reads `.env.production` as the source of truth.
+
+### Commands Run
+
+```bash
+# 1. Login and build image
+az acr login --name pqzcrftacr
+
+COMMIT_SHA=$(git rev-parse --short HEAD)
+ACR_LOGIN="pqzcrftacr-afb8abgzafb6fxf5.azurecr.io"
+
+docker build --platform linux/amd64 \
+  -t ${ACR_LOGIN}/quizcrafter-frontend:latest \
+  -t ${ACR_LOGIN}/quizcrafter-frontend:${COMMIT_SHA} \
+  ./frontend
+
+docker push ${ACR_LOGIN}/quizcrafter-frontend --all-tags
+
+# 2. Switch App Service to Docker container mode
+az webapp config set \
+  --name p-qzcrft-frontend --resource-group p-qzcrft \
+  --linux-fx-version "DOCKER|${ACR_LOGIN}/quizcrafter-frontend:latest"
+
+# 3. Add container settings
+az webapp config appsettings set \
+  --name p-qzcrft-frontend --resource-group p-qzcrft \
+  --settings \
+    WEBSITES_PORT="80" \
+    WEBSITES_ENABLE_APP_SERVICE_STORAGE="false"
+
+# 4. Remove Node.js-specific settings
+az webapp config appsettings delete \
+  --name p-qzcrft-frontend --resource-group p-qzcrft \
+  --setting-names WEBSITE_NODE_DEFAULT_VERSION SCM_DO_BUILD_DURING_DEPLOYMENT
+
+# 5. Clear PM2 startup command (must use resource update; --startup-file "" has no effect)
+az resource update \
+  --ids /subscriptions/f2d616a4-6e35-4999-aa17-22fa2c83dca5/resourceGroups/p-qzcrft/providers/Microsoft.Web/sites/p-qzcrft-frontend/config/web \
+  --set properties.appCommandLine=""
+
+# 6. Restart
+az webapp restart --name p-qzcrft-frontend --resource-group p-qzcrft
+```
+
+### Issues Encountered
+
+| #   | Issue                                                                      | Resolution                                                                            |
+| --- | -------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
+| 1   | `az webapp config set --startup-file ""` did not clear `appCommandLine`    | Used `az resource update --set properties.appCommandLine=""` instead                  |
+| 2   | Container started but showed `/docker-entrypoint.sh: exec: pm2: not found` | Root cause was issue #1 — PM2 startup command was still injected into nginx container |
+
+### Verification — Confirmed 2026-02-25
+
+**Log stream output after fix:**
+
+```text
+2026-02-25T09:24:58Z /docker-entrypoint.sh: Configuration complete; ready for start up
+2026-02-25T09:24:58Z nginx/1.29.5 start worker processes
+2026-02-25T09:24:59Z "GET /robots933456.txt HTTP/1.1" 200 462  (Azure health probe)
+2026-02-25T09:25:00Z "GET / HTTP/1.1" 200 462
+```
+
+**Result:** nginx 1.29.5 running, SPA routing active via `try_files $uri /index.html =404;`. Azure health probe and root both return HTTP 200.
+
+### Post-Migration State
+
+| Setting                               | Before                                           | After                                     |
+| ------------------------------------- | ------------------------------------------------ | ----------------------------------------- |
+| `linuxFxVersion`                      | `NODE\|24-lts`                                   | `DOCKER\|.../quizcrafter-frontend:latest` |
+| `appCommandLine`                      | `pm2 serve /home/site/wwwroot --no-daemon --spa` | `` (empty)                                |
+| `WEBSITES_PORT`                       | not set                                          | `80`                                      |
+| `WEBSITES_ENABLE_APP_SERVICE_STORAGE` | not set                                          | `false`                                   |
+| `WEBSITE_NODE_DEFAULT_VERSION`        | `~20`                                            | removed                                   |
+| `SCM_DO_BUILD_DURING_DEPLOYMENT`      | `false`                                          | removed                                   |
+| Web server                            | PM2 (Node.js)                                    | nginx 1.29.5                              |
