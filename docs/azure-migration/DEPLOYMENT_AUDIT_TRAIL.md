@@ -386,3 +386,134 @@ az monitor diagnostic-settings create \
 - Both frontend and backend have Log Analytics diagnostics enabled
 - Frontend uses PM2 in SPA mode for client-side routing
 - All secrets managed via Key Vault references (no plaintext in App Service settings)
+
+---
+
+## Step 10: Backend Performance Optimization (P0v3 Tuning)
+
+**Date:** 2026-02-25
+**Deployer:** Marius Solaas
+
+### Context
+
+The App Service Plan is Premium0V3 (P0v3): **1 vCore, 4 GB RAM**. The initial deployment used `fastapi run --workers 4`, which has two problems on this SKU:
+
+1. **No process management**: `fastapi run` provides no worker recycling, graceful restarts, or heartbeat monitoring — all important for a long-lived production container.
+2. **Over-provisioned workers**: 4 Python processes × ~250 MB each = ~1 GB RAM for workers alone on a 4 GB machine. Since the app is I/O-bound (async LLM calls, async DB, async Canvas API), 2 workers handle the same concurrency with half the memory.
+
+The fix: switch to **Gunicorn with `uvicorn.workers.UvicornWorker`** — the [officially recommended production setup for FastAPI](https://fastapi.tiangolo.com/deployment/server-workers/). Gunicorn manages processes; each worker runs a full Uvicorn asyncio event loop.
+
+### Code Changes
+
+#### `backend/pyproject.toml`
+
+Added `gunicorn>=23.0.0` to `[project.dependencies]`.
+
+#### `backend/scripts/start.sh`
+
+Replaced:
+
+```bash
+exec fastapi run --workers ${WEB_CONCURRENCY:-4} src/main.py
+```
+
+With:
+
+```bash
+exec gunicorn \
+  -w "${WEB_CONCURRENCY:-2}" \
+  -k uvicorn.workers.UvicornWorker \
+  --bind 0.0.0.0:8000 \
+  --timeout 600 \
+  --keep-alive 5 \
+  --max-requests 1000 \
+  --max-requests-jitter 100 \
+  --worker-tmp-dir /dev/shm \
+  src.main:app
+```
+
+| Flag | Value | Rationale |
+| ---------------------- | ---------------------- | --------------------------------------------------------------------------- |
+| `-w` | `${WEB_CONCURRENCY:-2}` | Default 2 workers; saves ~500 MB RAM vs 4 on a 4 GB machine |
+| `-k` | `UvicornWorker` | Each worker runs a full Uvicorn asyncio event loop — full async support |
+| `--timeout` | `600` | Must exceed `LLM_API_TIMEOUT=500 s`; kills and restarts hung workers |
+| `--keep-alive` | `5` | Reuses HTTP connections for 5 s — reduces TCP handshake overhead |
+| `--max-requests` | `1000` | Recycles workers after 1000 requests — prevents Python memory leaks |
+| `--max-requests-jitter` | `100` | Staggers recycling so not all workers restart simultaneously |
+| `--worker-tmp-dir` | `/dev/shm` | Uses tmpfs (RAM) for Gunicorn heartbeat files — no disk I/O in Docker |
+| `exec` | — | Replaces the shell process so Gunicorn receives container signals directly |
+
+### Azure App Service Settings — Commands Run
+
+```bash
+# 1. Reduce workers from 4 → 2, add MALLOC_ARENA_MAX to reduce glibc memory fragmentation
+az webapp config appsettings set \
+  --name p-qzcrft-backend \
+  --resource-group p-qzcrft \
+  --settings \
+    WEB_CONCURRENCY="2" \
+    MALLOC_ARENA_MAX="2"
+
+# 2. Fix use32BitWorkerProcess (was incorrectly true for a 64-bit Linux container)
+az resource update \
+  --ids /subscriptions/f2d616a4-6e35-4999-aa17-22fa2c83dca5/resourceGroups/p-qzcrft/providers/Microsoft.Web/sites/p-qzcrft-backend/config/web \
+  --set properties.use32BitWorkerProcess=false
+```
+
+**Results:**
+
+| Setting | Before | After |
+| ----------------------- | ------- | ------- |
+| `WEB_CONCURRENCY` | `4` | `2` |
+| `MALLOC_ARENA_MAX` | not set | `2` |
+| `use32BitWorkerProcess` | `true` | `false` |
+
+### Docker Image Rebuild — Completed
+
+**Note:** First push attempt failed with ACR auth expiry (`authentication required`). Re-ran `az acr login --name pqzcrftacr` and pushed successfully.
+
+**Note:** First run failed with `gunicorn: error: unrecognized arguments: --keepalive`. Flag corrected to `--keep-alive` (Gunicorn uses a hyphen). Image rebuilt and pushed again.
+
+```bash
+az acr login --name pqzcrftacr
+
+COMMIT_SHA=$(git rev-parse --short HEAD)
+ACR_LOGIN="pqzcrftacr-afb8abgzafb6fxf5.azurecr.io"
+
+docker build --platform linux/amd64 \
+  -t ${ACR_LOGIN}/quizcrafter-backend:latest \
+  -t ${ACR_LOGIN}/quizcrafter-backend:${COMMIT_SHA} \
+  ./backend
+
+docker push ${ACR_LOGIN}/quizcrafter-backend --all-tags
+
+az webapp restart --name p-qzcrft-backend --resource-group p-qzcrft
+```
+
+### Verification — Confirmed 2026-02-25
+
+Logs retrieved via Azure Portal Log Stream (SCM endpoint is IP-restricted, `az webapp log tail` returns 403 from local machine).
+
+**Actual log output:**
+
+```text
+2026-02-25T08:28:56Z [INFO] Starting gunicorn 25.1.0
+2026-02-25T08:28:56Z [INFO] Listening at: http://0.0.0.0:8000 (1)
+2026-02-25T08:28:56Z [INFO] Using worker: uvicorn.workers.UvicornWorker
+2026-02-25T08:28:56Z [INFO] Booting worker with pid: 9
+2026-02-25T08:28:56Z [INFO] Booting worker with pid: 10
+2026-02-25T08:29:01Z [INFO] Application startup complete.   (worker 9)
+2026-02-25T08:29:01Z [INFO] Application startup complete.   (worker 10)
+```
+
+**Result:** Gunicorn 25.1.0 running with 2 UvicornWorker processes. Both workers started and healthy.
+
+Then confirm health checks still pass:
+
+```bash
+curl -s https://p-qzcrft-backend-eab9c7dga9d4cxgv.westeurope-01.azurewebsites.net/utils/health-check/
+# Expected: true
+
+curl -s https://p-qzcrft-backend-eab9c7dga9d4cxgv.westeurope-01.azurewebsites.net/utils/health-check/ready
+# Expected: {"status":"ok","db":"ok"}
+```
