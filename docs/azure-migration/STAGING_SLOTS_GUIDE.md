@@ -299,6 +299,13 @@ az webapp config appsettings set \
 az resource update \
   --ids /subscriptions/f2d616a4-6e35-4999-aa17-22fa2c83dca5/resourceGroups/p-qzcrft/providers/Microsoft.Web/sites/p-qzcrft-backend/slots/staging/config/web \
   --set properties.acrUseManagedIdentityCreds=true
+
+# Clear startup command — MUST use resource update (--startup-file "" has no effect).
+# If appCommandLine is non-empty, it overrides the Dockerfile CMD and bypasses start.sh,
+# which means alembic upgrade head never runs and the database has no tables.
+az resource update \
+  --ids /subscriptions/f2d616a4-6e35-4999-aa17-22fa2c83dca5/resourceGroups/p-qzcrft/providers/Microsoft.Web/sites/p-qzcrft-backend/slots/staging/config/web \
+  --set properties.appCommandLine=""
 ```
 
 #### 5.3 Set all application settings
@@ -321,7 +328,8 @@ az webapp config appsettings set \
     POSTGRES_USER="sqladmin" \
     POSTGRES_SSLMODE="require" \
     PROJECT_NAME="QuizCrafter" \
-    WEB_CONCURRENCY="4" \
+    WEB_CONCURRENCY="2" \
+    MALLOC_ARENA_MAX="2" \
     WEBSITES_CONTAINER_STOP_TIME_LIMIT="300" \
     WEBSITE_VNET_ROUTE_ALL="1" \
     CANVAS_BASE_URL="@Microsoft.KeyVault(VaultName=${KV};SecretName=CANVAS-BASE-URL)" \
@@ -341,19 +349,24 @@ az webapp config appsettings set \
 Now mark the environment-specific settings as **slot-sticky** (these are the ones that must NOT swap):
 
 ```bash
+KV="p-qzcrft-kv"
+STAGING_FRONTEND_URL="https://p-qzcrft-frontend-staging-daatccdfh4f8djcr.westeurope-01.azurewebsites.net"
+
 az webapp config appsettings set \
   --name p-qzcrft-backend \
   --resource-group p-qzcrft \
   --slot staging \
   --slot-settings \
-    ENVIRONMENT \
-    POSTGRES_DB \
-    POSTGRES_PASSWORD \
-    SECRET_KEY \
-    FRONTEND_HOST \
-    CANVAS_REDIRECT_URI
+    ENVIRONMENT="staging" \
+    POSTGRES_DB="quizcrafter_staging" \
+    POSTGRES_PASSWORD="@Microsoft.KeyVault(VaultName=${KV};SecretName=STAGING-POSTGRES-PASSWORD)" \
+    SECRET_KEY="@Microsoft.KeyVault(VaultName=${KV};SecretName=STAGING-SECRET-KEY)" \
+    FRONTEND_HOST="${STAGING_FRONTEND_URL}" \
+    CANVAS_REDIRECT_URI="@Microsoft.KeyVault(VaultName=${KV};SecretName=STAGING-CANVAS-REDIRECT-URI)"
 ```
 
+> **Note:** `--slot-settings` requires `name=value` pairs — passing only names fails with Azure CLI 2.82.0+ (`not enough values to unpack`). The command above includes the values explicitly.
+>
 > **Why these six?** They are the only settings with different values between staging and production. Everything else (port, DB server, Canvas app credentials, OpenAI, worker count) is identical in both environments and should travel with the code when slots are swapped.
 
 #### 5.4 Security and health check
@@ -409,26 +422,87 @@ Expected: `true`
 
 ### Phase 6: Configure Frontend Staging Slot
 
-The frontend staging slot is a Node.js app serving static files via PM2, identical to production.
+The frontend staging slot serves a Docker container (nginx:1 from ACR), identical in structure to production. Because `VITE_API_URL` is baked into the static bundle at Docker build time, the staging slot needs its own system-assigned managed identity to pull images from ACR.
+
+> **No Key Vault access needed** — the frontend container has no secrets. All configuration is baked at build time.
+
+#### 6.0 Enable managed identity on the frontend staging slot
 
 ```bash
-# Set startup command (SPA routing)
+# Enable system-assigned managed identity
+az webapp identity assign \
+  --name p-qzcrft-frontend \
+  --resource-group p-qzcrft \
+  --slot staging
+
+# Get the principal ID for role assignments
+FRONTEND_STAGING_IDENTITY=$(az webapp identity show \
+  --name p-qzcrft-frontend \
+  --resource-group p-qzcrft \
+  --slot staging \
+  --query principalId -o tsv)
+
+echo "Frontend staging slot identity: $FRONTEND_STAGING_IDENTITY"
+```
+
+#### 6.1 Assign AcrPull role to frontend staging slot identity
+
+```bash
+ACR_ID=$(az acr show --name pqzcrftacr --query id -o tsv)
+
+az role assignment create \
+  --assignee "$FRONTEND_STAGING_IDENTITY" \
+  --role AcrPull \
+  --scope "$ACR_ID"
+```
+
+#### Verification 6.1
+
+```bash
+az role assignment list \
+  --assignee "$FRONTEND_STAGING_IDENTITY" \
+  --query "[].{role:roleDefinitionName, scope:scope}" -o table
+```
+
+Expected: one row — `AcrPull`.
+
+---
+
+#### 6.2 Set container image and ACR pull
+
+```bash
+ACR_LOGIN="pqzcrftacr-afb8abgzafb6fxf5.azurecr.io"
+
+# Switch to Docker container mode
 az webapp config set \
   --name p-qzcrft-frontend \
   --resource-group p-qzcrft \
   --slot staging \
-  --startup-file "pm2 serve /home/site/wwwroot --no-daemon --spa"
+  --linux-fx-version "DOCKER|${ACR_LOGIN}/quizcrafter-frontend:staging"
 
-# App settings
+# Container settings
 az webapp config appsettings set \
   --name p-qzcrft-frontend \
   --resource-group p-qzcrft \
   --slot staging \
   --settings \
-    WEBSITE_NODE_DEFAULT_VERSION="~20" \
-    SCM_DO_BUILD_DURING_DEPLOYMENT="false"
+    WEBSITES_PORT="80" \
+    WEBSITES_ENABLE_APP_SERVICE_STORAGE="false"
 
-# Security settings
+# Enable managed identity for ACR pull
+az resource update \
+  --ids /subscriptions/f2d616a4-6e35-4999-aa17-22fa2c83dca5/resourceGroups/p-qzcrft/providers/Microsoft.Web/sites/p-qzcrft-frontend/slots/staging/config/web \
+  --set properties.acrUseManagedIdentityCreds=true
+
+# Clear startup command (MUST use resource update — --startup-file "" has no effect)
+az resource update \
+  --ids /subscriptions/f2d616a4-6e35-4999-aa17-22fa2c83dca5/resourceGroups/p-qzcrft/providers/Microsoft.Web/sites/p-qzcrft-frontend/slots/staging/config/web \
+  --set properties.appCommandLine=""
+```
+
+#### 6.3 Security settings
+
+```bash
 az webapp config set \
   --name p-qzcrft-frontend \
   --resource-group p-qzcrft \
@@ -439,7 +513,21 @@ az webapp config set \
   --min-tls-version 1.2
 ```
 
-> The frontend has no slot-sticky settings — both slots serve static files with the same configuration. The difference (which backend URL is baked in) is controlled at **build time**, not through app settings.
+#### Verification 6.3
+
+```bash
+az resource show \
+  --ids /subscriptions/f2d616a4-6e35-4999-aa17-22fa2c83dca5/resourceGroups/p-qzcrft/providers/Microsoft.Web/sites/p-qzcrft-frontend/slots/staging/config/web \
+  --query "properties.acrUseManagedIdentityCreds" -o tsv
+# Expected: true
+
+az webapp config show \
+  --name p-qzcrft-frontend --resource-group p-qzcrft --slot staging \
+  --query "{linuxFxVersion:linuxFxVersion, appCommandLine:appCommandLine}" -o json
+# Expected: { "linuxFxVersion": "DOCKER|...quizcrafter-frontend:staging", "appCommandLine": "" }
+```
+
+> The frontend has no slot-sticky settings — both slots serve static files with the same nginx container configuration. The difference (which backend URL is baked in) is controlled at **Docker build time** via `--build-arg VITE_API_URL`, not through app settings.
 
 ---
 
@@ -496,20 +584,29 @@ curl -s https://p-qzcrft-backend-staging-a0byd6avbhatbgeq.westeurope-01.azureweb
 # Expected: {"status":"ok","db":"ok"}
 ```
 
-For the frontend, deploy the current production build to the staging slot:
+For the frontend, build a staging Docker image and deploy it to the staging slot:
 
 ```bash
-cd frontend
-npm ci
-VITE_API_URL="https://p-qzcrft-backend-staging-a0byd6avbhatbgeq.westeurope-01.azurewebsites.net" npm run build
+az acr login --name pqzcrftacr
 
-cd dist && zip -r ../frontend-staging.zip . && cd ..
+ACR_LOGIN="pqzcrftacr-afb8abgzafb6fxf5.azurecr.io"
+STAGING_BACKEND="https://p-qzcrft-backend-staging-a0byd6avbhatbgeq.westeurope-01.azurewebsites.net"
 
-az webapp deployment source config-zip \
+# Build with staging backend URL baked in via --build-arg
+docker build --platform linux/amd64 \
+  --build-arg VITE_API_URL="$STAGING_BACKEND" \
+  -t ${ACR_LOGIN}/quizcrafter-frontend:staging \
+  ./frontend
+
+docker push ${ACR_LOGIN}/quizcrafter-frontend:staging
+
+az webapp config set \
   --name p-qzcrft-frontend \
   --resource-group p-qzcrft \
   --slot staging \
-  --src frontend-staging.zip
+  --linux-fx-version "DOCKER|${ACR_LOGIN}/quizcrafter-frontend:staging"
+
+az webapp restart --name p-qzcrft-frontend --resource-group p-qzcrft --slot staging
 ```
 
 Verify:
@@ -542,7 +639,8 @@ This table shows every backend app setting and its swap behavior. Use this as a 
 | `POSTGRES_USER` | `sqladmin` | ❌ | Same user |
 | `POSTGRES_SSLMODE` | `require` | ❌ | Same |
 | `PROJECT_NAME` | `QuizCrafter` | ❌ | Same |
-| `WEB_CONCURRENCY` | `4` | ❌ | Same |
+| `WEB_CONCURRENCY` | `2` | ❌ | Same |
+| `MALLOC_ARENA_MAX` | `2` | ❌ | Same — reduces glibc memory fragmentation |
 | `WEBSITES_CONTAINER_STOP_TIME_LIMIT` | `300` | ❌ | Same |
 | `WEBSITE_VNET_ROUTE_ALL` | `1` | ❌ | Same — both slots need VNet routing |
 | `CANVAS_BASE_URL` | KV → `CANVAS-BASE-URL` | ❌ | Same Canvas instance |
@@ -657,27 +755,35 @@ After a successful swap the **old production image** is now running in the stagi
 
 ## Regular Frontend Deployment Workflow
 
-The frontend has `VITE_API_URL` baked into the static bundle at build time. Because of this, the workflow has two build steps: one for testing on staging, one for production-ready output before swapping.
+The frontend has `VITE_API_URL` baked into the Docker image at build time. Because of this, the workflow uses two image builds: one with the staging backend URL for testing, one with the production backend URL before swapping.
 
-### Step 1: Build with staging backend URL and deploy to staging
+> **Key note on `--build-arg`:** The Dockerfile declares `ARG VITE_API_URL` with **no default value**. When no `--build-arg` is passed, the ARG is unset and Vite reads `frontend/.env.production` (`https://quizcrafter-api.uit.no`). When `--build-arg VITE_API_URL=<value>` is passed, that value overrides `.env.production`. Never pass `--build-arg VITE_API_URL=` (empty string) — Vite treats process env vars as higher priority than `.env` files and would bake the empty string into the bundle.
+
+### Step 1: Build staging image and deploy to staging slot
 
 ```bash
-cd frontend
+# From the project root
+az acr login --name pqzcrftacr
 
+ACR_LOGIN="pqzcrftacr-afb8abgzafb6fxf5.azurecr.io"
 STAGING_BACKEND="https://p-qzcrft-backend-staging-a0byd6avbhatbgeq.westeurope-01.azurewebsites.net"
 
-npm ci
-VITE_API_URL="$STAGING_BACKEND" npm run build
+# Build with staging backend URL baked in
+docker build --platform linux/amd64 \
+  --build-arg VITE_API_URL="$STAGING_BACKEND" \
+  -t ${ACR_LOGIN}/quizcrafter-frontend:staging \
+  ./frontend
 
-cd dist && zip -r ../frontend-staging.zip . && cd ..
+docker push ${ACR_LOGIN}/quizcrafter-frontend:staging
 
-az webapp deployment source config-zip \
+# Tell staging slot to pull the new image
+az webapp config set \
   --name p-qzcrft-frontend \
   --resource-group p-qzcrft \
   --slot staging \
-  --src frontend-staging.zip
+  --linux-fx-version "DOCKER|${ACR_LOGIN}/quizcrafter-frontend:staging"
 
-cd ..
+az webapp restart --name p-qzcrft-frontend --resource-group p-qzcrft --slot staging
 ```
 
 ### Step 2: Test the staging frontend
@@ -690,27 +796,30 @@ https://p-qzcrft-frontend-staging-daatccdfh4f8djcr.westeurope-01.azurewebsites.n
 
 Confirm it talks to the staging backend (API calls go to the staging backend URL).
 
-### Step 3: Rebuild with production backend URL
+### Step 3: Build production image (before swap)
 
-Once testing is complete, rebuild with the **production backend URL** before swapping. This is the build that will go live.
+Once testing is complete, build the image **without** `--build-arg` — Vite will read `frontend/.env.production` and bake in `https://quizcrafter-api.uit.no`. This is the image that will go live.
 
 ```bash
-cd frontend
+COMMIT_SHA=$(git rev-parse --short HEAD)
+ACR_LOGIN="pqzcrftacr-afb8abgzafb6fxf5.azurecr.io"
 
-PROD_BACKEND="https://p-qzcrft-backend-eab9c7dga9d4cxgv.westeurope-01.azurewebsites.net"
+# No --build-arg: Vite reads frontend/.env.production → https://quizcrafter-api.uit.no
+docker build --platform linux/amd64 \
+  -t ${ACR_LOGIN}/quizcrafter-frontend:latest \
+  -t ${ACR_LOGIN}/quizcrafter-frontend:${COMMIT_SHA} \
+  ./frontend
 
-VITE_API_URL="$PROD_BACKEND" npm run build
+docker push ${ACR_LOGIN}/quizcrafter-frontend --all-tags
 
-cd dist && zip -r ../frontend-prod.zip . && cd ..
-
-# Redeploy to staging slot (overwrites the staging-URL build)
-az webapp deployment source config-zip \
+# Redeploy staging slot with the production image (overwrites the staging-URL build)
+az webapp config set \
   --name p-qzcrft-frontend \
   --resource-group p-qzcrft \
   --slot staging \
-  --src frontend-prod.zip
+  --linux-fx-version "DOCKER|${ACR_LOGIN}/quizcrafter-frontend:latest"
 
-cd ..
+az webapp restart --name p-qzcrft-frontend --resource-group p-qzcrft --slot staging
 ```
 
 ### Step 4: Swap frontend to production
@@ -930,17 +1039,28 @@ az webapp config set \
   --linux-fx-version "DOCKER|pqzcrftacr-afb8abgzafb6fxf5.azurecr.io/quizcrafter-backend:latest" && \
 az webapp restart --name p-qzcrft-backend --resource-group p-qzcrft --slot staging
 
-# Build frontend for staging testing
-cd frontend && VITE_API_URL="https://p-qzcrft-backend-staging-a0byd6avbhatbgeq.westeurope-01.azurewebsites.net" npm run build && \
-cd dist && zip -r ../frontend-staging.zip . && cd .. && \
-az webapp deployment source config-zip \
-  --name p-qzcrft-frontend --resource-group p-qzcrft --slot staging --src frontend-staging.zip && cd ..
+# Build frontend for staging testing (VITE_API_URL points to staging backend)
+ACR_LOGIN="pqzcrftacr-afb8abgzafb6fxf5.azurecr.io" && \
+docker build --platform linux/amd64 \
+  --build-arg VITE_API_URL="https://p-qzcrft-backend-staging-a0byd6avbhatbgeq.westeurope-01.azurewebsites.net" \
+  -t ${ACR_LOGIN}/quizcrafter-frontend:staging ./frontend && \
+docker push ${ACR_LOGIN}/quizcrafter-frontend:staging && \
+az webapp config set \
+  --name p-qzcrft-frontend --resource-group p-qzcrft --slot staging \
+  --linux-fx-version "DOCKER|${ACR_LOGIN}/quizcrafter-frontend:staging" && \
+az webapp restart --name p-qzcrft-frontend --resource-group p-qzcrft --slot staging
 
-# Build frontend for production (before swap)
-cd frontend && VITE_API_URL="https://p-qzcrft-backend-eab9c7dga9d4cxgv.westeurope-01.azurewebsites.net" npm run build && \
-cd dist && zip -r ../frontend-prod.zip . && cd .. && \
-az webapp deployment source config-zip \
-  --name p-qzcrft-frontend --resource-group p-qzcrft --slot staging --src frontend-prod.zip && cd ..
+# Build frontend for production (before swap — no --build-arg, uses frontend/.env.production)
+ACR_LOGIN="pqzcrftacr-afb8abgzafb6fxf5.azurecr.io" && \
+COMMIT_SHA=$(git rev-parse --short HEAD) && \
+docker build --platform linux/amd64 \
+  -t ${ACR_LOGIN}/quizcrafter-frontend:latest \
+  -t ${ACR_LOGIN}/quizcrafter-frontend:${COMMIT_SHA} ./frontend && \
+docker push ${ACR_LOGIN}/quizcrafter-frontend --all-tags && \
+az webapp config set \
+  --name p-qzcrft-frontend --resource-group p-qzcrft --slot staging \
+  --linux-fx-version "DOCKER|${ACR_LOGIN}/quizcrafter-frontend:latest" && \
+az webapp restart --name p-qzcrft-frontend --resource-group p-qzcrft --slot staging
 
 # --- SWAP ---
 
@@ -990,3 +1110,4 @@ az webapp config show \
 | Date | Author | Changes |
 |------|--------|---------|
 | 2026-02-24 | Claude Code | Initial guide creation |
+| 2026-02-26 | Claude Code | Updated Phase 5.3 (WEB_CONCURRENCY=2, MALLOC_ARENA_MAX=2); rewrote Phase 6 for container-based frontend (managed identity + nginx via ACR, removed PM2/zip); updated Phase 8 first-deploy, Slot Settings table, frontend deployment workflow, and Quick Reference to match Step 10 and Step 12 of audit trail |
