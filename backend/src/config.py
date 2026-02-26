@@ -274,7 +274,7 @@ def _get_log_level() -> int:
     log_levels = {
         "local": logging.DEBUG,
         "staging": logging.INFO,
-        "production": logging.WARNING,
+        "production": logging.INFO,
     }
     return log_levels.get(settings.ENVIRONMENT, logging.INFO)
 

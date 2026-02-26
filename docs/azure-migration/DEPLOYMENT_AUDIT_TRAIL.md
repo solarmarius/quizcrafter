@@ -630,3 +630,141 @@ az webapp restart --name p-qzcrft-frontend --resource-group p-qzcrft
 | `WEBSITE_NODE_DEFAULT_VERSION`        | `~20`                                            | removed                                   |
 | `SCM_DO_BUILD_DURING_DEPLOYMENT`      | `false`                                          | removed                                   |
 | Web server                            | PM2 (Node.js)                                    | nginx 1.29.5                              |
+
+---
+
+## Step 13: Logging Audit & Improvements
+
+**Date:** 2026-02-26
+**Deployer:** Marius Solaas
+
+Audited the Log Analytics workspace (`p-qzcrft-ws`) and diagnostic settings for both App Services. Logs were flowing but three issues were found and fixed.
+
+### Audit Results
+
+| Component | Finding |
+| --- | --- |
+| `p-qzcrft-ws` workspace | Healthy — West Europe, 30-day retention, Pay-per-GB |
+| Backend diagnostic settings | All 4 categories enabled (`AppServiceHTTPLogs`, `AppServiceConsoleLogs`, `AppServiceAppLogs`, `AppServicePlatformLogs`) |
+| Frontend diagnostic settings | Missing `AppServicePlatformLogs` — fixed in this step |
+| Backend HTTP logs | Active — 418 entries/hour confirmed via KQL |
+| Frontend HTTP logs | Active — 380 entries/hour confirmed via KQL |
+| Backend console logs | Only 158 entries/24h — root cause: production log level was `WARNING`, silencing all `INFO`-level structlog output from `LoggingMiddleware` |
+| Frontend console logs | 12,345 entries/24h — all nginx access log noise, redundant with `AppServiceHTTPLogs` |
+| Application Insights | Not provisioned — noted as future improvement |
+
+### Issues Found & Fixed
+
+| # | Issue | Fix | File |
+| --- | --- | --- | --- |
+| 1 | Production log level `WARNING` silenced all `LoggingMiddleware` output (request IDs, durations, user context logged at `INFO`) | Changed `"production": logging.WARNING` → `"production": logging.INFO` | `backend/src/config.py` |
+| 2 | nginx access log writing 12k+ plain-text entries/day to `AppServiceConsoleLogs` — redundant with platform `AppServiceHTTPLogs` | Added `access_log off; error_log /dev/stderr warn;` | `frontend/nginx.conf` |
+| 3 | `AppServicePlatformLogs` disabled on frontend (container restart/crash events not captured) | Updated diagnostic settings via Azure CLI | Azure (no code change) |
+
+### Fix 1 — Backend Log Level (`backend/src/config.py`)
+
+```python
+# Before
+"production": logging.WARNING,
+
+# After
+"production": logging.INFO,
+```
+
+### Fix 2 — nginx Access Log (`frontend/nginx.conf`)
+
+```nginx
+# Added to server block:
+access_log off;
+error_log /dev/stderr warn;
+```
+
+### Fix 3 — Frontend Diagnostic Settings (Azure CLI)
+
+```bash
+az monitor diagnostic-settings update \
+  --name p-qzcrft-frontend-diagnostics \
+  --resource /subscriptions/f2d616a4-6e35-4999-aa17-22fa2c83dca5/resourceGroups/p-qzcrft/providers/Microsoft.Web/sites/p-qzcrft-frontend \
+  --logs '[
+    {"category":"AppServiceHTTPLogs","enabled":true},
+    {"category":"AppServiceConsoleLogs","enabled":true},
+    {"category":"AppServicePlatformLogs","enabled":true}
+  ]' \
+  --metrics '[{"category":"AllMetrics","enabled":true}]'
+```
+
+**Result:** Applied immediately — no image rebuild required.
+
+### Docker Image Rebuild Required
+
+Fixes 1 and 2 require rebuilt images (pending deployment):
+
+```bash
+az acr login --name pqzcrftacr
+COMMIT_SHA=$(git rev-parse --short HEAD)
+ACR_LOGIN="pqzcrftacr-afb8abgzafb6fxf5.azurecr.io"
+
+docker build --platform linux/amd64 \
+  -t ${ACR_LOGIN}/quizcrafter-backend:latest \
+  -t ${ACR_LOGIN}/quizcrafter-backend:${COMMIT_SHA} \
+  ./backend
+docker push ${ACR_LOGIN}/quizcrafter-backend --all-tags
+az webapp restart --name p-qzcrft-backend --resource-group p-qzcrft
+
+docker build --platform linux/amd64 \
+  -t ${ACR_LOGIN}/quizcrafter-frontend:latest \
+  -t ${ACR_LOGIN}/quizcrafter-frontend:${COMMIT_SHA} \
+  ./frontend
+docker push ${ACR_LOGIN}/quizcrafter-frontend --all-tags
+az webapp restart --name p-qzcrft-frontend --resource-group p-qzcrft
+```
+
+### Verification (after image rebuild)
+
+```kql
+// Confirm structured JSON logs now flowing from backend
+AppServiceConsoleLogs
+| where TimeGenerated > ago(10m)
+| where _ResourceId contains "backend"
+| where ResultDescription startswith "{"
+| extend p = parse_json(ResultDescription)
+| project TimeGenerated, level=p.level, event=p.event, request_id=p.request_id, duration_ms=p.duration_ms
+```
+
+### Log Analytics GUI — How to Query
+
+**Azure Portal** → **Log Analytics workspaces** → `p-qzcrft-ws` → **Logs**
+
+Useful queries:
+
+```kql
+// HTTP traffic summary (last 1h)
+AppServiceHTTPLogs
+| where TimeGenerated > ago(1h)
+| summarize count() by _ResourceId, CsMethod, ScStatus
+| order by count_ desc
+
+// Parse backend structured logs (request tracing)
+AppServiceConsoleLogs
+| where _ResourceId contains "backend"
+| where ResultDescription startswith "{"
+| extend p = parse_json(ResultDescription)
+| project TimeGenerated, level=p.level, event=p.event,
+    request_id=p.request_id, method=p.method, path=p.path,
+    status=p.status_code, duration_ms=p.duration_ms, user_id=p.user_id
+
+// Container restart/crash events
+AppServicePlatformLogs
+| where TimeGenerated > ago(24h)
+| project TimeGenerated, _ResourceId, Level, ResultDescription
+| order by TimeGenerated desc
+
+// Error rate by hour
+AppServiceHTTPLogs
+| where TimeGenerated > ago(24h)
+| summarize errors=countif(ScStatus >= 500), total=count()
+    by bin(TimeGenerated, 1h), _ResourceId
+| order by TimeGenerated desc
+```
+
+**Note:** `az webapp log tail` returns 403 from local machine (SCM endpoint is IP-restricted). Use **Azure Portal** → **App Services** → `p-qzcrft-backend` → **Monitoring** → **Log stream** for real-time logs.
